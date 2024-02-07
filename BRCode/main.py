@@ -26,9 +26,9 @@ while True:
 
     elif startupInput == "credits":
         print("\nCredits :\n"
-              "- Destiny @destiny_29 : Programming, Creator\n"
-              "- Perru @perru_ : Programming\n"
-              "- Fluppi393 @fluppi393 : Game developer, shared game's code.\n")
+              "- Destiny (discord: @destiny_29, github: FateUnix29) : Programming, Creator\n"
+              "- Perru (discord: @perru_, github: MrPerruche) : Programming\n"
+              "- Fluppi393 (discord: @fluppi393) : Game developer, shared game's code.\n")
 
     elif startupInput == "start":
         break
