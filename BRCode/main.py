@@ -1,7 +1,7 @@
 # Imports
 import os
 from sys import exit
-import re
+import re # Regex! ooo, spooky!
 
 # Setup Stuff
 brvgen_version = f"A3"
@@ -82,11 +82,11 @@ if not os.path.exists(os.path.join(projectFolderPath, project)):
                     # Write the data to the file
                     file.write(BRCodeWrite)
 
-                input("\nThe file was successfully create. Please write your code in BRCode.txt and rerun the program to generate Vehicle.brv. Press enter tp end")
+                input("\nThe file was successfully created. Please write your code in BRCode.txt and rerun the program to generate the Vehicle.brv. Press enter to exit this program.")
                 exit()
 
             except Exception as e:
-                print(f"An error occurred: {e}")
+                print(f"A general error occurred: '{e}'")
 
 projectInPath = os.path.join(projectFolderPath, project)
 
