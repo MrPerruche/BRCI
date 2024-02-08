@@ -14,8 +14,8 @@ def w8uint(num):
     return chr(num)
 
 def w16uint(num): # this may not work i asked ai to write it havent got the time to test it yet!
-    assert  0 <= value <=  0xFFFF, "Value must be a  16-bit unsigned integer."
-    byte_array = value.to_bytes(2, 'big')
+    assert  0 <= num <=  0xFFFF, "Value must be a  16-bit unsigned integer."
+    byte_array = num.to_bytes(2, 'little')
     ascii_string = byte_array.decode('utf-8', errors='ignore')
 
     return ascii_string
