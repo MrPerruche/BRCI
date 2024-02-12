@@ -6,8 +6,8 @@ import numpy as np
 
 
 # Setup Stuff
-brvgen_version = f"A7"
-alg_version = f"A0 (TODO)"
+brvgen_version = f"A8"
+alg_version = f"SoonTM"
 new_file = False
 brick_count = 123
 monetary_value = 456
@@ -21,7 +21,8 @@ size_z = 0.161718
 
 # -Changing int size
 def setuintsize(integer, byte_len):
-    return (integer & (1 << (8 * byte_len) - 1)).to_bytes(byte_len, byteorder='little')
+    mask = (1 << (8 * byte_len)) - 1
+    return (integer & mask).to_bytes(byte_len, byteorder='little', signed=False)
 
 
 # -Changing int size, outputs negative signed int
@@ -35,16 +36,17 @@ def setnintsize(integer, byte_len):
 
 # -Changing float size
 def setfloatsize(float_number, byte_len):
+
     # Convert the float to the appropriate precision
     if byte_len == 2:
         # Half-precision float (not natively supported, using numpy)
         float_bytes = np.float16(float_number).tobytes()
     elif byte_len == 4:
         # Single-precision float
-        float_bytes = struct.pack('!f', float_number)
+        float_bytes = struct.pack('<f', float_number)
     elif byte_len == 8:
         # Double-precision float
-        float_bytes = struct.pack('!d', float_number)
+        float_bytes = struct.pack('<d', float_number)
     else:
         raise ValueError("Invalid byte length for float")
 
@@ -152,6 +154,8 @@ while True:
 
             except Exception as e:
                 print(f"An error occurred: {e}")
+    else:
+        break
 
 project_in_path = os.path.join(project_folder_path, project)
 
@@ -211,8 +215,11 @@ with open(os.path.join(project_in_path, "BRCode.txt"), 'r') as file:
 # Parse the setup block and update the variables
 parse_setup_block(BRCode)
 
+if file_description == "":
+    file_description = "No file description."
 
-def createmetadata(is_new_file):
+
+def createmetadata():
 
     # TODO: Finish this
 
@@ -223,14 +230,15 @@ def createmetadata(is_new_file):
 
         # Write all necessary information for the file name
         metadatafile.write(setnintsize(len(file_name), 2))
-        metadatafile.write(bstr(file_name))
+        metadatafile.write(bstr(file_name)[2:])
 
         # Write all necessary information for the file description
         watermarked_file_description = f"Created using BR-Logic-API by @destiny_29 and @perru_.\n" \
-                                       f"Vehicle Generator Version {brvgen_version},\nOptimization Algorithm Version {alg_version}\n\n" \
+                                       f"Vehicle Generator Version {brvgen_version},\nOptimization Algorithm Version {alg_version}.\n\n" \
                                        f"Description:\n{file_description}\n\nCode:\n{BRCode}"
+        watermarked_file_description = ((watermarked_file_description.encode('utf-16')).replace(b'\x0A\x00', b'\x0D\x00\x0A\x00')).decode('utf-16')
         metadatafile.write(setnintsize(len(watermarked_file_description), 2))
-        metadatafile.write(bstr(watermarked_file_description))
+        metadatafile.write(bstr(watermarked_file_description)[2:])
 
         # Write all necessary information for the 4 additional values : Bricks, Size, Weight and Monetary Value
         metadatafile.write(setuintsize(brick_count, 2))
@@ -241,8 +249,16 @@ def createmetadata(is_new_file):
         metadatafile.write(setfloatsize(monetary_value, 4))
 
         # Writes the author. We don't want it to be listed so we write invalid data.
-        metadatafile.write(sbstr("NoAuthor"))
-        metadatafile.write()
+        metadatafile.write(bytes.fromhex("FFFFFFFFFFFFFFFF"))
+
+        # I have no fucking clue of what I'm writing but hey its something right?
+        metadatafile.write(bytes.fromhex("14686300000000B034B6C7382ADC08E079251F392ADC08"))
+
+        # Writing tags
+        metadatafile.write(setuintsize(3, 1))
+        for i in range(3):
+            metadatafile.write(setuintsize(5, 1))
+            metadatafile.write(sbstr("Other"))
 
 
-createmetadata(new_file)
+createmetadata()
