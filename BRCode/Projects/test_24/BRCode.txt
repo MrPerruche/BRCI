@@ -1,0 +1,7 @@
+setup {
+    file_name = "test_24"
+    file_description = ""
+    code_version = "A9"
+    center_position = [0, 0, 0]
+    center_rotation = [0, 0, 0]
+}
