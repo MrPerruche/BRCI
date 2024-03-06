@@ -1,7 +1,0 @@
-setup {
-    file_name = "test_29"
-    file_description = ""
-    algorithm_version = "A1"
-    center_position = [0, 0, 0]
-    center_rotation = [0, 0, 0]
-}
