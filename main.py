@@ -85,6 +85,7 @@ class BRAPI:
 
     # Removing bricks from the brick list
     def remove_brick(self, brick_name):
+
         self.bricks = [sublist for sublist in self.bricks if sublist[0] != str(brick_name)]
 
 
@@ -96,17 +97,30 @@ class BRAPI:
 
     # Used to create directory for file generators
     def ensure_project_directory_exists(self):
+
+        # Verify for invalid inputs
+        if not os.path.exists(self.project_folder_directory):
+
+            raise FileNotFoundError(f'Unable to find the project\'s folder ({self.project_folder_directory})')
+
         os.makedirs(os.path.dirname(os.path.join(self.in_project_folder_directory, self.project_name)), exist_ok=True)
 
 
     # Writing preview.png
     def write_preview(self):
 
+        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_compressed_reg.png')
+
         # Create folder if missing
         self.ensure_project_directory_exists()
 
+        # Verify the image exists.
+        if not os.path.exists(_write_preview_regular_image_path):
+
+            raise FileNotFoundError('Unable to create preview, original image not found.')
+
         # Copy saved image to the project folders.
-        copy_file(os.path.join(_cwd, "Resources", "icon_compressed_reg.png"),
+        copy_file(os.path.join(_write_preview_regular_image_path),
                   os.path.join(self.in_project_folder_directory, "Preview.png"))
 
 
@@ -116,8 +130,14 @@ class BRAPI:
         # Create folder if missing
         self.ensure_project_directory_exists()
 
+        # Verify self.write_blank is valid.
+        if not isinstance(self.write_blank, bool):
+
+            raise TypeError('Invalid write_blank type. Expected bool.')
+
         # Write blank file for metadata (if desired)
         if self.write_blank:
+
             blank_metadata = open(os.path.join(self.in_project_folder_directory, "MetaData.brm"), "x")
             blank_metadata.close()
 
@@ -171,6 +191,11 @@ class BRAPI:
         # Create folder if missing
         self.ensure_project_directory_exists()
 
+        # Verify self.write_blank is valid.
+        if not isinstance(self.write_blank, bool):
+
+            raise TypeError('Invalid write_blank type. Expected bool.')
+
         # Write blank file for vehicle (if desired)
         if self.write_blank:
             blank_brv = open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), "x")
@@ -187,17 +212,10 @@ class BRAPI:
         print(self.bricks)
 
 
-@dataclass
-class BrickInput:
-
-    brick_input_type: str
-    brick_input: any
-
-
 """
 # Try it out
 data = BRAPI()
-data.project_name = 'test_project'
+data.project_name = 'test project'
 data.project_display_name = 'My Project'
 data.project_folder_directory = os.path.join(_cwd, 'Projects')
 

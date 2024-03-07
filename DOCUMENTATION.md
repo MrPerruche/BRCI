@@ -134,6 +134,29 @@ data.write_brv()
 Bricks and properties use the name given to them by the BRV file,
 not the display name.
 
+### Creating a brick
+
+To create a brick, you may use the function `create_brick(brick)`.
+
+`brick` (`str`): Indicate which brick you are creating.
+
+```
+# Exemple :
+
+my_brick = create_brick('Switch_1sx1sx1s')  # 'Switch_1sx1sx1s' corresponds to a small switch.
+```
+
+### Editing a brick
+
+Brick info is stored as a dictionary. You can edit the dictionary directly.
+
+```
+# Exemple :
+
+my_brick = create_brick('Switch_1sx1sx1s')
+my_brick['OutputChannel.MinIn'] = 0
+```
+
 ### Main settings
 
 This sections contains settings common to all bricks.
@@ -143,7 +166,7 @@ It is set to the first argument, it is set by the function create_brick()
 Avoid changing `gbn`. 'gbn' stands for 'Game Brick Name'.
 
 `BrickColor` (list `[int, int, int, int]`): You can use this to change the bricks' color.
-Elements in the list correspond to (in order) `[HSV, VALUE, SATURATION, ALPHA]`.
+Elements in the list correspond to (in order) `[HUE, VALUE, SATURATION, ALPHA]`.
 Integers must range between 0 and 255.
 
 `BrickPattern` (`str`): You can use this to change the bricks' pattern.
@@ -158,6 +181,37 @@ Integers must range between 0 and 255.
 
 ### Common settings
 
-This section contains all frequently occuring settings for bricks.
+This section contains all frequently occurring settings for bricks.
 
-`` TODO
+`bGenerateLift` (`bool`): Toggle fluid dynamics.
+
+TODO
+
+
+### Modded bricks
+
+Some bricks (modded or recently added bricks) may not be available in the brick list
+(accessible in the br_brick_list variable).
+
+If you're already using the latest version of BR-API,
+you may use `append_multiple(var, keys, value, gbn)` function to add them to your list of bricks:
+
+`var` : Set it to `br_brick_list`.
+
+`keys` : Set it to the list of bricks you want to be created with these potential properties.
+
+`value` : Set it to `br_brick_list['default_brick_data'] | {...}`,
+replace `{...}` with the potential properties list.
+
+`gbn` : Set it to `True`.
+
+
+```
+# Exemple : Adding a new brick to the brick list
+# Warning : This part is still under active development and is guarenteed to change as it contains several flaws.
+
+append_multiple(br_brick_list, ['ModdedBrick1', 'ModdedBrick2'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': True,
+                    'ConnectorSpacing': signed_sub_byte_int([3, 3, 2, 3, 0, 0], 6, 2)}, True)  # Subject to changes.
+```
