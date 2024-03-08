@@ -1,10 +1,10 @@
-# BR-API (Update C4)
+# BR-API (Update C6)
 
 BR-API is an API for video game Brick Rigs.
 It allows users to create and manipulate Brick Rigs' game files that handle creations (A.K.A. vehicles).
 
 BR-API is closely tied to BrickLang, a programming language for Brick Rigs based using BR-API.
-Therefore, we will also include basic informations on this project.
+Therefore, we will also include basic information on this project.
 To learn more, read [link, here];
 
 ## Credits
@@ -17,7 +17,7 @@ To learn more, read [link, here];
 - Vehicle.brv file generation & edition :
   - Perru (@perru_) : Development & Research
   - Erzbangel Raziel (@erzbangel_raziel) : Research & Help
-  - Fluppi393 (@fluppi393) : Sharing Brick Rigs's code (BR Dev)
+  - Fluppi393 (@fluppi393) : Sharing Brick Rigs' code (BR Dev)
 
 - Project Lead : Destiny (@destiny_29)
 
@@ -27,7 +27,7 @@ To learn more, read [link, here];
   - Conspicuous (@conspicuous.develops) : Development
 
 - BrickLang IDE :
-  - Conspicuous (@conspicous.develops) : Development
+  - Conspicuous (@conspicuous.develops) : Development
 
  - Whole team : Suggestions
 

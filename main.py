@@ -205,25 +205,73 @@ class BRAPI:
         else:
             with open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file:
 
+                # Writes Carriage Return char
                 brv_file.write(unsigned_int(13, 1))
+                # Write brick count
                 brv_file.write(unsigned_int(self.brick_count, 2))
 
+                # Get the different bricks present in the project
+                brick_types = list(set(item[1]['gbn'] for item in self.bricks))
 
-        print(self.bricks)
+                print('Verify input', self.bricks)
+
+                print('br_brick_list:', br_brick_list)
 
 
-"""
+                """
+                Destiny here's your home work:
+                
+                Structure:
+
+                self.bricks is a list with sublists. Each sublist has two items: the brick's name (not important) and a
+                dictionary with all the brick's data, including position, rotation, and 'gbn' (which is the brick type
+                for the BRV).
+                br_brick_list is a dictionary where each key is a brick type, and the value is a dictionary with default
+                data for that brick type.
+
+                Goal:
+
+                Remove any data from each brick that matches the default values listed in br_brick_list.
+                """
+
+                print('verify output', self.bricks)
+
+                # Write each brick type
+                for brick_type in brick_types:
+                    brv_file.write(unsigned_int(len(brick_type), 1))
+                    brv_file.write(small_bin_str(brick_type))
+
+                brv_file.write(unsigned_int(len(brick_types), 2))
+
+
+
 # Try it out
 data = BRAPI()
-data.project_name = 'test project'
+data.project_name = 'test project b'
 data.project_display_name = 'My Project'
 data.project_folder_directory = os.path.join(_cwd, 'Projects')
+data.file_description = 'My first project.'
 
 print(data.project_folder_directory)
 
+first_brick = create_brick('Switch_1sx1sx1s')
+second_brick = create_brick('DisplayBrick')
+third_brick = create_brick('Switch_1sx1sx1s')
+
+first_brick['bReturnToZero'] = False
+first_brick['OutputChannel.MinIn'] = 12
+third_brick['OutputChannel.MaxOut'] = -12
+
+data.add_brick('first_brick', first_brick)
+data.add_brick('second_brick', second_brick)
+data.add_brick('third_brick', third_brick)
+
+print(first_brick['gbn'])
+
 data.write_preview()
 data.write_metadata()
-"""
+data.write_brv()
+
 
 """
 # Doesnt matter.
