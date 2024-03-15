@@ -1,7 +1,6 @@
-from dataclasses import dataclass
-from BRAPIF import append_multiple
+from BRAPIF import append_multiple, BrickInput
 
-bd_materials = {
+br_brick_materials = {
     'aluminium':        {'price': 2.00, 'density': 2.70, 'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
     'brushed aluminum': {'price': 2.00, 'density': 2.70, 'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
     'carbon':           {'price': 6.00, 'density': 1.55, 'strength': 10.0, 'friction': 0.70, 'restitution': 0.10},
@@ -24,20 +23,10 @@ bd_materials = {
 }
 
 
-@dataclass
-class BrickInput:
-
-    brick_input_type: str
-    brick_input: any
-
-    def return_br(self):
-        return b'01000700000006437573746F6D12496E7075744368616E6E656C2E56616C756501000400000000000040'  # TODO
-
-
 # Bricks
 
 br_brick_list = {
-    '_default_brick' : {
+    'default_brick_data' : {
         'BrickColor': [0, 0, 127, 255],
         'BrickPattern': 'Default',
         'BrickMaterial': 'Plastic',
@@ -46,22 +35,22 @@ br_brick_list = {
     }
 }
 
-append_multiple(br_brick_list,['Switch_1sx1sx1s','Switch_1x1x1s'],
-                br_brick_list['_default_brick'] | {
-                    'OutputChannel.MinIn': -1,
-                    'OutputChannel.MaxIn': 1,
-                    'OutputChannel.MinOut': -1,
-                    'OutputChannel.MaxOut': 1,
+append_multiple(br_brick_list,['Switch_1sx1sx1s', 'Switch_1x1x1s'],
+                br_brick_list['default_brick_data'] | {
+                    'OutputChannel.MinIn': -1.0,
+                    'OutputChannel.MaxIn': 1.0,
+                    'OutputChannel.MinOut': -1.0,
+                    'OutputChannel.MaxOut': 1.0,
                     'InputChannel.InputAxis': BrickInput('None', None),
                     'bReturnToZero': True,
                     'SwitchName': ''}, True)
 
 append_multiple(br_brick_list, ['DisplayBrick'],
-                br_brick_list['_default_brick'] | {
+                br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False,
                     'BrickSize': [6, 3, 1],
                     'ConnectorSpacing': [3, 3, 3, 3, 3, 3],
                     'InputChannel.InputAxis': BrickInput('Custom', None),
                     'NumFractionalDigits': 1,
-                    'DisplayColor': [255, 255, 255, 255]
+                    'DisplayColor': [0, 80, 50]
                 }, True)

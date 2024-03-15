@@ -1,6 +1,14 @@
 import struct
+from dataclasses import dataclass
 
 def unsigned_int(integer, byte_len):
+
+    if integer >= 2**(byte_len*8) :
+        raise OverflowError(f'Input is greater than {byte_len*8} bit limit of unsigned integer.')
+
+    if integer < 0 :
+        raise OverflowError(f'Negative input. {integer} is less than 0.')
+
     return (integer & ((1 << (8 * byte_len)) - 1)).to_bytes(byte_len, byteorder='little', signed=False)
 
 
@@ -86,11 +94,23 @@ def copy_file(source_path, destination_path):
         destination_file.write(cp_data)
 
 
-
-def append_multiple(var, keys, value, gbn = True):
+def append_multiple(var, keys, value, gbn = False):
     for key in keys:
 
-        var[key] = value
+        var[key] = value.copy()
 
         if gbn:
             var[key]['gbn'] = key
+
+
+
+
+
+@dataclass
+class BrickInput:
+
+    brick_input_type: str
+    brick_input: any
+
+    def return_br(self):
+        return b'01000700000006437573746F6D12496E7075744368616E6E656C2E56616C756501000400000000000040'  # TODO

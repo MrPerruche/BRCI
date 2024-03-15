@@ -7,7 +7,7 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version = "C2"
+version : str = "C7"
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))
@@ -23,7 +23,7 @@ _cwd = os.path.dirname(os.path.realpath(__file__))
 
 # Return all data about specified brick
 def create_brick(brick: str):
-    return br_brick_list[brick]
+    return br_brick_list[brick].copy()
 
 
 # What am I supposed to comment here?
@@ -79,20 +79,26 @@ class BRAPI:
         return 0.2
 
     # Adding bricks to the brick list
-    def add_brick(self, brick_name, new_brick):
+    def add_brick(self, brick_name: str, new_brick: dict):
         self.bricks.append([str(brick_name), new_brick])
+
+        return self
 
 
     # Removing bricks from the brick list
-    def remove_brick(self, brick_name):
+    def remove_brick(self, brick_name: str):
 
         self.bricks = [sublist for sublist in self.bricks if sublist[0] != str(brick_name)]
 
+        return self
+
 
     # Updating a currently existing brick
-    def update_brick(self, brick_name, new_brick):
+    def update_brick(self, brick_name: str, new_brick: dict):
         self.remove_brick(brick_name)
         self.add_brick(brick_name, new_brick)
+
+        return self
 
 
     # Used to create directory for file generators
@@ -203,38 +209,92 @@ class BRAPI:
 
         # Otherwise write working vehicle file
         else:
+
+            # Verify if there are too many bricks
+            if len(self.bricks) > 65535:
+
+                raise OverflowError('Brick Rigs cannot support more than 65535 bricks. (16 bit int maximum)')
+
             with open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file:
+
+
+                bricks_writing = self.bricks.copy()
 
                 # Writes Carriage Return char
                 brv_file.write(unsigned_int(13, 1))
                 # Write brick count
-                brv_file.write(unsigned_int(self.brick_count, 2))
+                brv_file.write(unsigned_int(len(bricks_writing), 2))
 
                 # Get the different bricks present in the project
-                brick_types = list(set(item[1]['gbn'] for item in self.bricks))
+                brick_types = list(set(item[1]['gbn'] for item in bricks_writing))
 
-                print('Verify input', self.bricks)
+                # Write the number of different brick types
+                brv_file.write(unsigned_int(len(brick_types), 2))
 
-                print('br_brick_list:', br_brick_list)
+
+                # [ Getting rid of all properties that are set to the default value for each brick ]
+                # Brick list filtering variables
+                identical_excluded_brick_list : list = []
+                strict_identical_excluded_brick_list : list = []
+                safe_property_list : list = ['gbn', 'Position', 'Rotation']
+
+                # Writing properties variables
+                property_count : int = 0
+
+                # Defining bricks
+                w_current_brick_id : int = 1
+                string_name_to_id_table = {}
+                w_current_property_id : int = 1
+                property_id_to_property_table = {}
+
+                for current_brick in bricks_writing:
+
+                    # --------------------------------------------------
+                    # Getting rid of already existing elements, setting brick IDs
+                    # --------------------------------------------------
+
+                    # Add all bricks without including data
+                    identical_excluded_brick_list += [[w_current_brick_id, [{}]]]
+                    strict_identical_excluded_brick_list += [[w_current_brick_id, []]]
+                    string_name_to_id_table = string_name_to_id_table | {current_brick[0]: w_current_brick_id}
+                    w_current_brick_id += 1
+
+                    # For each data for each brick
+                    for p_del_current_key, p_del_current_value in current_brick[1].items():
+
+                        # Accept if it's in the safe list (list which gets whitelisted even if default value is identical)
+                        if p_del_current_key in safe_property_list:
+
+                            identical_excluded_brick_list[-1][1][0][p_del_current_key] = p_del_current_value
+
+                        # Otherwise regular process : if not default get rid of it
+                        elif not p_del_current_value == br_brick_list[current_brick[1]['gbn']][p_del_current_key]:
+
+                            # Looking if we have an ID already defined to our value
+                            keys_with_value = [key for key, value in property_id_to_property_table.items() if value == p_del_current_value]
+
+                            # Otherwise
+                            if not keys_with_value: # TODO: replace with if not already in with some id
+
+                                identical_excluded_brick_list[-1][1].append(w_current_property_id)
+                                strict_identical_excluded_brick_list[-1][1].append(w_current_property_id)
+                                property_count += 1
+                                property_id_to_property_table[w_current_property_id] = [p_del_current_key, p_del_current_value]
+                                w_current_property_id += 1
+
+                            else:
+
+                                identical_excluded_brick_list[-1][1].append(int(keys_with_value[0]))
+                                strict_identical_excluded_brick_list[-1][1].append(int(keys_with_value[0]))
 
 
-                """
-                Destiny here's your home work:
-                
-                Structure:
 
-                self.bricks is a list with sublists. Each sublist has two items: the brick's name (not important) and a
-                dictionary with all the brick's data, including position, rotation, and 'gbn' (which is the brick type
-                for the BRV).
-                br_brick_list is a dictionary where each key is a brick type, and the value is a dictionary with default
-                data for that brick type.
+                print(f'identical : {identical_excluded_brick_list}')
+                print(f'strict i. : {strict_identical_excluded_brick_list}')
+                print(f'pid table : {property_id_to_property_table}')
 
-                Goal:
+                brv_file.write(unsigned_int(property_count, 2))
 
-                Remove any data from each brick that matches the default values listed in br_brick_list.
-                """
-
-                print('verify output', self.bricks)
 
                 # Write each brick type
                 for brick_type in brick_types:
@@ -242,7 +302,6 @@ class BRAPI:
                     brv_file.write(small_bin_str(brick_type))
 
                 brv_file.write(unsigned_int(len(brick_types), 2))
-
 
 
 # Try it out
@@ -265,8 +324,6 @@ third_brick['OutputChannel.MaxOut'] = -12
 data.add_brick('first_brick', first_brick)
 data.add_brick('second_brick', second_brick)
 data.add_brick('third_brick', third_brick)
-
-print(first_brick['gbn'])
 
 data.write_preview()
 data.write_metadata()
