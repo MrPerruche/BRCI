@@ -2,15 +2,17 @@ import os
 
 from BRAPIF import *
 
+# Note : every time you see unsigned_int() / signed_int() / bin_float(), byte_len * 8 is the number of bits.
+
 # ------------------------------------------------------------
 # DEFAULT VARIABLES AND SETUP
 # ------------------------------------------------------------
 
 # Setup variables
-version : str = "C7"
+version : str = "C8" # String
 
 # Important variables
-_cwd = os.path.dirname(os.path.realpath(__file__))
+_cwd = os.path.dirname(os.path.realpath(__file__)) # File Path
 
 # Temporary Variables
 # No Temporary Variables.
@@ -39,12 +41,12 @@ class BRAPI:
                  file_description=''):
 
         # I'm not commenting this either.
-        self.project_folder_directory = project_folder_directory
-        self.project_name = project_name
-        self.write_blank = write_blank
-        self.project_display_name = project_display_name
-        self.file_description = file_description
-        if bricks is None:
+        self.project_folder_directory = project_folder_directory # Path
+        self.project_name = project_name # String
+        self.write_blank = write_blank # Boolean
+        self.project_display_name = project_display_name # String
+        self.file_description = file_description # String
+        if bricks is None: # List (None is used here for initialization)
             bricks = []
         self.bricks = bricks
 
@@ -52,29 +54,29 @@ class BRAPI:
     # Creating more variables
     # In project path
     @property
-    def in_project_folder_directory(self):
+    def in_project_folder_directory(self): # String
         return os.path.join(self.project_folder_directory, self.project_name)
 
     # Calculate brick count
     @property
-    def brick_count(self):
+    def brick_count(self): # 16 Bit integer
         return len(self.bricks)
 
     # Calculate vehicle size
     @property
-    def vehicle_size(self):
+    def vehicle_size(self): # List of 3 32-bit float
         # TODO : CALCULATE SIZE
         return [1, 2, 3]
 
     # Calculate vehicle weight
     @property
-    def vehicle_weight(self):
+    def vehicle_weight(self): # 32 bit float
         # TODO : CALCULATE WEIGHT
         return 0.1
 
     # Calculate vehicle worth
     @property
-    def vehicle_worth(self):
+    def vehicle_worth(self): # 32 bit float
         # TODO : CALCULATE WORTH
         return 0.2
 
@@ -115,7 +117,7 @@ class BRAPI:
     # Writing preview.png
     def write_preview(self):
 
-        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_compressed_reg.png')
+        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_compressed_reg.png') # Path
 
         # Create folder if missing
         self.ensure_project_directory_exists()
@@ -156,17 +158,17 @@ class BRAPI:
 
                 # Write all necessary information for the file name
                 line_feed_file_name = (((self.project_name.replace("\\n", "\n")).encode('utf-16'))
-                                       .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16')
+                                       .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16') # String
                 metadata_file.write(signed_int(-len(line_feed_file_name), 2))
                 metadata_file.write(bin_str(line_feed_file_name)[2:])
 
                 # Write all necessary information for the file description
                 watermarked_file_description = f"Created using BR-API.\n" \
                                                f"BR-API Version {version}.\n\n" \
-                                               f"Description:\n{self.file_description}."
+                                               f"Description:\n{self.file_description}." # String
                 watermarked_file_description = (
                     ((watermarked_file_description.replace("\\n", "\n")).encode('utf-16'))
-                    .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16')
+                    .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16') # String
                 metadata_file.write(signed_int(-len(watermarked_file_description), 2))
                 metadata_file.write(bin_str(watermarked_file_description)[2:])
 
@@ -226,7 +228,7 @@ class BRAPI:
                 brv_file.write(unsigned_int(len(bricks_writing), 2))
 
                 # Get the different bricks present in the project
-                brick_types = list(set(item[1]['gbn'] for item in bricks_writing))
+                brick_types = list(set(item[1]['gbn'] for item in bricks_writing)) # List
 
                 # Write the number of different brick types
                 brv_file.write(unsigned_int(len(brick_types), 2))
@@ -234,19 +236,16 @@ class BRAPI:
 
                 # [ Getting rid of all properties that are set to the default value for each brick ]
                 # Brick list filtering variables
-                identical_excluded_brick_list : list = []
-                strict_identical_excluded_brick_list : list = []
+                temp_iebl : list = [] # List of lists containing an integer and a list containing a dictionary and integers
                 safe_property_list : list = ['gbn', 'Position', 'Rotation']
 
-                # Writing properties variables
-                property_count : int = 0
-
                 # Defining bricks
-                w_current_brick_id : int = 1
+                w_current_brick_id : int = 1 # 16 bit
                 string_name_to_id_table = {}
-                w_current_property_id : int = 1
-                property_id_to_property_table = {}
+                property_table : dict = {}
+                property_id_to_property_type_table : dict = {}
 
+                # List Properties
                 for current_brick in bricks_writing:
 
                     # --------------------------------------------------
@@ -254,8 +253,7 @@ class BRAPI:
                     # --------------------------------------------------
 
                     # Add all bricks without including data
-                    identical_excluded_brick_list += [[w_current_brick_id, [{}]]]
-                    strict_identical_excluded_brick_list += [[w_current_brick_id, []]]
+                    temp_iebl += [[w_current_brick_id, [{}, {}]]]
                     string_name_to_id_table = string_name_to_id_table | {current_brick[0]: w_current_brick_id}
                     w_current_brick_id += 1
 
@@ -265,34 +263,76 @@ class BRAPI:
                         # Accept if it's in the safe list (list which gets whitelisted even if default value is identical)
                         if p_del_current_key in safe_property_list:
 
-                            identical_excluded_brick_list[-1][1][0][p_del_current_key] = p_del_current_value
+                            temp_iebl[-1][1][0][p_del_current_key] = p_del_current_value
 
                         # Otherwise regular process : if not default get rid of it
                         elif not p_del_current_value == br_brick_list[current_brick[1]['gbn']][p_del_current_key]:
 
-                            # Looking if we have an ID already defined to our value
-                            keys_with_value = [key for key, value in property_id_to_property_table.items() if value == p_del_current_value]
+                            # stfu
+                            temp_iebl[-1][1][1] = temp_iebl[-1][1][1] | {p_del_current_key: p_del_current_value}
 
-                            # Otherwise
-                            if not keys_with_value: # TODO: replace with if not already in with some id
+                            # Make sure key in the dict exist
+                            property_table.setdefault(p_del_current_key, [])
 
-                                identical_excluded_brick_list[-1][1].append(w_current_property_id)
-                                strict_identical_excluded_brick_list[-1][1].append(w_current_property_id)
-                                property_count += 1
-                                property_id_to_property_table[w_current_property_id] = [p_del_current_key, p_del_current_value]
-                                w_current_property_id += 1
-
-                            else:
-
-                                identical_excluded_brick_list[-1][1].append(int(keys_with_value[0]))
-                                strict_identical_excluded_brick_list[-1][1].append(int(keys_with_value[0]))
+                            if p_del_current_value not in property_table[p_del_current_key]:
+                                property_table[p_del_current_key].append(p_del_current_value)
 
 
+                # Setup property ids
+                w_current_property_id: int = 1  # 16 bit
+                id_assigned_property_table: dict = {}
 
-                print(f'identical : {identical_excluded_brick_list}')
-                print(f'strict i. : {strict_identical_excluded_brick_list}')
-                print(f'pid table : {property_id_to_property_table}')
+                # Give IDs to all values in var 'id_assigned_property_table'
+                for property_value_key, property_value_value in property_table.items():
 
+                    id_assigned_property_table = id_assigned_property_table | {property_value_key: {}}
+
+                    for pvv_value in property_value_value:
+
+                        id_assigned_property_table[property_value_key]: dict = id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
+                        w_current_property_id += 1
+
+                # Give IDs
+                temp_bricks_writing: list = []
+
+                for current_brick in range(len(bricks_writing)):
+
+                    temp_bricks_writing += [[ temp_iebl[current_brick][0], [temp_iebl[current_brick][1][0], []] ]]
+
+                    # Give Property IDs, Brick Type IDs
+                    for current_property, current_property_value in temp_iebl[current_brick][1][1].items():
+
+                        # Find what the id is
+                        for key, value in id_assigned_property_table[current_property].items():
+                            if value == current_property_value:
+                                found_key: int = int(key)
+
+                        # Giving IDs
+                        temp_bricks_writing[-1][1][1].append(found_key)
+
+                    # Giving Brick Type IDs
+                    temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
+
+                # Bricks Writing is ready!
+                temp_bricks_writing = temp_bricks_writing.copy()
+
+                # Insert n-word here
+
+                # Bricks Writing is ready to be updated!
+                bricks_writing = temp_bricks_writing
+
+
+                # Debug
+                print(f'identical : {temp_iebl}')
+                print(f'p_t table : {property_table}')
+                print(f'iap table : {id_assigned_property_table}')
+                print(f'temp bp w : {temp_bricks_writing}')
+                print(f'str n->id : {string_name_to_id_table}')
+                print(f'bricks t. : {brick_types}')
+                print(f'pit table : {property_id_to_property_type_table}')
+
+                # Write how many properties there are
+                property_count = w_current_property_id-1
                 brv_file.write(unsigned_int(property_count, 2))
 
 
@@ -301,10 +341,13 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(brick_type), 1))
                     brv_file.write(small_bin_str(brick_type))
 
-                brv_file.write(unsigned_int(len(brick_types), 2))
+                # Write properties
+                for property_type in id_assigned_property_table
+
 
 
 # Try it out
+
 data = BRAPI()
 data.project_name = 'test project b'
 data.project_display_name = 'My Project'
@@ -320,6 +363,8 @@ third_brick = create_brick('Switch_1sx1sx1s')
 first_brick['bReturnToZero'] = False
 first_brick['OutputChannel.MinIn'] = 12
 third_brick['OutputChannel.MaxOut'] = -12
+first_brick['OutputChannel.MaxOut'] = 174
+second_brick['bGenerateLift'] = True
 
 data.add_brick('first_brick', first_brick)
 data.add_brick('second_brick', second_brick)
