@@ -63,11 +63,18 @@ append_multiple(br_brick_list, ['Sensor_1sx1sx1s', 'Sensor_1x1x1s'],
                     'OutputChannel.MaxIn': 1.0,
                     'OutputChannel.MinOut': -1.0,
                     'OutputChannel.MaxOut': 1.0,
-                    'EnabledInputChannel.InputAxis': BrickInput('ConstantValue', 1), # TODO
+                    'EnabledInputChannel.InputAxis': BrickInput('ConstantValue', 1.0), # TODO
                     'SensorType': 'Speed',
                     'TraceMask': 'All',
                     'bReturnToZero': False
                 }, True)
+
+append_multiple(br_brick_list, ['MathBrick_1sx1sx1s'],
+                br_brick_list['default_brick_data'] | {
+                    'Operation': 'Add',
+                    'InputChannelA.InputAxis': BrickInput('Custom', None),
+                    'InputChannelB.InputAxis': BrickInput('ConstantValue', 1.0)
+                })
 
 
 # -------------------------------------------------

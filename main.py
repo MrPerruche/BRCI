@@ -1,5 +1,5 @@
 import os
-from warnings import warn as raise_warning
+# from warnings import warn as raise_warning
 
 from BRAPIF import *
 
@@ -10,7 +10,7 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version : str = "C10"  # String
+version : str = "C1"  # String, This is equivalant to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -39,7 +39,8 @@ class BRAPI:
                  project_name='',
                  write_blank=False,
                  project_display_name='',
-                 file_description=''):
+                 file_description='',
+                 debug_logs=False):
 
         # I'm not commenting this either.
         self.project_folder_directory = project_folder_directory  # Path
@@ -50,6 +51,7 @@ class BRAPI:
         if bricks is None:  # List (None is used here for initialization)
             bricks = []
         self.bricks = bricks
+        self.debug_logs = debug_logs
 
 
     # Creating more variables
@@ -241,7 +243,7 @@ class BRAPI:
                 safe_property_list : list = ['gbn', 'Position', 'Rotation']
 
                 # Defining bricks
-                w_current_brick_id : int = 1 # 16 bit
+                w_current_brick_id : int = 0 # 16 bit
                 string_name_to_id_table = {}
                 property_table : dict = {}
                 property_id_to_property_type_table : dict = {}
@@ -280,7 +282,7 @@ class BRAPI:
 
 
                 # Setup property ids
-                w_current_property_id: int = 1  # 16 bit
+                w_current_property_id: int = 0  # 32 bit
                 id_assigned_property_table: dict = {}
 
                 # Give IDs to all values in var 'id_assigned_property_table'
@@ -291,6 +293,7 @@ class BRAPI:
                     for pvv_value in property_value_value:
 
                         id_assigned_property_table[property_value_key]: dict = id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
+                        property_id_to_property_type_table = property_id_to_property_type_table | {w_current_property_id: property_value_key}
                         w_current_property_id += 1
 
                 # Give IDs
@@ -324,13 +327,14 @@ class BRAPI:
 
 
                 # Debug
-                print(f'identical : {temp_iebl}')
-                print(f'p_t table : {property_table}')
-                print(f'iap table : {id_assigned_property_table}')
-                print(f'temp bp w : {temp_bricks_writing}')
-                print(f'str n->id : {string_name_to_id_table}')
-                print(f'bricks t. : {brick_types}')
-                print(f'pit table : {property_id_to_property_type_table}')
+                if self.debug_logs:
+                    print(f'identical : {temp_iebl}')
+                    print(f'p_t table : {property_table}')
+                    print(f'iap table : {id_assigned_property_table}')
+                    print(f'temp bp w : {temp_bricks_writing}')
+                    print(f'str n->id : {string_name_to_id_table}')
+                    print(f'bricks t. : {brick_types}')
+                    print(f'pit table : {property_id_to_property_type_table}')
 
                 # Write how many properties there are
                 property_count = w_current_property_id-1
@@ -361,12 +365,52 @@ class BRAPI:
                         if isinstance(property_type_current_value, bool):
                             temp_spl += unsigned_int(int(property_type_current_value), 1)
 
-                    brv_file.write(unsigned_int(len(temp_spl), 4))
+                    # Lazy fix I HAVE NO IDEA WHY THAT IS TODO
+                    bool_inverse_throw_back: int = 0
+                    if (True in property_type_value) and (False in property_type_value):
+                        temp_spl += b'\x01\x00'
+                        bool_inverse_throw_back = 2
+
+                    brv_file.write(unsigned_int(len(temp_spl) - bool_inverse_throw_back, 4))
                     brv_file.write(temp_spl)
                     print(f'temp spl. : {temp_spl}')
                     temp_spl: bytes = b''  # Reset
 
                 print(f'post tspl : {temp_spl}')
+
+
+                # WRITING BRICKS
+                brick_data_writing: bytes = b''
+
+
+                for current_brick in bricks_writing:
+
+                    # Writing Brick Type
+                    brv_file.write(unsigned_int(current_brick[1][0]['gbn'], 2))
+                    # Getting ready to list properties
+                    brick_data_writing += unsigned_int(len(current_brick[1][1]), 1)
+                    for current_property in current_brick[1][1]:
+                        brick_data_writing += unsigned_int(current_property, 4)
+                        print(current_property)
+                    # Getting ready to write position and rotation
+                    brick_data_writing += bin_float(current_brick[1][0]['Position'][0]*100, 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Position'][1]*100, 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Position'][2]*100, 4)
+                    # Note sure why its out of order in the brv. Whatever
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][1]*100, 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][2]*100, 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][0]*100, 4)
+
+                    # Writing
+                    brv_file.write(unsigned_int(len(brick_data_writing), 4))
+                    brv_file.write(brick_data_writing)
+
+                    # Reset
+                    brick_data_writing = b''
+
+                brv_file.write(b'\x00\x00')
+
+
 
 
 
@@ -378,28 +422,20 @@ data.project_name = 'test project b'
 data.project_display_name = 'My Project'
 data.project_folder_directory = os.path.join(_cwd, 'Projects')
 data.file_description = 'My first project.'
+data.debug_logs = True
 
 print(data.project_folder_directory)
 
-"""first_brick = create_brick('Switch_1sx1sx1s')
-second_brick = create_brick('DisplayBrick')
-third_brick = create_brick('Switch_1sx1sx1s')
-
-first_brick['bReturnToZero'] = bool(False)
-first_brick['OutputChannel.MinIn'] = float(12)
-third_brick['OutputChannel.MaxOut'] = float(-12)
-first_brick['OutputChannel.MaxOut'] = float(174)
-second_brick['bGenerateLift'] = bool(True)
-
-data.add_brick('first_brick', first_brick)
-data.add_brick('second_brick', second_brick)
-data.add_brick('third_brick', third_brick)"""
 
 my_sensor = create_brick('Sensor_1sx1sx1s')
 my_sensor['bReturnToZero'] = True
+my_sensor['Position'] = [1.1, 2.2, 3.3]
+my_sensor['Rotation'] = [10.0, 20.0, 30.0]
 
 my_switch = create_brick('Switch_1sx1sx1s')
 my_switch['bReturnToZero'] = False
+my_switch['Position'] = [3.5, 3.4, 3.3]
+my_switch['Rotation'] = [90.0, -180.0, 45.0]
 
 data.add_brick('my_switch', my_switch)
 data.add_brick('my_sensor', my_sensor)
@@ -416,3 +452,21 @@ data.add_brick('my_test_brick', my_test_brick)
 print(my_test_brick)
 print(data.bricks)
 """
+
+"""first_brick = create_brick('Switch_1sx1sx1s')
+second_brick = create_brick('DisplayBrick')
+third_brick = create_brick('Switch_1sx1sx1s')
+
+first_brick['bReturnToZero'] = bool(False)
+first_brick['OutputChannel.MinIn'] = float(12)
+third_brick['OutputChannel.MaxOut'] = float(-12)
+first_brick['OutputChannel.MaxOut'] = float(174)
+second_brick['bGenerateLift'] = bool(True)
+
+data.add_brick('first_brick', first_brick)
+data.add_brick('second_brick', second_brick)
+data.add_brick('third_brick', third_brick)"""
+
+
+
+
