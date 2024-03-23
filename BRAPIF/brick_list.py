@@ -23,7 +23,9 @@ br_brick_materials = {
 }
 
 
-# Bricks
+# -------------------------------------------------
+# BRICKS
+# --------------------------------------------------
 
 br_brick_list = {
     'default_brick_data' : {
@@ -54,3 +56,10 @@ append_multiple(br_brick_list, ['DisplayBrick'],
                     'NumFractionalDigits': 1,
                     'DisplayColor': [0, 80, 50]
                 }, True)
+
+
+# -------------------------------------------------
+# PROPERTIES
+# --------------------------------------------------
+
+br_special_property_instance_list = {}

@@ -1,4 +1,5 @@
 import os
+from warnings import warn as raise_warning
 
 from BRAPIF import *
 
@@ -9,10 +10,10 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version : str = "C8" # String
+version : str = "C8"  # String
 
 # Important variables
-_cwd = os.path.dirname(os.path.realpath(__file__)) # File Path
+_cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
 # Temporary Variables
 # No Temporary Variables.
@@ -41,12 +42,12 @@ class BRAPI:
                  file_description=''):
 
         # I'm not commenting this either.
-        self.project_folder_directory = project_folder_directory # Path
-        self.project_name = project_name # String
-        self.write_blank = write_blank # Boolean
-        self.project_display_name = project_display_name # String
-        self.file_description = file_description # String
-        if bricks is None: # List (None is used here for initialization)
+        self.project_folder_directory = project_folder_directory  # Path
+        self.project_name = project_name  # String
+        self.write_blank = write_blank  # Boolean
+        self.project_display_name = project_display_name  # String
+        self.file_description = file_description  # String
+        if bricks is None:  # List (None is used here for initialization)
             bricks = []
         self.bricks = bricks
 
@@ -341,8 +342,30 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(brick_type), 1))
                     brv_file.write(small_bin_str(brick_type))
 
+                temp_spl: bytes = b''
+
                 # Write properties
-                for property_type in id_assigned_property_table
+                for property_type_key, property_type_value in property_table.items():
+                    brv_file.write(unsigned_int(len(property_type_key), 1))
+                    brv_file.write(small_bin_str(property_type_key))
+                    brv_file.write(unsigned_int(len(property_type_value), 2))
+
+
+                    for property_type_current_value in property_type_value:
+                        if isinstance(property_type_current_value, int):
+                            temp_spl += unsigned_int(property_type_current_value, 2)
+                        if isinstance(property_type_current_value, float):
+                            temp_spl += bin_float(property_type_current_value, 4)
+                        if isinstance(property_type_current_value, bool):
+                            raise_warning(f'Booleans are not supported. Value: {property_type_current_value}')
+                            temp_spl += b'\x00\x00'
+
+                    brv_file.write(unsigned_int(len(temp_spl), 4))
+                    brv_file.write(temp_spl)
+                    temp_spl: bytes = b''  # Reset
+
+                print(f'temp spl. : {temp_spl}')
+
 
 
 
@@ -360,11 +383,11 @@ first_brick = create_brick('Switch_1sx1sx1s')
 second_brick = create_brick('DisplayBrick')
 third_brick = create_brick('Switch_1sx1sx1s')
 
-first_brick['bReturnToZero'] = False
-first_brick['OutputChannel.MinIn'] = 12
-third_brick['OutputChannel.MaxOut'] = -12
-first_brick['OutputChannel.MaxOut'] = 174
-second_brick['bGenerateLift'] = True
+first_brick['bReturnToZero'] = bool(False)
+first_brick['OutputChannel.MinIn'] = float(12)
+third_brick['OutputChannel.MaxOut'] = float(-12)
+first_brick['OutputChannel.MaxOut'] = float(174)
+second_brick['bGenerateLift'] = bool(True)
 
 data.add_brick('first_brick', first_brick)
 data.add_brick('second_brick', second_brick)
