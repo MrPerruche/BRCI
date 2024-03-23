@@ -10,7 +10,7 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version : str = "C8"  # String
+version : str = "C10"  # String
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -346,25 +346,27 @@ class BRAPI:
 
                 # Write properties
                 for property_type_key, property_type_value in property_table.items():
+                    # Writing keys
                     brv_file.write(unsigned_int(len(property_type_key), 1))
                     brv_file.write(small_bin_str(property_type_key))
+                    # Number of values
                     brv_file.write(unsigned_int(len(property_type_value), 2))
 
-
+                    # Summing values
                     for property_type_current_value in property_type_value:
-                        if isinstance(property_type_current_value, int):
+                        if type(property_type_current_value) == int:  # This is because it fucks around when its bool as bool is a subtype of int
                             temp_spl += unsigned_int(property_type_current_value, 2)
                         if isinstance(property_type_current_value, float):
                             temp_spl += bin_float(property_type_current_value, 4)
                         if isinstance(property_type_current_value, bool):
-                            raise_warning(f'Booleans are not supported. Value: {property_type_current_value}')
-                            temp_spl += b'\x00\x00'
+                            temp_spl += unsigned_int(int(property_type_current_value), 1)
 
                     brv_file.write(unsigned_int(len(temp_spl), 4))
                     brv_file.write(temp_spl)
+                    print(f'temp spl. : {temp_spl}')
                     temp_spl: bytes = b''  # Reset
 
-                print(f'temp spl. : {temp_spl}')
+                print(f'post tspl : {temp_spl}')
 
 
 
@@ -379,7 +381,7 @@ data.file_description = 'My first project.'
 
 print(data.project_folder_directory)
 
-first_brick = create_brick('Switch_1sx1sx1s')
+"""first_brick = create_brick('Switch_1sx1sx1s')
 second_brick = create_brick('DisplayBrick')
 third_brick = create_brick('Switch_1sx1sx1s')
 
@@ -391,7 +393,16 @@ second_brick['bGenerateLift'] = bool(True)
 
 data.add_brick('first_brick', first_brick)
 data.add_brick('second_brick', second_brick)
-data.add_brick('third_brick', third_brick)
+data.add_brick('third_brick', third_brick)"""
+
+my_sensor = create_brick('Sensor_1sx1sx1s')
+my_sensor['bReturnToZero'] = True
+
+my_switch = create_brick('Switch_1sx1sx1s')
+my_switch['bReturnToZero'] = False
+
+data.add_brick('my_switch', my_switch)
+data.add_brick('my_sensor', my_sensor)
 
 data.write_preview()
 data.write_metadata()

@@ -57,6 +57,18 @@ append_multiple(br_brick_list, ['DisplayBrick'],
                     'DisplayColor': [0, 80, 50]
                 }, True)
 
+append_multiple(br_brick_list, ['Sensor_1sx1sx1s', 'Sensor_1x1x1s'],
+                br_brick_list['default_brick_data'] | {
+                    'OutputChannel.MinIn': -1.0,
+                    'OutputChannel.MaxIn': 1.0,
+                    'OutputChannel.MinOut': -1.0,
+                    'OutputChannel.MaxOut': 1.0,
+                    'EnabledInputChannel.InputAxis': BrickInput('ConstantValue', 1), # TODO
+                    'SensorType': 'Speed',
+                    'TraceMask': 'All',
+                    'bReturnToZero': False
+                }, True)
+
 
 # -------------------------------------------------
 # PROPERTIES
