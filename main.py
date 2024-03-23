@@ -10,7 +10,7 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version : str = "C1"  # String, This is equivalant to 3.__ fyi
+version : str = "C12"  # String, This is equivalant to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -160,7 +160,7 @@ class BRAPI:
                 metadata_file.write(unsigned_int(13, 1))
 
                 # Write all necessary information for the file name
-                line_feed_file_name = (((self.project_name.replace("\\n", "\n")).encode('utf-16'))
+                line_feed_file_name = (((self.project_display_name.replace("\\n", "\n")).encode('utf-16'))
                                        .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16') # String
                 metadata_file.write(signed_int(-len(line_feed_file_name), 2))
                 metadata_file.write(bin_str(line_feed_file_name)[2:])
@@ -248,6 +248,7 @@ class BRAPI:
                 property_table : dict = {}
                 property_id_to_property_type_table : dict = {}
 
+
                 # List Properties
                 for current_brick in bricks_writing:
 
@@ -271,19 +272,22 @@ class BRAPI:
                         # Otherwise regular process : if not default get rid of it
                         elif not p_del_current_value == br_brick_list[current_brick[1]['gbn']][p_del_current_key]:
 
-                            # stfu
                             temp_iebl[-1][1][1] = temp_iebl[-1][1][1] | {p_del_current_key: p_del_current_value}
 
                             # Make sure key in the dict exist
                             property_table.setdefault(p_del_current_key, [])
 
+                            # Setup property table
                             if p_del_current_value not in property_table[p_del_current_key]:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
 
                 # Setup property ids
                 w_current_property_id: int = 0  # 32 bit
+                w_property_count: int = 0 # 32 bit
                 id_assigned_property_table: dict = {}
+                property_key_table: dict = {}
+                w_property_key_num: int = 0
 
                 # Give IDs to all values in var 'id_assigned_property_table'
                 for property_value_key, property_value_value in property_table.items():
@@ -293,8 +297,12 @@ class BRAPI:
                     for pvv_value in property_value_value:
 
                         id_assigned_property_table[property_value_key]: dict = id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
-                        property_id_to_property_type_table = property_id_to_property_type_table | {w_current_property_id: property_value_key}
                         w_current_property_id += 1
+                        w_property_count += 1
+
+                    property_key_table = property_key_table | {property_value_key: w_property_key_num}
+                    w_property_key_num += 1
+                    w_current_property_id = 0
 
                 # Give IDs
                 temp_bricks_writing: list = []
@@ -312,7 +320,7 @@ class BRAPI:
                                 found_key: int = int(key)
 
                         # Giving IDs
-                        temp_bricks_writing[-1][1][1].append(found_key)
+                        temp_bricks_writing[-1][1][1].append([property_key_table[current_property], found_key])
 
                     # Giving Brick Type IDs
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
@@ -337,7 +345,7 @@ class BRAPI:
                     print(f'pit table : {property_id_to_property_type_table}')
 
                 # Write how many properties there are
-                property_count = w_current_property_id-1
+                property_count = w_property_count
                 brv_file.write(unsigned_int(property_count, 2))
 
 
@@ -358,18 +366,22 @@ class BRAPI:
 
                     # Summing values
                     for property_type_current_value in property_type_value:
-                        if type(property_type_current_value) == int:  # This is because it fucks around when its bool as bool is a subtype of int
-                            temp_spl += unsigned_int(property_type_current_value, 2)
-                        if isinstance(property_type_current_value, float):
-                            temp_spl += bin_float(property_type_current_value, 4)
-                        if isinstance(property_type_current_value, bool):
-                            temp_spl += unsigned_int(int(property_type_current_value), 1)
+                        if not property_type_key in br_special_property_instance_list:
+                            if type(property_type_current_value) == int:  # This is because it fucks around when its bool as bool is a subtype of int
+                                temp_spl += unsigned_int(property_type_current_value, 2)
+                            if isinstance(property_type_current_value, float):
+                                temp_spl += bin_float(property_type_current_value, 4)
+                            if isinstance(property_type_current_value, bool):
+                                temp_spl += unsigned_int(int(property_type_current_value), 1)
+                        else:
+                            if br_special_property_instance_list[property_type_key] == 'INT8':
+                                temp_spl += unsigned_int(property_type_current_value, 1)
 
                     # Lazy fix I HAVE NO IDEA WHY THAT IS TODO
                     bool_inverse_throw_back: int = 0
                     if (True in property_type_value) and (False in property_type_value):
                         temp_spl += b'\x01\x00'
-                        bool_inverse_throw_back = 2
+                        bool_inverse_throw_back += 2
 
                     brv_file.write(unsigned_int(len(temp_spl) - bool_inverse_throw_back, 4))
                     brv_file.write(temp_spl)
@@ -390,16 +402,17 @@ class BRAPI:
                     # Getting ready to list properties
                     brick_data_writing += unsigned_int(len(current_brick[1][1]), 1)
                     for current_property in current_brick[1][1]:
-                        brick_data_writing += unsigned_int(current_property, 4)
+                        brick_data_writing += unsigned_int(current_property[0], 2)
+                        brick_data_writing += unsigned_int(current_property[1], 2)
                         print(current_property)
                     # Getting ready to write position and rotation
                     brick_data_writing += bin_float(current_brick[1][0]['Position'][0]*100, 4)
                     brick_data_writing += bin_float(current_brick[1][0]['Position'][1]*100, 4)
                     brick_data_writing += bin_float(current_brick[1][0]['Position'][2]*100, 4)
                     # Note sure why its out of order in the brv. Whatever
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][1]*100, 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][2]*100, 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][0]*100, 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][1], 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][2], 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][0], 4)
 
                     # Writing
                     brv_file.write(unsigned_int(len(brick_data_writing), 4))
@@ -414,59 +427,28 @@ class BRAPI:
 
 
 
-
 # Try it out
+if __name__ == '__main__':
+    data = BRAPI()
+    data.project_name = 'test_project_demo'
+    data.project_display_name = 'My Test Project Demo'
+    data.project_folder_directory = os.path.join(_cwd, 'Projects')
+    data.file_description = 'Hello\nSir'
+    data.debug_logs = True
 
-data = BRAPI()
-data.project_name = 'test project b'
-data.project_display_name = 'My Project'
-data.project_folder_directory = os.path.join(_cwd, 'Projects')
-data.file_description = 'My first project.'
-data.debug_logs = True
+    my_switch = create_brick('Switch_1sx1sx1s')
+    my_switch['bReturnToZero'] = False
+    my_switch['Position'] = [1.6, 0.6, 1.2]
+    my_switch['Rotation'] = [10.5, 25.2, -13.6]
 
-print(data.project_folder_directory)
+    my_display = create_brick('DisplayBrick')
+    my_display['NumFractionalDigits'] = 5
+    my_display['Position'] = [2.2, 1.9, -4.2]
+    my_display['Rotation'] = [68.3, 12.5, -90]
 
+    data.add_brick('my_switch', my_switch)
+    data.add_brick('my_display', my_display)
 
-my_sensor = create_brick('Sensor_1sx1sx1s')
-my_sensor['bReturnToZero'] = True
-my_sensor['Position'] = [1.1, 2.2, 3.3]
-my_sensor['Rotation'] = [10.0, 20.0, 30.0]
-
-my_switch = create_brick('Switch_1sx1sx1s')
-my_switch['bReturnToZero'] = False
-my_switch['Position'] = [3.5, 3.4, 3.3]
-my_switch['Rotation'] = [90.0, -180.0, 45.0]
-
-data.add_brick('my_switch', my_switch)
-data.add_brick('my_sensor', my_sensor)
-
-data.write_preview()
-data.write_metadata()
-data.write_brv()
-
-
-"""
-# Doesnt matter.
-my_test_brick = create_brick('Switch_1sx1sx1s')
-data.add_brick('my_test_brick', my_test_brick)
-print(my_test_brick)
-print(data.bricks)
-"""
-
-"""first_brick = create_brick('Switch_1sx1sx1s')
-second_brick = create_brick('DisplayBrick')
-third_brick = create_brick('Switch_1sx1sx1s')
-
-first_brick['bReturnToZero'] = bool(False)
-first_brick['OutputChannel.MinIn'] = float(12)
-third_brick['OutputChannel.MaxOut'] = float(-12)
-first_brick['OutputChannel.MaxOut'] = float(174)
-second_brick['bGenerateLift'] = bool(True)
-
-data.add_brick('first_brick', first_brick)
-data.add_brick('second_brick', second_brick)
-data.add_brick('third_brick', third_brick)"""
-
-
-
-
+    data.write_preview()
+    data.write_metadata()
+    data.write_brv()

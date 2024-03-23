@@ -81,4 +81,6 @@ append_multiple(br_brick_list, ['MathBrick_1sx1sx1s'],
 # PROPERTIES
 # --------------------------------------------------
 
-br_special_property_instance_list = {}
+br_special_property_instance_list = {
+    'NumFractionalDigits': 'INT8'
+}
