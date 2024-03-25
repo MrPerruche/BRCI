@@ -19,25 +19,25 @@ br_brick_materials = {
     'rubber':           {'price': 1.00, 'density': 1.00, 'strength': 3.00, 'friction': 2.00, 'restitution': 0.10},
     'rusted steel':     {'price': 3.00, 'density': 8.00, 'strength': 10.0, 'friction': 0.50, 'restitution': 0.10},
     'steel':            {'price': 4.00, 'density': 8.00, 'strength': 20.0, 'friction': 0.35, 'restitution': 0.10},
-    'tungsten':         {'price': 8.50, 'density': 19.25, 'strength': 30.0, 'friction': 0.20, 'restitution': 0.10}
+    'tungsten':         {'price': 8.50, 'density': 19.25, 'strength': 30.0, 'friction': 0.20, 'restitution': 0.10} # Damn you it was perfect!
 }
 
 
-# -------------------------------------------------
+# --------------------------------------------------
 # BRICKS
 # --------------------------------------------------
 
 br_brick_list = {
-    'default_brick_data' : {
+    'default_brick_data': {
         'BrickColor': [0, 0, 127, 255],
         'BrickPattern': 'Default',
         'BrickMaterial': 'Plastic',
-        'Position': [0.0, 0.0, 0.0],
-        'Rotation': [0.0, 0.0, 0.0]
+        'Position': [0.0, 0.0, 0.0],  # Do not include in special handling list. Already taken care of.
+        'Rotation': [0.0, 0.0, 0.0]   # Do not include in special handling list. Already taken care of.
     }
 }
 
-append_multiple(br_brick_list,['Switch_1sx1sx1s', 'Switch_1x1x1s'],
+append_multiple(br_brick_list, ['Switch_1sx1sx1s', 'Switch_1x1x1s'],
                 br_brick_list['default_brick_data'] | {
                     'OutputChannel.MinIn': -1.0,
                     'OutputChannel.MaxIn': 1.0,
@@ -76,11 +76,35 @@ append_multiple(br_brick_list, ['MathBrick_1sx1sx1s'],
                     'InputChannelB.InputAxis': BrickInput('ConstantValue', 1.0)
                 })
 
+# Scalables w/ aerodynamics
+append_multiple(br_brick_list,
+                ['ScalableBrick', 'ScalableCone', 'ScalableConeRounded', 'ScalableZylinder', 'ScalableCylinder90R0',
+                 'ScalableCylinder90R1', 'ScalableHalfCone', 'ScalableHalfCylinder', 'ScalableHemisphere',
+                 'ScalablePyramid', 'ScalableQuarterSphere', 'ScalableRamp', 'ScalableRampRounded', 'ScalableRampRoundedN',
+                 'ScalableWedge', 'ScalableWedgeCorner'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'BrickSize': [3, 3, 3],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
+                }, True)
+# Scalables w/out aerodynamics
+append_multiple(br_brick_list,
+                ['ScalableCorner', 'ScalableCornerN', 'ScalableCornerRounded', 'ScalableCornerRoundedN',
+                 'ScalableQuarterCone', 'ScalablePyramidCorner', 'ScalablePyramidCornerRounded'],
+                br_brick_list['default_brick_data'] | {
+                    'BrickSize': [3, 3, 3],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
+                }, True)
+
 
 # -------------------------------------------------
 # PROPERTIES
 # --------------------------------------------------
 
 br_special_property_instance_list = {
+    'BrickColor': '4xINT8',
+    'BrickSize': '3xINT16',
+    'ConnectorSpacing': '6xINT2',
+    'DisplayColor': '3xINT8',
     'NumFractionalDigits': 'INT8'
 }

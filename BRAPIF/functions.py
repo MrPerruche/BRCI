@@ -1,12 +1,13 @@
 import struct
 from dataclasses import dataclass
 
+
 def unsigned_int(integer, byte_len):
 
-    if integer >= 2**(byte_len*8) :
+    if integer >= 2**(byte_len*8):
         raise OverflowError(f'Input is greater than {byte_len*8} bit limit of unsigned integer.')
 
-    if integer < 0 :
+    if integer < 0:
         raise OverflowError(f'Negative input. {integer} is less than 0.')
 
     return (integer & ((1 << (8 * byte_len)) - 1)).to_bytes(byte_len, byteorder='little', signed=False)
@@ -94,7 +95,7 @@ def copy_file(source_path, destination_path):
         destination_file.write(cp_data)
 
 
-def append_multiple(var, keys, value, gbn = False):
+def append_multiple(var, keys, value, gbn=False):
     for key in keys:
 
         var[key] = value.copy()
@@ -113,4 +114,30 @@ class BrickInput:
     brick_input: any
 
     def return_br(self):
-        return b'01000700000006437573746F6D12496E7075744368616E6E656C2E56616C756501000400000000000040'  # TODO
+        w_return = b''
+
+        # We write what the input is
+        w_return += unsigned_int(len(self.brick_input_type), 1)
+
+
+        # Now if its something that has more information..
+        match self.brick_input_type:
+            # If its a constant value (They're called AlwaysOn ingame, why fluppi?)
+            case 'AlwaysOn':
+                # If something other than 1.0 or nothing is defined..
+                if float(self.brick_input) is not None or float(self.brick_input) != 1.0:
+                    # We write what value is in
+                    w_return += (b'\x12' + small_bin_str('InputChannel.Value')
+                                 + b'\x01\x00\x00\x00\x04' + bin_float(self.brick_input, 4))
+
+            case 'Custom':
+                # This require data only available in main.py
+                # It is impossible to write it here as it this data is from BRAPI class in main.py
+                # So we send a message BRAPI class has some work to do
+                w_return = b'CUSTOM REQ STR2BID'  # Pay attention, we're not adding, we're replacing!
+            # If theres nothing special we don't care then
+
+            case _:
+                pass
+
+        return w_return

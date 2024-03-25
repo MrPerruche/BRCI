@@ -1,16 +1,27 @@
 import os
-# from warnings import warn as raise_warning
+from warnings import warn as raise_warning
 
 from BRAPIF import *
 
 # Note : every time you see unsigned_int() / signed_int() / bin_float(), byte_len * 8 is the number of bits.
+
+# TODO
+# TODO
+# TODO
+# TODO
+# Spamming TODO so we can see it well in the sidebar
+# TODO
+# TODO
+# TODO
+# TODO
+# TODO Find another way to make Brick Inputs.
 
 # ------------------------------------------------------------
 # DEFAULT VARIABLES AND SETUP
 # ------------------------------------------------------------
 
 # Setup variables
-version : str = "C12"  # String, This is equivalant to 3.__ fyi
+version: str = "C13"  # String, This is equivalant to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -161,7 +172,7 @@ class BRAPI:
 
                 # Write all necessary information for the file name
                 line_feed_file_name = (((self.project_display_name.replace("\\n", "\n")).encode('utf-16'))
-                                       .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16') # String
+                                       .replace(b'\x0A\x00', b'\x0D\x00\x0A\x00')).decode('utf-16') # String
                 metadata_file.write(signed_int(-len(line_feed_file_name), 2))
                 metadata_file.write(bin_str(line_feed_file_name)[2:])
 
@@ -171,7 +182,7 @@ class BRAPI:
                                                f"Description:\n{self.file_description}." # String
                 watermarked_file_description = (
                     ((watermarked_file_description.replace("\\n", "\n")).encode('utf-16'))
-                    .replace(b'\x0A\x00',b'\x0D\x00\x0A\x00')).decode('utf-16') # String
+                    .replace(b'\x0A\x00', b'\x0D\x00\x0A\x00')).decode('utf-16') # String
                 metadata_file.write(signed_int(-len(watermarked_file_description), 2))
                 metadata_file.write(bin_str(watermarked_file_description)[2:])
 
@@ -189,7 +200,7 @@ class BRAPI:
                 # I have no fucking clue of what I'm writing but hey it's something right?
                 metadata_file.write(bytes.fromhex("14686300000000B034B6C7382ADC08E079251F392ADC08"))
 
-                # Writing tags                                                                                          TODO Broken
+                # Writing tags                                                                                          FIXME
                 metadata_file.write(unsigned_int(3, 1))
                 for i in range(3):
                     metadata_file.write(unsigned_int(5, 1))
@@ -239,14 +250,14 @@ class BRAPI:
 
                 # [ Getting rid of all properties that are set to the default value for each brick ]
                 # Brick list filtering variables
-                temp_iebl : list = [] # List of lists containing an integer and a list containing a dictionary and integers
-                safe_property_list : list = ['gbn', 'Position', 'Rotation']
+                temp_iebl: list = [] # List of lists containing an integer and a list containing a dictionary and integers
+                safe_property_list: list = ['gbn', 'Position', 'Rotation']
 
                 # Defining bricks
-                w_current_brick_id : int = 0 # 16 bit
+                w_current_brick_id: int = 0 # 16 bit
                 string_name_to_id_table = {}
-                property_table : dict = {}
-                property_id_to_property_type_table : dict = {}
+                property_table: dict = {}
+                property_id_to_property_type_table: dict = {}
 
 
                 # List Properties
@@ -309,7 +320,7 @@ class BRAPI:
 
                 for current_brick in range(len(bricks_writing)):
 
-                    temp_bricks_writing += [[ temp_iebl[current_brick][0], [temp_iebl[current_brick][1][0], []] ]]
+                    temp_bricks_writing += [[temp_iebl[current_brick][0], [temp_iebl[current_brick][1][0], []]]]
 
                     # Give Property IDs, Brick Type IDs
                     for current_property, current_property_value in temp_iebl[current_brick][1][1].items():
@@ -336,13 +347,13 @@ class BRAPI:
 
                 # Debug
                 if self.debug_logs:
-                    print(f'identical : {temp_iebl}')
-                    print(f'p_t table : {property_table}')
-                    print(f'iap table : {id_assigned_property_table}')
-                    print(f'temp bp w : {temp_bricks_writing}')
-                    print(f'str n->id : {string_name_to_id_table}')
-                    print(f'bricks t. : {brick_types}')
-                    print(f'pit table : {property_id_to_property_type_table}')
+                    print(f'[DEBUG] Identical Excluded Brick L : {temp_iebl}')
+                    print(f'[DEBUG] Property Table............ : {property_table}')
+                    print(f'[DEBUG] ID Assigned Property Table : {id_assigned_property_table}')
+                    print(f'[DEBUG] Brick Properties Writing.. : {temp_bricks_writing}')
+                    print(f'[DEBUG] String Name to ID Table... : {string_name_to_id_table}')
+                    print(f'[DEBUG] Brick Types............... : {brick_types}')
+                    print(f'[DEBUG] Property ID to Prop. Type. : {property_id_to_property_type_table}')
 
                 # Write how many properties there are
                 property_count = w_property_count
@@ -355,6 +366,7 @@ class BRAPI:
                     brv_file.write(small_bin_str(brick_type))
 
                 temp_spl: bytes = b''
+                temp_pre_spl: bytes = b''
 
                 # Write properties
                 for property_type_key, property_type_value in property_table.items():
@@ -365,19 +377,67 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(property_type_value), 2))
 
                     # Summing values
-                    for property_type_current_value in property_type_value:
-                        if not property_type_key in br_special_property_instance_list:
-                            if type(property_type_current_value) == int:  # This is because it fucks around when its bool as bool is a subtype of int
-                                temp_spl += unsigned_int(property_type_current_value, 2)
-                            if isinstance(property_type_current_value, float):
-                                temp_spl += bin_float(property_type_current_value, 4)
-                            if isinstance(property_type_current_value, bool):
-                                temp_spl += unsigned_int(int(property_type_current_value), 1)
-                        else:
-                            if br_special_property_instance_list[property_type_key] == 'INT8':
-                                temp_spl += unsigned_int(property_type_current_value, 1)
+                    for pt_c_val in property_type_value: # property_table_current_value
+                        if property_type_key not in br_special_property_instance_list:
 
-                    # Lazy fix I HAVE NO IDEA WHY THAT IS TODO
+
+                            # If its an integer (uint 16 bit by default)
+                            if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
+                                temp_spl += unsigned_int(pt_c_val, 2)
+
+
+                            # If its a float (float 32 bit by default)
+                            if isinstance(pt_c_val, float):
+                                temp_spl += bin_float(pt_c_val, 4)
+
+
+                            # If its a bool
+                            if isinstance(pt_c_val, bool):
+                                temp_spl += unsigned_int(int(pt_c_val), 1)
+
+
+                            # If its a brick input
+                            if isinstance(pt_c_val, BrickInput):
+                                temp_pre_spl += pt_c_val.return_br()
+
+                                if temp_pre_spl == b'CUSTOM REQ STR2BID':
+                                    # Converting all brick names to IDs
+                                    for brick_str_id in pt_c_val.brick_input:
+                                        # And putting them together
+                                        temp_spl += unsigned_int(string_name_to_id_table[brick_str_id], 2)
+
+
+                                else:
+                                    temp_spl += temp_pre_spl
+                                temp_pre_spl: bytes = b''  # Reset
+
+
+                            # If its a string (converting to utf-16)
+                            if isinstance(pt_c_val, str):
+                                temp_spl += signed_int(-len(pt_c_val), 2)
+                                temp_spl += bin_str(pt_c_val)
+                        else:
+                            match br_special_property_instance_list[property_type_key]:
+                                case 'INT8':
+                                    temp_spl += unsigned_int(pt_c_val, 1)
+                                case '6xINT2':
+                                    temp_w_spl_connector = pt_c_val[0] + pt_c_val[1]*4 + pt_c_val[2]*16 + pt_c_val[3]*64 + pt_c_val[4]*256 + pt_c_val[5]*1024
+                                    temp_spl += unsigned_int(temp_w_spl_connector, 2)
+                                case '3xINT16':
+                                    temp_spl += unsigned_int(pt_c_val[0], 2)
+                                    temp_spl += unsigned_int(pt_c_val[1], 2)
+                                    temp_spl += unsigned_int(pt_c_val[2], 2)
+                                case '3xINT8':
+                                    temp_spl += unsigned_int(pt_c_val[0], 1)
+                                    temp_spl += unsigned_int(pt_c_val[1], 1)
+                                    temp_spl += unsigned_int(pt_c_val[2], 1)
+                                case '4xINT8':
+                                    temp_spl += unsigned_int(pt_c_val[0], 1)
+                                    temp_spl += unsigned_int(pt_c_val[1], 1)
+                                    temp_spl += unsigned_int(pt_c_val[2], 1)
+                                    temp_spl += unsigned_int(pt_c_val[3], 1)
+
+                    # FIXME : Lazy fix, may not work in all scenarios. Needs research.
                     bool_inverse_throw_back: int = 0
                     if (True in property_type_value) and (False in property_type_value):
                         temp_spl += b'\x01\x00'
@@ -385,10 +445,7 @@ class BRAPI:
 
                     brv_file.write(unsigned_int(len(temp_spl) - bool_inverse_throw_back, 4))
                     brv_file.write(temp_spl)
-                    print(f'temp spl. : {temp_spl}')
                     temp_spl: bytes = b''  # Reset
-
-                print(f'post tspl : {temp_spl}')
 
 
                 # WRITING BRICKS
@@ -404,7 +461,6 @@ class BRAPI:
                     for current_property in current_brick[1][1]:
                         brick_data_writing += unsigned_int(current_property[0], 2)
                         brick_data_writing += unsigned_int(current_property[1], 2)
-                        print(current_property)
                     # Getting ready to write position and rotation
                     brick_data_writing += bin_float(current_brick[1][0]['Position'][0]*100, 4)
                     brick_data_writing += bin_float(current_brick[1][0]['Position'][1]*100, 4)
@@ -424,7 +480,7 @@ class BRAPI:
                 brv_file.write(b'\x00\x00')
 
 
-
+# --------------------------------------------------
 
 
 # Try it out
@@ -436,6 +492,7 @@ if __name__ == '__main__':
     data.file_description = 'Hello\nSir'
     data.debug_logs = True
 
+    """
     my_switch = create_brick('Switch_1sx1sx1s')
     my_switch['bReturnToZero'] = False
     my_switch['Position'] = [1.6, 0.6, 1.2]
@@ -445,9 +502,19 @@ if __name__ == '__main__':
     my_display['NumFractionalDigits'] = 5
     my_display['Position'] = [2.2, 1.9, -4.2]
     my_display['Rotation'] = [68.3, 12.5, -90]
+    my_display['ConnectorSpacing'] = [0, 2, 1, 0, 3, 1]
 
     data.add_brick('my_switch', my_switch)
+    """
+
+    my_display = create_brick('DisplayBrick')
+    my_display['NumFractionalDigits'] = 4
+
+    my_switch = create_brick('Switch_1sx1sx1s')
+    my_switch['InputChannel'] = BrickInput('Custom', ['my_display'])
+
     data.add_brick('my_display', my_display)
+    data.add_brick('my_switch', my_switch)
 
     data.write_preview()
     data.write_metadata()
