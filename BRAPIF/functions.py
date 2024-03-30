@@ -120,22 +120,22 @@ class BrickInput:
         w_return += unsigned_int(len(self.brick_input_type), 1)
 
 
-        # Now if its something that has more information..
+        # Now if it's something that has more information...
         match self.brick_input_type:
-            # If its a constant value (They're called AlwaysOn ingame, why fluppi?)
+            # If it's a constant value (They're called AlwaysOn in-game, why?)
             case 'AlwaysOn':
-                # If something other than 1.0 or nothing is defined..
-                if float(self.brick_input) is not None or float(self.brick_input) != 1.0:
+                # If something other than (1.0 or nothing) is defined...
+                if float(self.brick_input) is not None and float(self.brick_input) != 1.0:
                     # We write what value is in
                     w_return += (b'\x12' + small_bin_str('InputChannel.Value')
                                  + b'\x01\x00\x00\x00\x04' + bin_float(self.brick_input, 4))
 
             case 'Custom':
-                # This require data only available in main.py
+                # This requires data only available in main.py
                 # It is impossible to write it here as it this data is from BRAPI class in main.py
                 # So we send a message BRAPI class has some work to do
                 w_return = b'CUSTOM REQ STR2BID'  # Pay attention, we're not adding, we're replacing!
-            # If theres nothing special we don't care then
+            # If there's nothing special we don't care then
 
             case _:
                 pass

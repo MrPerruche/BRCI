@@ -88,24 +88,37 @@ data.add_brick('original_name', my_brick)
 data.remove_brick('original_name')
 ```
 
-## Writing files
+## BRAPI Functions
 
-### Preview.png
+### Writing Preview.png
 
 To write `Preview.png` files, you can use the following function :  
 `data.write_preview()`
 
-### Metadata.brm
+### Writing Metadata.brm
 
 To write `Metadata.brm` files, you can use the following function :  
 `data.write_metadata()`
 
 Note : You can use `\n` to create a new line.
 
-### Vehicle.brv
+### Writing Vehicle.brv
 
-To write `Vehicle.brv` files, you can use the following function :
+To write `Vehicle.brv` files, you can use the following function :  
 `data.write_brv()`
+
+### Debugging
+
+While using the API, you may encounter errors. In this case, please do the following:
+- Verify for human errors : Typos, mise-use of functions, incorrect properties etc. You have several tools to help you :
+  - `data.debug_print()` will print you various information about the project post generation,
+  helping you locate and troubleshoot human error etc. Peculiarly useful for troubleshooting incorrect inputs.
+  - `data.debug_logs = True` will print you various information about the conversion process.
+  This was originally made for BR-API developers, and you may not understand it. 
+- Seek help on the BR-API discord, for potential mis-use etc.
+- File a bug report on the BR-API discord. If not possible, file it on GitHub.
+  - Please include both `data.debug_logs = True` and `data.debug_print()` logs when filing your bug report.
+  - Please explain in details your bug, and attempt to find the source by yourself.
 
 ### Exemple
 

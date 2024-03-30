@@ -1,27 +1,22 @@
 import os
-from warnings import warn as raise_warning
+# from warnings import warn as raise_warning
 
 from BRAPIF import *
 
 # Note : every time you see unsigned_int() / signed_int() / bin_float(), byte_len * 8 is the number of bits.
 
-# TODO
-# TODO
-# TODO
-# TODO
-# Spamming TODO so we can see it well in the sidebar
-# TODO
-# TODO
-# TODO
-# TODO
-# TODO Find another way to make Brick Inputs.
+# TODO Add more jokes in comments because they're pretty annoying.
+# TODO Comment each variable to specify their content & classes for rust translation.
+# TODO Find another way to make Brick Inputs. (Perhaps they should work and I'm just an idiot?)
+# TODO Finish Appendix System (DO NOT USE MEANWHILE)
+# TODO Implement Brick Loading (IDEA : Exclusively load user appendix)
 
 # ------------------------------------------------------------
 # DEFAULT VARIABLES AND SETUP
 # ------------------------------------------------------------
 
 # Setup variables
-version: str = "C13"  # String, This is equivalant to 3.__ fyi
+version: str = "C14"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -51,7 +46,8 @@ class BRAPI:
                  write_blank=False,
                  project_display_name='',
                  file_description='',
-                 debug_logs=False):
+                 debug_logs=False,
+                 user_appendix=b''):
 
         # I'm not commenting this either.
         self.project_folder_directory = project_folder_directory  # Path
@@ -63,6 +59,7 @@ class BRAPI:
             bricks = []
         self.bricks = bricks
         self.debug_logs = debug_logs
+        self.user_appendix = user_appendix
 
 
     # Creating more variables
@@ -207,6 +204,15 @@ class BRAPI:
                     metadata_file.write(small_bin_str("Other"))
 
 
+
+    # Sharing some variables from writing vehicle.brv to the rest of the class
+    bricks_writing = []
+    inverted_property_key_table = {}
+    id_assigned_property_table = {}
+    brapi_appendix: list = []
+
+
+
     # Writing Vehicle.brv
     def write_brv(self):
 
@@ -234,15 +240,15 @@ class BRAPI:
             with open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file:
 
 
-                bricks_writing = self.bricks.copy()
+                self.bricks_writing = self.bricks.copy()
 
                 # Writes Carriage Return char
                 brv_file.write(unsigned_int(13, 1))
                 # Write brick count
-                brv_file.write(unsigned_int(len(bricks_writing), 2))
+                brv_file.write(unsigned_int(len(self.bricks_writing), 2))
 
                 # Get the different bricks present in the project
-                brick_types = list(set(item[1]['gbn'] for item in bricks_writing)) # List
+                brick_types = list(set(item[1]['gbn'] for item in self.bricks_writing)) # List
 
                 # Write the number of different brick types
                 brv_file.write(unsigned_int(len(brick_types), 2))
@@ -257,11 +263,10 @@ class BRAPI:
                 w_current_brick_id: int = 0 # 16 bit
                 string_name_to_id_table = {}
                 property_table: dict = {}
-                property_id_to_property_type_table: dict = {}
 
 
                 # List Properties
-                for current_brick in bricks_writing:
+                for current_brick in self.bricks_writing:
 
                     # --------------------------------------------------
                     # Getting rid of already existing elements, setting brick IDs
@@ -296,29 +301,29 @@ class BRAPI:
                 # Setup property ids
                 w_current_property_id: int = 0  # 32 bit
                 w_property_count: int = 0 # 32 bit
-                id_assigned_property_table: dict = {}
                 property_key_table: dict = {}
                 w_property_key_num: int = 0
 
                 # Give IDs to all values in var 'id_assigned_property_table'
                 for property_value_key, property_value_value in property_table.items():
 
-                    id_assigned_property_table = id_assigned_property_table | {property_value_key: {}}
+                    self.id_assigned_property_table = self.id_assigned_property_table | {property_value_key: {}}
 
                     for pvv_value in property_value_value:
 
-                        id_assigned_property_table[property_value_key]: dict = id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
+                        self.id_assigned_property_table[property_value_key]: dict = self.id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
                         w_current_property_id += 1
                         w_property_count += 1
 
                     property_key_table = property_key_table | {property_value_key: w_property_key_num}
+                    self.inverted_property_key_table = self.inverted_property_key_table | {w_property_key_num: property_value_key}
                     w_property_key_num += 1
                     w_current_property_id = 0
 
                 # Give IDs
                 temp_bricks_writing: list = []
 
-                for current_brick in range(len(bricks_writing)):
+                for current_brick in range(len(self.bricks_writing)):
 
                     temp_bricks_writing += [[temp_iebl[current_brick][0], [temp_iebl[current_brick][1][0], []]]]
 
@@ -326,7 +331,7 @@ class BRAPI:
                     for current_property, current_property_value in temp_iebl[current_brick][1][1].items():
 
                         # Find what the id is
-                        for key, value in id_assigned_property_table[current_property].items():
+                        for key, value in self.id_assigned_property_table[current_property].items():
                             if value == current_property_value:
                                 found_key: int = int(key)
 
@@ -342,18 +347,19 @@ class BRAPI:
                 # Insert n-word here
 
                 # Bricks Writing is ready to be updated!
-                bricks_writing = temp_bricks_writing
+                self.bricks_writing = temp_bricks_writing.copy()
 
 
                 # Debug
                 if self.debug_logs:
                     print(f'[DEBUG] Identical Excluded Brick L : {temp_iebl}')
                     print(f'[DEBUG] Property Table............ : {property_table}')
-                    print(f'[DEBUG] ID Assigned Property Table : {id_assigned_property_table}')
-                    print(f'[DEBUG] Brick Properties Writing.. : {temp_bricks_writing}')
+                    print(f'[DEBUG] ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'[DEBUG] Brick Properties Writing.. : {self.bricks_writing}')
                     print(f'[DEBUG] String Name to ID Table... : {string_name_to_id_table}')
                     print(f'[DEBUG] Brick Types............... : {brick_types}')
-                    print(f'[DEBUG] Property ID to Prop. Type. : {property_id_to_property_type_table}')
+                    print(f'[DEBUG] Property Key Table........ : {property_key_table}')
+                    print(f'[DEBUG] Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
                 property_count = w_property_count
@@ -381,22 +387,22 @@ class BRAPI:
                         if property_type_key not in br_special_property_instance_list:
 
 
-                            # If its an integer (uint 16 bit by default)
+                            # If it's an integer (uint 16 bit by default)
                             if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
                                 temp_spl += unsigned_int(pt_c_val, 2)
 
 
-                            # If its a float (float 32 bit by default)
+                            # If it's a float (float 32 bit by default)
                             if isinstance(pt_c_val, float):
                                 temp_spl += bin_float(pt_c_val, 4)
 
 
-                            # If its a bool
+                            # If it's a bool
                             if isinstance(pt_c_val, bool):
                                 temp_spl += unsigned_int(int(pt_c_val), 1)
 
 
-                            # If its a brick input
+                            # If it's a brick input
                             if isinstance(pt_c_val, BrickInput):
                                 temp_pre_spl += pt_c_val.return_br()
 
@@ -412,7 +418,7 @@ class BRAPI:
                                 temp_pre_spl: bytes = b''  # Reset
 
 
-                            # If its a string (converting to utf-16)
+                            # If it's a string (converting to utf-16)
                             if isinstance(pt_c_val, str):
                                 temp_spl += signed_int(-len(pt_c_val), 2)
                                 temp_spl += bin_str(pt_c_val)
@@ -421,7 +427,7 @@ class BRAPI:
                                 case 'INT8':
                                     temp_spl += unsigned_int(pt_c_val, 1)
                                 case '6xINT2':
-                                    temp_w_spl_connector = pt_c_val[0] + pt_c_val[1]*4 + pt_c_val[2]*16 + pt_c_val[3]*64 + pt_c_val[4]*256 + pt_c_val[5]*1024
+                                    temp_w_spl_connector = pt_c_val[0] + (pt_c_val[1]<<2) + (pt_c_val[2]<<4) + (pt_c_val[3]<<6) + (pt_c_val[4]<<8) + (pt_c_val[5]<<10)
                                     temp_spl += unsigned_int(temp_w_spl_connector, 2)
                                 case '3xINT16':
                                     temp_spl += unsigned_int(pt_c_val[0], 2)
@@ -452,7 +458,7 @@ class BRAPI:
                 brick_data_writing: bytes = b''
 
 
-                for current_brick in bricks_writing:
+                for current_brick in self.bricks_writing:
 
                     # Writing Brick Type
                     brv_file.write(unsigned_int(current_brick[1][0]['gbn'], 2))
@@ -480,11 +486,79 @@ class BRAPI:
                 brv_file.write(b'\x00\x00')
 
 
+                #  BR-API & USER APPENDIX
+
+
+                brv_watermark = f'File written with BR-API version {version}. Join our discord to learn more: sZXaESzDd9'
+                self.brapi_appendix.append(small_bin_str(brv_watermark))
+
+
+                for brapi_individual_appendix in self.brapi_appendix:
+                    brv_file.write(unsigned_int(len(brapi_individual_appendix), 4))
+                    print(len(brapi_individual_appendix))
+                    brv_file.write(brapi_individual_appendix)
+
+
+
+    def debug_print(self, print_bricks=False):
+
+        def print_named_spacer(name: str):
+            print('=== ', end='')
+            print(name, end='')
+            print(' ' + '='*(95-len(name)))
+
+        spacer = '█'*100
+
+        # PRINTING GENERAL INFORMATION
+        print(spacer)
+        print_named_spacer("PROJECT INFORMATION")
+        print(f"PROJECT FOLDER: {self.in_project_folder_directory}")
+        print(f"PROJECT NAME: {self.project_display_name!r} [ID: {self.project_name}]")
+        print(f"FILE DESCRIPTION: {self.file_description!r}")
+        print(f"DEBUG LOGS: {self.debug_logs}")
+        print_named_spacer("CREATION INFORMATION")
+        print(f"BRICK COUNT: {self.brick_count}")
+        print(f"VEHICLE SIZE [X,Y,Z]: {self.vehicle_size}")
+        print(f"VEHICLE WEIGHT (KG): {self.vehicle_weight}")
+        print(f"VEHICLE WORTH: {self.vehicle_worth}")
+
+        # PRINTING BRICKS
+
+        if print_bricks:
+            for current_brick in range(len(self.bricks)):
+
+                print(spacer)
+
+                # BRICK INFORMATION
+
+                print_named_spacer('BRICK INFORMATION')
+                print(f'BRICK NAME: {self.bricks[current_brick][0]} [ID:{self.bricks_writing[current_brick][0]}]')
+                print(f"BRICK TYPE: {self.bricks[current_brick][1]['gbn']} "
+                      f"[ID: {self.bricks_writing[current_brick][1][0]['gbn']}]")
+                print(f"BRICK POS.: {self.bricks[current_brick][1]['Position']}")
+                print(f"BRICK ROT.: {self.bricks[current_brick][1]['Rotation']}")
+
+                # BRICK PROPERTIES
+                print_named_spacer('BRICK PROPERTIES')
+                no_properties = True
+                for brick_property, brick_property_value in self.bricks_writing[current_brick][1][1]:
+                    string_property = self.inverted_property_key_table[brick_property]
+                    print(f"{string_property}: "
+                          f"{self.id_assigned_property_table[string_property][brick_property_value]}"
+                          f" [ID: {brick_property}, {brick_property_value}]")
+                    no_properties = False
+                if no_properties:
+                    print("No properties found.")
+            print(spacer)
+
+
 # --------------------------------------------------
 
 
 # Try it out
 if __name__ == '__main__':
+
+    # Setting up BR-API
     data = BRAPI()
     data.project_name = 'test_project_demo'
     data.project_display_name = 'My Test Project Demo'
@@ -492,30 +566,14 @@ if __name__ == '__main__':
     data.file_description = 'Hello\nSir'
     data.debug_logs = True
 
-    """
-    my_switch = create_brick('Switch_1sx1sx1s')
-    my_switch['bReturnToZero'] = False
-    my_switch['Position'] = [1.6, 0.6, 1.2]
-    my_switch['Rotation'] = [10.5, 25.2, -13.6]
+    # Bricks
+    my_brick = create_brick("ScalableRampRoundedN")
+    my_brick['bGenerateLift'] = True
+    data.add_brick('my_brick', my_brick)
+    data.user_appendix = 'Hello World!'.encode('utf-8')
 
-    my_display = create_brick('DisplayBrick')
-    my_display['NumFractionalDigits'] = 5
-    my_display['Position'] = [2.2, 1.9, -4.2]
-    my_display['Rotation'] = [68.3, 12.5, -90]
-    my_display['ConnectorSpacing'] = [0, 2, 1, 0, 3, 1]
-
-    data.add_brick('my_switch', my_switch)
-    """
-
-    my_display = create_brick('DisplayBrick')
-    my_display['NumFractionalDigits'] = 4
-
-    my_switch = create_brick('Switch_1sx1sx1s')
-    my_switch['InputChannel'] = BrickInput('Custom', ['my_display'])
-
-    data.add_brick('my_display', my_display)
-    data.add_brick('my_switch', my_switch)
-
+    # Writing stuff
     data.write_preview()
     data.write_metadata()
     data.write_brv()
+    data.debug_print(True)

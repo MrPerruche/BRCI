@@ -96,10 +96,26 @@ append_multiple(br_brick_list,
                     'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
                 }, True)
 
+append_multiple(br_brick_list,
+                ['Motor_1x2x5s', 'EMotor_2x2x2', 'Motor_3x2x5s', 'AircraftR4',
+                 'Motor_4x2x5s', 'DragV8', 'DieselV12'],
+                br_brick_list['default_brick_data'] | {
+                    'ThrottleInputChannel.InputAxis': BrickInput('Throttle', None),
+                    'GearRatioScale': 1.0,
+                    'bTankDrive': False
+                })
+
 
 # -------------------------------------------------
 # PROPERTIES
 # --------------------------------------------------
+
+"""
+Order for Connector Spacing in UI:
+    [1] [0]
+    [3] [2]
+    [5] [4]
+"""
 
 br_special_property_instance_list = {
     'BrickColor': '4xINT8',
