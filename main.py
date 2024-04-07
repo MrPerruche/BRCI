@@ -16,7 +16,7 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version: str = "C14"  # String, This is equivalent to 3.__ fyi
+version: str = "C15"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -184,7 +184,7 @@ class BRAPI:
                 metadata_file.write(bin_str(watermarked_file_description)[2:])
 
                 # Write all necessary information for the 4 additional values : Bricks, Size, Weight and Monetary Value
-                metadata_file.write(signed_int(self.brick_count, 2))
+                metadata_file.write(unsigned_int(self.brick_count, 2))
                 metadata_file.write(bin_float(self.vehicle_size[0], 4))
                 metadata_file.write(bin_float(self.vehicle_size[1], 4))
                 metadata_file.write(bin_float(self.vehicle_size[2], 4))
@@ -363,7 +363,7 @@ class BRAPI:
 
                 # Write how many properties there are
                 property_count = w_property_count
-                brv_file.write(unsigned_int(property_count, 2))
+                brv_file.write(unsigned_int(len(property_table), 2))
 
 
                 # Write each brick type
@@ -383,6 +383,7 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(property_type_value), 2))
 
                     # Summing values
+                    property_length_precised: bool = False
                     for pt_c_val in property_type_value: # property_table_current_value
                         if property_type_key not in br_special_property_instance_list:
 
@@ -443,14 +444,18 @@ class BRAPI:
                                     temp_spl += unsigned_int(pt_c_val[2], 1)
                                     temp_spl += unsigned_int(pt_c_val[3], 1)
 
-                    # FIXME : Lazy fix, may not work in all scenarios. Needs research.
-                    bool_inverse_throw_back: int = 0
-                    if (True in property_type_value) and (False in property_type_value):
-                        temp_spl += b'\x01\x00'
-                        bool_inverse_throw_back += 2
+                        if not property_length_precised :
+                            property_length = len(temp_spl)
+                            property_length_precised = True
 
-                    brv_file.write(unsigned_int(len(temp_spl) - bool_inverse_throw_back, 4))
+
+                    brv_file.write(unsigned_int(len(temp_spl), 4))
                     brv_file.write(temp_spl)
+
+                    # Indicating property length if there's more than one property value.
+                    if len(property_type_value) > 1:
+                        brv_file.write(unsigned_int(property_length, 2))
+
                     temp_spl: bytes = b''  # Reset
 
 
@@ -468,13 +473,13 @@ class BRAPI:
                         brick_data_writing += unsigned_int(current_property[0], 2)
                         brick_data_writing += unsigned_int(current_property[1], 2)
                     # Getting ready to write position and rotation
-                    brick_data_writing += bin_float(current_brick[1][0]['Position'][0]*100, 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Position'][1]*100, 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Position'][2]*100, 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Position'][0], 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Position'][1], 4)
+                    brick_data_writing += bin_float(current_brick[1][0]['Position'][2], 4)
                     # Note sure why its out of order in the brv. Whatever
+                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][0], 4)
                     brick_data_writing += bin_float(current_brick[1][0]['Rotation'][1], 4)
                     brick_data_writing += bin_float(current_brick[1][0]['Rotation'][2], 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][0], 4)
 
                     # Writing
                     brv_file.write(unsigned_int(len(brick_data_writing), 4))
@@ -502,54 +507,60 @@ class BRAPI:
 
     def debug_print(self, print_bricks=False):
 
-        def print_named_spacer(name: str):
-            print('=== ', end='')
-            print(name, end='')
-            print(' ' + '='*(95-len(name)))
+        def named_spacer(name: str):
+            return '=== ' + name + ' ' + '='*(95-len(name))
 
         spacer = '█'*100
 
+        str_to_write = ''
+
         # PRINTING GENERAL INFORMATION
-        print(spacer)
-        print_named_spacer("PROJECT INFORMATION")
-        print(f"PROJECT FOLDER: {self.in_project_folder_directory}")
-        print(f"PROJECT NAME: {self.project_display_name!r} [ID: {self.project_name}]")
-        print(f"FILE DESCRIPTION: {self.file_description!r}")
-        print(f"DEBUG LOGS: {self.debug_logs}")
-        print_named_spacer("CREATION INFORMATION")
-        print(f"BRICK COUNT: {self.brick_count}")
-        print(f"VEHICLE SIZE [X,Y,Z]: {self.vehicle_size}")
-        print(f"VEHICLE WEIGHT (KG): {self.vehicle_weight}")
-        print(f"VEHICLE WORTH: {self.vehicle_worth}")
+        str_to_write += spacer + '\n'
+        str_to_write += named_spacer("PROJECT INFORMATION") + '\n'
+        str_to_write += f"PROJECT FOLDER: {self.in_project_folder_directory}\n"
+        str_to_write += f"PROJECT NAME: {self.project_display_name!r} [ID: {self.project_name}]\n"
+        str_to_write += f"FILE DESCRIPTION: {self.file_description!r}\n"
+        str_to_write += f"DEBUG LOGS: {self.debug_logs}\n"
+        str_to_write += named_spacer("CREATION INFORMATION") + '\n'
+        str_to_write += f"BRICK COUNT: {self.brick_count}\n"
+        str_to_write += f"VEHICLE SIZE [X,Y,Z] (CM): {self.vehicle_size}\n"
+        str_to_write += f"VEHICLE WEIGHT (KG): {self.vehicle_weight}\n"
+        str_to_write += f"VEHICLE WORTH: {self.vehicle_worth}\n"
 
         # PRINTING BRICKS
 
         if print_bricks:
             for current_brick in range(len(self.bricks)):
 
-                print(spacer)
+                str_to_write += spacer + '\n'
 
                 # BRICK INFORMATION
 
-                print_named_spacer('BRICK INFORMATION')
-                print(f'BRICK NAME: {self.bricks[current_brick][0]} [ID:{self.bricks_writing[current_brick][0]}]')
-                print(f"BRICK TYPE: {self.bricks[current_brick][1]['gbn']} "
-                      f"[ID: {self.bricks_writing[current_brick][1][0]['gbn']}]")
-                print(f"BRICK POS.: {self.bricks[current_brick][1]['Position']}")
-                print(f"BRICK ROT.: {self.bricks[current_brick][1]['Rotation']}")
+                str_to_write += named_spacer('BRICK INFORMATION') + '\n'
+                str_to_write += f'BRICK NAME: {self.bricks[current_brick][0]} [ID:{self.bricks_writing[current_brick][0]}]\n'
+                str_to_write += (f"BRICK TYPE: {self.bricks[current_brick][1]['gbn']} "
+                      f"[ID: {self.bricks_writing[current_brick][1][0]['gbn']}]\n")
+                str_to_write += f"BRICK POS.: {self.bricks[current_brick][1]['Position']}\n"
+                str_to_write += f"BRICK ROT.: {self.bricks[current_brick][1]['Rotation']}\n"
 
                 # BRICK PROPERTIES
-                print_named_spacer('BRICK PROPERTIES')
+                str_to_write += named_spacer('BRICK PROPERTIES') + '\n'
                 no_properties = True
                 for brick_property, brick_property_value in self.bricks_writing[current_brick][1][1]:
                     string_property = self.inverted_property_key_table[brick_property]
-                    print(f"{string_property}: "
+                    str_to_write += (f"{string_property}: "
                           f"{self.id_assigned_property_table[string_property][brick_property_value]}"
-                          f" [ID: {brick_property}, {brick_property_value}]")
+                          f" [ID: {brick_property}, {brick_property_value}]\n")
                     no_properties = False
                 if no_properties:
-                    print("No properties found.")
-            print(spacer)
+                    str_to_write += "No properties found.\n"
+            str_to_write += spacer
+
+            with open(os.path.join(self.in_project_folder_directory, "debug_logs.txt"), 'w', encoding='utf-16') as file:
+                file.write('DEBUG LOGS\n')
+                file.write(str_to_write)
+
+            print(str_to_write)
 
 
 # --------------------------------------------------
@@ -566,11 +577,37 @@ if __name__ == '__main__':
     data.file_description = 'Hello\nSir'
     data.debug_logs = True
 
-    # Bricks
-    my_brick = create_brick("ScalableRampRoundedN")
-    my_brick['bGenerateLift'] = True
-    data.add_brick('my_brick', my_brick)
-    data.user_appendix = 'Hello World!'.encode('utf-8')
+    def stress_test_run() -> None:
+        import random
+        for bricknum in range(3000):
+            try:
+                temptestbrick = create_brick(random.choice(list(br_brick_list.keys())))
+                temptestselectedprop = random.choice(list(temptestbrick.keys()))
+                if isinstance(temptestbrick[temptestselectedprop], float):
+                    temptestbrick[temptestselectedprop] = random.uniform(0.0, 1000.0)
+                if 'gbn' in temptestbrick:
+                    data.add_brick(str(bricknum), temptestbrick)
+            except KeyError:
+                raise KeyError(f'GBN INVALID BRICK')
+
+    # stress_test_run()
+
+    apiutest_pitch = 0.5
+    posx = 0
+    hue = 0
+    for itineration in range(20):
+        apiutest_pitch -= 0.025
+        posx += 10
+        hue += 10
+        apiutest_currentbrickw = create_brick('DoubleSiren_1x2x1s')
+        apiutest_currentbrickw['HornPitch'] = apiutest_pitch
+        apiutest_currentbrickw['Position'] = [posx, 0, 0]
+        apiutest_currentbrickw['BrickColor'] = [hue, 255, 255, 255]
+        data.add_brick(str(itineration), apiutest_currentbrickw)
+
+
+
+    print('now generating file')
 
     # Writing stuff
     data.write_preview()
