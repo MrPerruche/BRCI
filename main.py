@@ -7,16 +7,18 @@ from BRAPIF import *
 
 # TODO Add more jokes in comments because they're pretty annoying.
 # TODO Comment each variable to specify their content & classes for rust translation.
+# TODO Add all bricks in br_brick_list
+# TODO Calculate vehicle_size, vehicle_weight and vehicle_worth
 # TODO Find another way to make Brick Inputs. (Perhaps they should work and I'm just an idiot?)
 # TODO Finish Appendix System (DO NOT USE MEANWHILE)
-# TODO Implement Brick Loading (IDEA : Exclusively load user appendix)
+# TODO Implement Brick Loading (IDEA : Exclusively load user appendix)?
 
 # ------------------------------------------------------------
 # DEFAULT VARIABLES AND SETUP
 # ------------------------------------------------------------
 
 # Setup variables
-version: str = "C15"  # String, This is equivalent to 3.__ fyi
+version: str = "C16"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -157,8 +159,8 @@ class BRAPI:
         # Write blank file for metadata (if desired)
         if self.write_blank:
 
-            blank_metadata = open(os.path.join(self.in_project_folder_directory, "MetaData.brm"), "x")
-            blank_metadata.close()
+            with open(os.path.join(self.in_project_folder_directory, "MetaData.brm"), "x"):
+                pass
 
         # Otherwise write working metadata file
         else:
@@ -174,8 +176,8 @@ class BRAPI:
                 metadata_file.write(bin_str(line_feed_file_name)[2:])
 
                 # Write all necessary information for the file description
-                watermarked_file_description = f"Created using BR-API.\n" \
-                                               f"BR-API Version {version}.\n\n" \
+                watermarked_file_description = f"Created using BR-API (Version {version}).\n" \
+                                               f"Join our discord for more information : [INVITE LINK]\n\n" \
                                                f"Description:\n{self.file_description}." # String
                 watermarked_file_description = (
                     ((watermarked_file_description.replace("\\n", "\n")).encode('utf-16'))
@@ -216,6 +218,10 @@ class BRAPI:
     # Writing Vehicle.brv
     def write_brv(self):
 
+        import time # DEBUGCODE
+        previous_time = time.time()
+        begin_time = time.time()
+
         # Create folder if missing
         self.ensure_project_directory_exists()
 
@@ -250,6 +256,11 @@ class BRAPI:
                 # Get the different bricks present in the project
                 brick_types = list(set(item[1]['gbn'] for item in self.bricks_writing)) # List
 
+                print(f'FROM SETUP TO BRICKTYPES : {time.time() - previous_time}')
+                previous_time = time.time()  # DEBUGCODE
+
+                """This code may be difficult to understand. Here is the old code, which does the same thing,
+                but is easier to understand and less optimised
                 # Write the number of different brick types
                 brv_file.write(unsigned_int(len(brick_types), 2))
 
@@ -297,6 +308,46 @@ class BRAPI:
                             if p_del_current_value not in property_table[p_del_current_key]:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
+                print(f'TEMPIEBL, PROPERTY TABLE, STRING NAME TO ID : {time.time() - previous_time}')
+                previous_time = time.time()  # DEBUGCODE"""
+
+                # Write the number of different brick types
+                brv_file.write(unsigned_int(len(brick_types), 2))
+
+                # [ Getting rid of all properties that are set to the default value for each brick ]
+                # Brick list filtering variables
+                temp_iebl = []  # List of lists containing an integer and a list containing a dictionary and integers
+                safe_property_list = ['gbn', 'Position', 'Rotation']
+
+                # Defining bricks
+                w_current_brick_id = 0  # 16 bit
+                string_name_to_id_table = {}
+                property_table = {}
+
+                # List Properties
+                for current_brick in self.bricks_writing:
+                    # Add all bricks without including data
+                    temp_iebl.append([w_current_brick_id, [{}, {}]])
+                    string_name_to_id_table[current_brick[0]] = w_current_brick_id
+                    w_current_brick_id += 1
+
+                    # For each data for each brick
+                    for p_del_current_key, p_del_current_value in current_brick[1].items():
+                        # Accept if it's in the safe list (list which gets whitelisted even if default value is identical)
+                        if p_del_current_key in safe_property_list:
+                            temp_iebl[-1][1][0][p_del_current_key] = p_del_current_value
+                        # Otherwise regular process: if not default, get rid of it
+                        elif p_del_current_value != br_brick_list[current_brick[1]['gbn']][p_del_current_key]:
+                            temp_iebl[-1][1][1][p_del_current_key] = p_del_current_value
+                            # Make sure key in the dict exists
+                            property_table.setdefault(p_del_current_key, [])
+                            # Setup property table
+                            if p_del_current_value not in property_table[p_del_current_key]:
+                                property_table[p_del_current_key].append(p_del_current_value)
+
+                print(f'TEMPIEBL, PROPERTY TABLE, STRING NAME TO ID : {time.time() - previous_time}')
+                previous_time = time.time()  # DEBUGCODE
+
 
                 # Setup property ids
                 w_current_property_id: int = 0  # 32 bit
@@ -320,6 +371,10 @@ class BRAPI:
                     w_property_key_num += 1
                     w_current_property_id = 0
 
+
+                print(f'ID ASSIGNED PROPERTY TABLE : {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
+
                 # Give IDs
                 temp_bricks_writing: list = []
 
@@ -341,13 +396,16 @@ class BRAPI:
                     # Giving Brick Type IDs
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
 
-                # Bricks Writing is ready!
-                temp_bricks_writing = temp_bricks_writing.copy()
+                print(f'TEMP BRICKS WRITING : {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
 
                 # Insert n-word here
 
                 # Bricks Writing is ready to be updated!
                 self.bricks_writing = temp_bricks_writing.copy()
+
+                print(f'BRICKS WRITING : {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
 
 
                 # Debug
@@ -370,6 +428,9 @@ class BRAPI:
                 for brick_type in brick_types:
                     brv_file.write(unsigned_int(len(brick_type), 1))
                     brv_file.write(small_bin_str(brick_type))
+
+                print(f'WRITE BRICK TYPES: {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
 
                 temp_spl: bytes = b''
                 temp_pre_spl: bytes = b''
@@ -458,6 +519,9 @@ class BRAPI:
 
                     temp_spl: bytes = b''  # Reset
 
+                print(f'WRITE PROPERTIES: {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
+
 
                 # WRITING BRICKS
                 brick_data_writing: bytes = b''
@@ -491,6 +555,10 @@ class BRAPI:
                 brv_file.write(b'\x00\x00')
 
 
+                print(f'WRITE BRICKS: {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
+
+
                 #  BR-API & USER APPENDIX
 
 
@@ -502,6 +570,10 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(brapi_individual_appendix), 4))
                     print(len(brapi_individual_appendix))
                     brv_file.write(brapi_individual_appendix)
+
+                print(f'WRITE APPENDIX: {time.time() - previous_time}')  # DEBUGCODE
+                previous_time = time.time()
+                print(f'TOTAL TIME: {time.time() - begin_time}')
 
 
 
@@ -571,39 +643,42 @@ if __name__ == '__main__':
 
     # Setting up BR-API
     data = BRAPI()
-    data.project_name = 'test_project_demo'
-    data.project_display_name = 'My Test Project Demo'
+    data.project_name = 'stress_test_15000'
+    data.project_display_name = 'BR-API Stress Test\n15,000 Bricks'
     data.project_folder_directory = os.path.join(_cwd, 'Projects')
-    data.file_description = 'Hello\nSir'
-    data.debug_logs = True
+    data.file_description = 'Stress Test for BR-API.\nAs this program may generate invalid bricks, and brick rigs only load 1 engine, this creation\'s brick count may not equal what it is claimed to be.'
+    data.debug_logs = False
 
     def stress_test_run() -> None:
         import random
-        for bricknum in range(3000):
+        for bricknum in range(15_000):
             try:
                 temptestbrick = create_brick(random.choice(list(br_brick_list.keys())))
                 temptestselectedprop = random.choice(list(temptestbrick.keys()))
                 if isinstance(temptestbrick[temptestselectedprop], float):
                     temptestbrick[temptestselectedprop] = random.uniform(0.0, 1000.0)
+                temptestbrick['Position'] = [random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0)]
+                temptestbrick['Rotation'] = [random.uniform(0.0, 360.0), random.uniform(0.0, 360.0), random.uniform(0.0, 360.0)]
                 if 'gbn' in temptestbrick:
                     data.add_brick(str(bricknum), temptestbrick)
             except KeyError:
                 raise KeyError(f'GBN INVALID BRICK')
 
-    # stress_test_run()
+    def horn_pitch_test() -> None:
+        apiutest_pitch = 0.5
+        posx = 0
+        hue = 0
+        for itineration in range(20):
+            apiutest_pitch -= 0.025
+            posx += 10
+            hue += 10
+            apiutest_currentbrickw = create_brick('DoubleSiren_1x2x1s')
+            apiutest_currentbrickw['HornPitch'] = apiutest_pitch
+            apiutest_currentbrickw['Position'] = [posx, 0, 0]
+            apiutest_currentbrickw['BrickColor'] = [hue, 255, 255, 255]
+            data.add_brick(str(itineration), apiutest_currentbrickw)
 
-    apiutest_pitch = 0.5
-    posx = 0
-    hue = 0
-    for itineration in range(20):
-        apiutest_pitch -= 0.025
-        posx += 10
-        hue += 10
-        apiutest_currentbrickw = create_brick('DoubleSiren_1x2x1s')
-        apiutest_currentbrickw['HornPitch'] = apiutest_pitch
-        apiutest_currentbrickw['Position'] = [posx, 0, 0]
-        apiutest_currentbrickw['BrickColor'] = [hue, 255, 255, 255]
-        data.add_brick(str(itineration), apiutest_currentbrickw)
+    stress_test_run()
 
 
 
@@ -613,4 +688,4 @@ if __name__ == '__main__':
     data.write_preview()
     data.write_metadata()
     data.write_brv()
-    data.debug_print(True)
+    data.debug_print(False)
