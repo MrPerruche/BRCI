@@ -18,10 +18,60 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version: str = "C16"  # String, This is equivalent to 3.__ fyi
+version: str = "C17"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
+
+# Regular Variables
+
+reset_after_each_line = True # Reset colors after each line? [[WARNING: OVERRIDES PRINT TO HAVE MORE ARGUMENTS, BUT OTHERWISE PRINT IS UNCHANGED]]
+
+# Colors
+class clr:
+    reset = '\x1b[0m' # Reset code
+    red = '\x1b[31m'
+    blue = '\x1b[34m'
+    green = '\x1b[32m'
+    yellow = '\x1b[33m'
+    purple = '\x1b[35m'
+    cyan = '\x1b[36m'
+    white = '\x1b[37m'
+    black = '\x1b[30m'
+    lightblue = '\x1b[94m'
+    lightgreen = '\x1b[92m'
+    lightred = '\x1b[91m'
+    lightpurple = '\x1b[95m'
+    lightwhite = '\x1b[97m'
+    lightblack = '\x1b[90m'
+    lightcyan = '\x1b[96m'
+    lightyellow = '\x1b[93m'
+    bold = '\x1b[1m'
+    unbold = '\x1b[22m'
+
+
+if reset_after_each_line:
+    from builtins import print as printins
+    # Override the built-in print function
+    def print(*args, end='\n', resetcolor=True, **kwargs):
+        # Print-ception
+        if resetcolor:     printins(*args, end=f"{end}{clr.reset}", **kwargs)
+        else: printins(*args, end=f"{end}", **kwargs)
+
+# Stupid Functions
+def debugformat():
+    return f"{clr.lightpurple}{clr.bold}[DEBUG]:{clr.unbold} "
+def successformat():
+    return f"{clr.lightgreen}{clr.bold}[SUCCESS]:{clr.unbold} "
+def errorformat():
+    return f"{clr.red}{clr.bold}[ERROR]:{clr.unbold} "
+def warningformat():
+    return f"{clr.lightyellow}{clr.bold}[WARNING]:{clr.unbold} "
+def infoformat():
+    return f"{clr.blue}{clr.bold}[INFO]:{clr.unbold} "
+def testformat():
+    return f"{clr.lightcyan}{clr.bold}[TEST]:{clr.unbold} "
+
 
 # Temporary Variables
 # No Temporary Variables.
@@ -33,14 +83,19 @@ _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
 
 # Return all data about specified brick
-def create_brick(brick: str):
-    return br_brick_list[brick].copy()
+#def create_brick(brick: str):
+    #return br_brick_list[brick].copy()
+
+# pain
+
+def create_brick(brick: str, properties: dict = {}) -> dict:
+    return br_brick_list[brick].copy() | properties
 
 
-# What am I supposed to comment here?
+# Brick Rigs API Class
 class BRAPI:
 
-    # Getting all values. Do I have to comment that too?
+    # Grab values
     def __init__(self,
                  bricks=None,
                  project_folder_directory='',
@@ -51,17 +106,17 @@ class BRAPI:
                  debug_logs=False,
                  user_appendix=b''):
 
-        # I'm not commenting this either.
+        # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
         self.project_name = project_name  # String
         self.write_blank = write_blank  # Boolean
-        self.project_display_name = project_display_name  # String
-        self.file_description = file_description  # String
-        if bricks is None:  # List (None is used here for initialization)
-            bricks = []
-        self.bricks = bricks
-        self.debug_logs = debug_logs
-        self.user_appendix = user_appendix
+        self.project_display_name = project_display_name  # String (Ingame name (.brm))
+        self.file_description = file_description  # String (The description of the file (.brm))
+        if bricks is None:  # List (If unspecified, create an empty list)
+            bricks = [] # Initialize bricks
+        self.bricks = bricks # List (Of bricks)
+        self.debug_logs = debug_logs # Boolean (Debug logs toggle)
+        self.user_appendix = user_appendix # List (User appendix)
 
 
     # Creating more variables
@@ -91,11 +146,11 @@ class BRAPI:
     @property
     def vehicle_worth(self): # 32 bit float
         # TODO : CALCULATE WORTH
-        return 0.2
+        return 0.2 # I wonder if this will make it 0.2 ingame? Or does BR calculate the price itself?
 
     # Adding bricks to the brick list
     def add_brick(self, brick_name: str, new_brick: dict):
-        self.bricks.append([str(brick_name), new_brick])
+        self.bricks.append([str(brick_name), new_brick]) # TODO : CHECK IF NAME IS INVALID (probably by using BRAPIF)
 
         return self
 
@@ -130,7 +185,7 @@ class BRAPI:
     # Writing preview.png
     def write_preview(self):
 
-        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_compressed_reg.png') # Path
+        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_beta.png') # Path
 
         # Create folder if missing
         self.ensure_project_directory_exists()
@@ -197,13 +252,20 @@ class BRAPI:
                 metadata_file.write(bytes.fromhex('FFFFFFFFFFFFFFFF'))
 
                 # I have no fucking clue of what I'm writing but hey it's something right?
-                metadata_file.write(bytes.fromhex("14686300000000B034B6C7382ADC08E079251F392ADC08"))
+                metadata_file.write(bytes.fromhex("14686300000000B034B6C7382ADC08E079251F392ADC08")) # Peak programming. TODO Figure out what the fuck we're writing here
+
+
+                # Write a function for a very specific and stupid purpose
+                def write_tags_to_file(tag1: str = "Other", tag2: str = "Other", tag3: str = "Other"):
+                    metadata_file.write(unsigned_int(3, 1))
+                    for i in range(3):
+                        metadata_file.write(unsigned_int(5, 1))
+                        metadata_file.write(small_bin_str(locals()[f"tag{i+1}"])) # "locals()" returns the dict of all variables in the current scope
+                        # Trying to modify said dict will actually add a new variable or change an existing one. I don't know why, since it is returning the *current* variables.
+
 
                 # Writing tags                                                                                          FIXME
-                metadata_file.write(unsigned_int(3, 1))
-                for i in range(3):
-                    metadata_file.write(unsigned_int(5, 1))
-                    metadata_file.write(small_bin_str("Other"))
+                write_tags_to_file() # TODO: Add a way to input tags. For now, they are all "Other"
 
 
 
@@ -238,10 +300,16 @@ class BRAPI:
         # Otherwise write working vehicle file
         else:
 
-            # Verify if there are too many bricks
-            if len(self.bricks) > 65535:
+            # Future-proofing (Fluppi may change the number of bits in the brick count)
+            bitcount = 16
+            signed = False
+            br_intlimit = 2**bitcount     # DO NOT TOUCH EITHER OF THESE
+            if signed: br_intlimit -= 1   # DO NOT TOUCH EITHER OF THESE
 
-                raise OverflowError('Brick Rigs cannot support more than 65535 bricks. (16 bit int maximum)')
+            # Verify if there are too many bricks
+            if len(self.bricks) > br_intlimit:
+
+                raise OverflowError(f'Brick Rigs cannot support more than {br_intlimit} bricks ({bitcount} bit unsigned integer limit).')
 
             with open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file:
 
@@ -362,7 +430,7 @@ class BRAPI:
 
                     for pvv_value in property_value_value:
 
-                        self.id_assigned_property_table[property_value_key]: dict = self.id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
+                        self.id_assigned_property_table[property_value_key] = self.id_assigned_property_table[property_value_key] | {w_current_property_id: pvv_value}
                         w_current_property_id += 1
                         w_property_count += 1
 
@@ -410,14 +478,14 @@ class BRAPI:
 
                 # Debug
                 if self.debug_logs:
-                    print(f'[DEBUG] Identical Excluded Brick L : {temp_iebl}')
-                    print(f'[DEBUG] Property Table............ : {property_table}')
-                    print(f'[DEBUG] ID Assigned Property Table : {self.id_assigned_property_table}')
-                    print(f'[DEBUG] Brick Properties Writing.. : {self.bricks_writing}')
-                    print(f'[DEBUG] String Name to ID Table... : {string_name_to_id_table}')
-                    print(f'[DEBUG] Brick Types............... : {brick_types}')
-                    print(f'[DEBUG] Property Key Table........ : {property_key_table}')
-                    print(f'[DEBUG] Inverted Property Key Tbl. : {self.inverted_property_key_table}')
+                    print(f'{debugformat()} Identical Excluded Brick L : {temp_iebl}')
+                    print(f'{debugformat()} Property Table............ : {property_table}')
+                    print(f'{debugformat()} ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'{debugformat()} Brick Properties Writing.. : {self.bricks_writing}')
+                    print(f'{debugformat()} String Name to ID Table... : {string_name_to_id_table}')
+                    print(f'{debugformat()} Brick Types............... : {brick_types}')
+                    print(f'{debugformat()} Property Key Table........ : {property_key_table}')
+                    print(f'{debugformat()} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
                 property_count = w_property_count
@@ -643,11 +711,11 @@ if __name__ == '__main__':
 
     # Setting up BR-API
     data = BRAPI()
-    data.project_name = 'stress_test_15000'
-    data.project_display_name = 'BR-API Stress Test\n15,000 Bricks'
+    data.project_name = 'BR-API test'
+    data.project_display_name = 'BR-API test'
     data.project_folder_directory = os.path.join(_cwd, 'Projects')
-    data.file_description = 'Stress Test for BR-API.\nAs this program may generate invalid bricks, and brick rigs only load 1 engine, this creation\'s brick count may not equal what it is claimed to be.'
-    data.debug_logs = False
+    data.file_description = '....fuck..'
+    data.debug_logs = True
 
     def stress_test_run() -> None:
         import random
@@ -678,14 +746,23 @@ if __name__ == '__main__':
             apiutest_currentbrickw['BrickColor'] = [hue, 255, 255, 255]
             data.add_brick(str(itineration), apiutest_currentbrickw)
 
-    stress_test_run()
+    #stress_test_run() # Since apparently I've just deleted main.py if I don't keep this function smh (why the fuck would a default be a benchmark?)
 
+    # TODO make an actual default vehicle that wont cause even high end systems to kill themselves when spawned 
+    # (or simply just one that doesnt drive people with low end systems away entirely)
 
+    properties = {"Position": [0,0,0], "Rotation": [0,0,0], "BrickColor": [0, 255, 255, 255]}
+    switch1 = create_brick('Switch_1sx1sx1s', properties)
+    data.add_brick("Switch1", switch1)
 
-    print('now generating file')
+    print(f"{infoformat()}Now generating file.")
 
+    try:
     # Writing stuff
-    data.write_preview()
-    data.write_metadata()
-    data.write_brv()
-    data.debug_print(False)
+        data.write_preview()
+        data.write_metadata()
+        data.write_brv()
+        data.debug_print(False)
+        print(f"{successformat()}File successfully generated.")
+    except Exception as e:
+        print(f"{errorformat()}File generation failed. Information: ('{e}')")

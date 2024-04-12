@@ -2,7 +2,7 @@
 
 ## Default Brick Properties
 
-This is a list of properties all bricks are (supposed to) have.  
+This is a list of properties all bricks (are supposed to) have.  
 NAME: `br_brick_list['default_brick_data']`
 
 - `BrickColor` (`[u8, u8, u8, u8]`) (`[0, 0, 127, 255]`)

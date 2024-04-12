@@ -1,26 +1,26 @@
 from BRAPIF import append_multiple, BrickInput
 
 br_brick_materials = {
-    'aluminium':        {'price': 2.00, 'density': 2.70, 'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
-    'brushed aluminum': {'price': 2.00, 'density': 2.70, 'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
-    'carbon':           {'price': 6.00, 'density': 1.55, 'strength': 10.0, 'friction': 0.70, 'restitution': 0.10},
-    'traction plate':   {'price': 2.00, 'density': 2.70, 'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
-    'chrome':           {'price': 2.00, 'density': 8.00, 'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
-    'cloudy glass':     {'price': 1.50, 'density': 1.00, 'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
-    'copper':           {'price': 3.00, 'density': 9.00, 'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
-    'foam':             {'price': 0.50, 'density': 0.10, 'strength': 0.10, 'friction': 0.70, 'restitution': 0.10},
-    'glass':            {'price': 1.50, 'density': 1.00, 'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
-    'glow':             {'price': 1.50, 'density': 1.00, 'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
-    'gold':             {'price': 11.0, 'density': 19.3, 'strength': 7.50, 'friction': 0.50, 'restitution': 0.10},
-    'oak':              {'price': 1.00, 'density': 0.60, 'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
-    'pine':             {'price': 1.00, 'density': 0.60, 'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
-    'plastic':          {'price': 1.00, 'density': 1.00, 'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
-    'old wood':         {'price': 0.75, 'density': 0.60, 'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
-    'rubber':           {'price': 1.00, 'density': 1.00, 'strength': 3.00, 'friction': 2.00, 'restitution': 0.10},
-    'rusted steel':     {'price': 3.00, 'density': 8.00, 'strength': 10.0, 'friction': 0.50, 'restitution': 0.10},
-    'steel':            {'price': 4.00, 'density': 8.00, 'strength': 20.0, 'friction': 0.35, 'restitution': 0.10},
+    'aluminium':        {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
+    'brushed aluminum': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
+    'carbon':           {'price': 6.00, 'density': 1.55,  'strength': 10.0, 'friction': 0.70, 'restitution': 0.10},
+    'traction plate':   {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
+    'chrome':           {'price': 2.00, 'density': 8.00,  'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
+    'cloudy glass':     {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
+    'copper':           {'price': 3.00, 'density': 9.00,  'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
+    'foam':             {'price': 0.50, 'density': 0.10,  'strength': 0.10, 'friction': 0.70, 'restitution': 0.10},
+    'glass':            {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
+    'glow':             {'price': 1.50, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
+    'gold':             {'price': 11.0, 'density': 19.3,  'strength': 7.50, 'friction': 0.50, 'restitution': 0.10},
+    'oak':              {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
+    'pine':             {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
+    'plastic':          {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
+    'old wood':         {'price': 0.75, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
+    'rubber':           {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 2.00, 'restitution': 0.10},
+    'rusted steel':     {'price': 3.00, 'density': 8.00,  'strength': 10.0, 'friction': 0.50, 'restitution': 0.10},
+    'steel':            {'price': 4.00, 'density': 8.00,  'strength': 20.0, 'friction': 0.35, 'restitution': 0.10},
     'tungsten':         {'price': 8.50, 'density': 19.25, 'strength': 30.0, 'friction': 0.20, 'restitution': 0.10} # Damn you it was perfect!
-}
+}                                                                                                                  # Made it perfect for you :3
 
 
 
@@ -102,7 +102,7 @@ append_multiple(br_brick_list,
                 True)
 
 
-# BRICKS WITh HELI ENGINE PROPERTIES
+# BRICKS WITH HELI ENGINE PROPERTIES
 append_multiple(br_brick_list,
                 ['Turbine_6x2x2'],
                 br_brick_list['default_brick_data'] | {
