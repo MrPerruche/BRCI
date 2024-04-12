@@ -10,7 +10,7 @@ from BRAPIF import *
 # TODO Add all bricks in br_brick_list
 # TODO Calculate vehicle_size, vehicle_weight and vehicle_worth
 # TODO Find another way to make Brick Inputs. (Perhaps they should work and I'm just an idiot?)
-# TODO Finish Appendix System (DO NOT USE MEANWHILE)
+# TODO Finish Appendix System
 # TODO Implement Brick Loading (IDEA : Exclusively load user appendix)?
 
 # ------------------------------------------------------------
@@ -18,17 +18,13 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version: str = "C17"  # String, This is equivalent to 3.__ fyi
+version: str = "C18"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
-# Regular Variables
-
-reset_after_each_line = True # Reset colors after each line? [[WARNING: OVERRIDES PRINT TO HAVE MORE ARGUMENTS, BUT OTHERWISE PRINT IS UNCHANGED]]
-
 # Colors
-class clr:
+class FORMATS:
     reset = '\x1b[0m' # Reset code
     red = '\x1b[31m'
     blue = '\x1b[34m'
@@ -38,43 +34,40 @@ class clr:
     cyan = '\x1b[36m'
     white = '\x1b[37m'
     black = '\x1b[30m'
-    lightblue = '\x1b[94m'
-    lightgreen = '\x1b[92m'
-    lightred = '\x1b[91m'
-    lightpurple = '\x1b[95m'
-    lightwhite = '\x1b[97m'
-    lightblack = '\x1b[90m'
-    lightcyan = '\x1b[96m'
-    lightyellow = '\x1b[93m'
+    light_blue = '\x1b[94m'
+    light_green = '\x1b[92m'
+    light_red = '\x1b[91m'
+    light_purple = '\x1b[95m'
+    light_white = '\x1b[97m'
+    light_black = '\x1b[90m'
+    light_cyan = '\x1b[96m'
+    light_yellow = '\x1b[93m'
     bold = '\x1b[1m'
-    unbold = '\x1b[22m'
+    underline = '\x1b[4m'
+    italic = '\x1b[3m'
+    reverse = '\x1b[7m'
+    strikethrough = '\x1b[9m'
+    remove_color = '\x1b[39m'
+    remove_bold = '\x1b[22m'
+    remove_underline = '\x1b[24m'
+    remove_italic = '\x1b[23m'
+    remove_reverse = '\x1b[27m'
+    remove_strikethrough = '\x1b[29m'
+    info = f'{light_blue}{bold}[INFO]:{remove_bold}'
+    success = f'{light_green}{bold}[SUCCESS]:{remove_bold}'
+    error = f'{light_red}{bold}[ERROR]:{remove_bold}'
+    warning = f'{light_yellow}{bold}[WARNING]:{remove_bold}'
+    debug = f'{light_purple}{bold}[DEBUG]:{remove_bold}'
+    test = f'{light_cyan}{bold}[TEST]:{remove_bold}'
 
 
-if reset_after_each_line:
-    from builtins import print as printins
-    # Override the built-in print function
-    def print(*args, end='\n', resetcolor=True, **kwargs):
-        # Print-ception
-        if resetcolor:     printins(*args, end=f"{end}{clr.reset}", **kwargs)
-        else: printins(*args, end=f"{end}", **kwargs)
 
-# Stupid Functions
-def debugformat():
-    return f"{clr.lightpurple}{clr.bold}[DEBUG]:{clr.unbold} "
-def successformat():
-    return f"{clr.lightgreen}{clr.bold}[SUCCESS]:{clr.unbold} "
-def errorformat():
-    return f"{clr.red}{clr.bold}[ERROR]:{clr.unbold} "
-def warningformat():
-    return f"{clr.lightyellow}{clr.bold}[WARNING]:{clr.unbold} "
-def infoformat():
-    return f"{clr.blue}{clr.bold}[INFO]:{clr.unbold} "
-def testformat():
-    return f"{clr.lightcyan}{clr.bold}[TEST]:{clr.unbold} "
-
-
-# Temporary Variables
-# No Temporary Variables.
+from builtins import print as print_ins
+# Override the built-in print function
+def print(*args, end='\n', reset_color=True, **kwargs):
+    # I removed this comment because my IDE complained about it containing a typo (there was none :bob_troll:)
+    if reset_color: print_ins(*args, end=f"{end}{FORMATS.reset}", **kwargs)
+    else: print_ins(*args, end=f"{end}", **kwargs)
 
 
 # ------------------------------------------------------------
@@ -88,8 +81,10 @@ def testformat():
 
 # pain
 
-def create_brick(brick: str, properties: dict = {}) -> dict:
-    return br_brick_list[brick].copy() | properties
+def create_brick(brick: str, brick_properties: dict = None) -> dict:
+    if brick_properties is None:
+        brick_properties = {}
+    return br_brick_list[brick].copy() | brick_properties
 
 
 # Brick Rigs API Class
@@ -103,19 +98,21 @@ class BRAPI:
                  write_blank=False,
                  project_display_name='',
                  file_description='',
-                 debug_logs=False,
+                 debug_logs=None,
                  user_appendix=b''):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
         self.project_name = project_name  # String
         self.write_blank = write_blank  # Boolean
-        self.project_display_name = project_display_name  # String (Ingame name (.brm))
+        self.project_display_name = project_display_name  # String (in-game name (.brm))
         self.file_description = file_description  # String (The description of the file (.brm))
         if bricks is None:  # List (If unspecified, create an empty list)
             bricks = [] # Initialize bricks
         self.bricks = bricks # List (Of bricks)
-        self.debug_logs = debug_logs # Boolean (Debug logs toggle)
+        if debug_logs is None:
+            debug_logs = []
+        self.debug_logs = debug_logs # List of logs to print
         self.user_appendix = user_appendix # List (User appendix)
 
 
@@ -146,7 +143,7 @@ class BRAPI:
     @property
     def vehicle_worth(self): # 32 bit float
         # TODO : CALCULATE WORTH
-        return 0.2 # I wonder if this will make it 0.2 ingame? Or does BR calculate the price itself?
+        return 0.2 # I wonder if this will make it 0.2 in-game? Or does BR calculate the price itself?
 
     # Adding bricks to the brick list
     def add_brick(self, brick_name: str, new_brick: dict):
@@ -280,9 +277,10 @@ class BRAPI:
     # Writing Vehicle.brv
     def write_brv(self):
 
-        import time # DEBUGCODE
-        previous_time = time.time()
-        begin_time = time.time()
+        # Show generation time if debug logs
+        from time import perf_counter
+        previous_time = perf_counter()
+        begin_time = perf_counter()
 
         # Create folder if missing
         self.ensure_project_directory_exists()
@@ -300,16 +298,10 @@ class BRAPI:
         # Otherwise write working vehicle file
         else:
 
-            # Future-proofing (Fluppi may change the number of bits in the brick count)
-            bitcount = 16
-            signed = False
-            br_intlimit = 2**bitcount     # DO NOT TOUCH EITHER OF THESE
-            if signed: br_intlimit -= 1   # DO NOT TOUCH EITHER OF THESE
-
             # Verify if there are too many bricks
-            if len(self.bricks) > br_intlimit:
+            if len(self.bricks) >= 65535:
 
-                raise OverflowError(f'Brick Rigs cannot support more than {br_intlimit} bricks ({bitcount} bit unsigned integer limit).')
+                raise OverflowError(f'Brick Rigs cannot support more than 65,535 bricks (16 bit unsigned integer limit).')
 
             with open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file:
 
@@ -324,8 +316,9 @@ class BRAPI:
                 # Get the different bricks present in the project
                 brick_types = list(set(item[1]['gbn'] for item in self.bricks_writing)) # List
 
-                print(f'FROM SETUP TO BRICKTYPES : {time.time() - previous_time}')
-                previous_time = time.time()  # DEBUGCODE
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
                 """This code may be difficult to understand. Here is the old code, which does the same thing,
                 but is easier to understand and less optimised
@@ -374,10 +367,7 @@ class BRAPI:
 
                             # Setup property table
                             if p_del_current_value not in property_table[p_del_current_key]:
-                                property_table[p_del_current_key].append(p_del_current_value)
-
-                print(f'TEMPIEBL, PROPERTY TABLE, STRING NAME TO ID : {time.time() - previous_time}')
-                previous_time = time.time()  # DEBUGCODE"""
+                                property_table[p_del_current_key].append(p_del_current_value)"""
 
                 # Write the number of different brick types
                 brv_file.write(unsigned_int(len(brick_types), 2))
@@ -413,8 +403,9 @@ class BRAPI:
                             if p_del_current_value not in property_table[p_del_current_key]:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
-                print(f'TEMPIEBL, PROPERTY TABLE, STRING NAME TO ID : {time.time() - previous_time}')
-                previous_time = time.time()  # DEBUGCODE
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
 
                 # Setup property ids
@@ -440,8 +431,9 @@ class BRAPI:
                     w_current_property_id = 0
 
 
-                print(f'ID ASSIGNED PROPERTY TABLE : {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
                 # Give IDs
                 temp_bricks_writing: list = []
@@ -464,31 +456,32 @@ class BRAPI:
                     # Giving Brick Type IDs
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
 
-                print(f'TEMP BRICKS WRITING : {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
                 # Insert n-word here
 
                 # Bricks Writing is ready to be updated!
                 self.bricks_writing = temp_bricks_writing.copy()
 
-                print(f'BRICKS WRITING : {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
 
                 # Debug
-                if self.debug_logs:
-                    print(f'{debugformat()} Identical Excluded Brick L : {temp_iebl}')
-                    print(f'{debugformat()} Property Table............ : {property_table}')
-                    print(f'{debugformat()} ID Assigned Property Table : {self.id_assigned_property_table}')
-                    print(f'{debugformat()} Brick Properties Writing.. : {self.bricks_writing}')
-                    print(f'{debugformat()} String Name to ID Table... : {string_name_to_id_table}')
-                    print(f'{debugformat()} Brick Types............... : {brick_types}')
-                    print(f'{debugformat()} Property Key Table........ : {property_key_table}')
-                    print(f'{debugformat()} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
+                if 'bricks' in self.debug_logs:
+                    print(f'{FORMATS.debug} Identical Excluded Brick L : {temp_iebl}')
+                    print(f'{FORMATS.debug} Property Table............ : {property_table}')
+                    print(f'{FORMATS.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'{FORMATS.debug} Brick Properties Writing.. : {self.bricks_writing}')
+                    print(f'{FORMATS.debug} String Name to ID Table... : {string_name_to_id_table}')
+                    print(f'{FORMATS.debug} Brick Types............... : {brick_types}')
+                    print(f'{FORMATS.debug} Property Key Table........ : {property_key_table}')
+                    print(f'{FORMATS.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
-                property_count = w_property_count
                 brv_file.write(unsigned_int(len(property_table), 2))
 
 
@@ -497,8 +490,9 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(brick_type), 1))
                     brv_file.write(small_bin_str(brick_type))
 
-                print(f'WRITE BRICK TYPES: {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
                 temp_spl: bytes = b''
                 temp_pre_spl: bytes = b''
@@ -587,8 +581,9 @@ class BRAPI:
 
                     temp_spl: bytes = b''  # Reset
 
-                print(f'WRITE PROPERTIES: {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
 
                 # WRITING BRICKS
@@ -622,9 +617,9 @@ class BRAPI:
 
                 brv_file.write(b'\x00\x00')
 
-
-                print(f'WRITE BRICKS: {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
+                    previous_time = perf_counter()
 
 
                 #  BR-API & USER APPENDIX
@@ -636,21 +631,18 @@ class BRAPI:
 
                 for brapi_individual_appendix in self.brapi_appendix:
                     brv_file.write(unsigned_int(len(brapi_individual_appendix), 4))
-                    print(len(brapi_individual_appendix))
                     brv_file.write(brapi_individual_appendix)
 
-                print(f'WRITE APPENDIX: {time.time() - previous_time}')  # DEBUGCODE
-                previous_time = time.time()
-                print(f'TOTAL TIME: {time.time() - begin_time}')
+                if 'time' in self.debug_logs:
+                    print(f'{FORMATS.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FORMATS.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
-
-
-    def debug_print(self, print_bricks=False):
+    def debug_print(self, summary_only=False, write=True, print_bricks=False):
 
         def named_spacer(name: str):
-            return '=== ' + name + ' ' + '='*(95-len(name))
+            return '=== ' + name + ' ' + '=' * (95 - len(name))
 
-        spacer = '█'*100
+        spacer = '█' * 100
 
         str_to_write = ''
 
@@ -669,7 +661,7 @@ class BRAPI:
 
         # PRINTING BRICKS
 
-        if print_bricks:
+        if not summary_only:
             for current_brick in range(len(self.bricks)):
 
                 str_to_write += spacer + '\n'
@@ -679,7 +671,7 @@ class BRAPI:
                 str_to_write += named_spacer('BRICK INFORMATION') + '\n'
                 str_to_write += f'BRICK NAME: {self.bricks[current_brick][0]} [ID:{self.bricks_writing[current_brick][0]}]\n'
                 str_to_write += (f"BRICK TYPE: {self.bricks[current_brick][1]['gbn']} "
-                      f"[ID: {self.bricks_writing[current_brick][1][0]['gbn']}]\n")
+                                 f"[ID: {self.bricks_writing[current_brick][1][0]['gbn']}]\n")
                 str_to_write += f"BRICK POS.: {self.bricks[current_brick][1]['Position']}\n"
                 str_to_write += f"BRICK ROT.: {self.bricks[current_brick][1]['Rotation']}\n"
 
@@ -689,18 +681,20 @@ class BRAPI:
                 for brick_property, brick_property_value in self.bricks_writing[current_brick][1][1]:
                     string_property = self.inverted_property_key_table[brick_property]
                     str_to_write += (f"{string_property}: "
-                          f"{self.id_assigned_property_table[string_property][brick_property_value]}"
-                          f" [ID: {brick_property}, {brick_property_value}]\n")
+                                     f"{self.id_assigned_property_table[string_property][brick_property_value]}"
+                                     f" [ID: {brick_property}, {brick_property_value}]\n")
                     no_properties = False
                 if no_properties:
                     str_to_write += "No properties found.\n"
+
             str_to_write += spacer
 
+        if write:
             with open(os.path.join(self.in_project_folder_directory, "debug_logs.txt"), 'w', encoding='utf-16') as file:
                 file.write('DEBUG LOGS\n')
                 file.write(str_to_write)
 
-            print(str_to_write)
+        if print_bricks: print(str_to_write)
 
 
 # --------------------------------------------------
@@ -715,54 +709,55 @@ if __name__ == '__main__':
     data.project_display_name = 'BR-API test'
     data.project_folder_directory = os.path.join(_cwd, 'Projects')
     data.file_description = '....fuck..'
-    data.debug_logs = True
+    data.debug_logs = ['time']
 
     def stress_test_run() -> None:
         import random
-        for bricknum in range(15_000):
+        for brick_number in range(66_000):
             try:
-                temptestbrick = create_brick(random.choice(list(br_brick_list.keys())))
-                temptestselectedprop = random.choice(list(temptestbrick.keys()))
-                if isinstance(temptestbrick[temptestselectedprop], float):
-                    temptestbrick[temptestselectedprop] = random.uniform(0.0, 1000.0)
-                temptestbrick['Position'] = [random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0)]
-                temptestbrick['Rotation'] = [random.uniform(0.0, 360.0), random.uniform(0.0, 360.0), random.uniform(0.0, 360.0)]
-                if 'gbn' in temptestbrick:
-                    data.add_brick(str(bricknum), temptestbrick)
+                test_brick = create_brick(random.choice(list(br_brick_list.keys())))
+                temp_test_selected_property = random.choice(list(test_brick.keys()))
+                if isinstance(test_brick[temp_test_selected_property], float):
+                    test_brick[temp_test_selected_property] = random.uniform(0.0, 1000.0)
+                test_brick['Position'] = [random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0)]
+                test_brick['Rotation'] = [random.uniform(0.0, 360.0), random.uniform(0.0, 360.0), random.uniform(0.0, 360.0)]
+                if 'gbn' in test_brick:
+                    data.add_brick(str(brick_number), test_brick)
             except KeyError:
                 raise KeyError(f'GBN INVALID BRICK')
 
     def horn_pitch_test() -> None:
-        apiutest_pitch = 0.5
-        posx = 0
+        test_pitch = 0.5
+        position_x = 0
         hue = 0
-        for itineration in range(20):
-            apiutest_pitch -= 0.025
-            posx += 10
+        for brick_number_b in range(20):
+            test_pitch -= 0.025
+            position_x += 10
             hue += 10
-            apiutest_currentbrickw = create_brick('DoubleSiren_1x2x1s')
-            apiutest_currentbrickw['HornPitch'] = apiutest_pitch
-            apiutest_currentbrickw['Position'] = [posx, 0, 0]
-            apiutest_currentbrickw['BrickColor'] = [hue, 255, 255, 255]
-            data.add_brick(str(itineration), apiutest_currentbrickw)
+            test_current_brick_w = create_brick('DoubleSiren_1x2x1s')
+            test_current_brick_w['HornPitch'] = test_pitch
+            test_current_brick_w['Position'] = [position_x, 0, 0]
+            test_current_brick_w['BrickColor'] = [hue, 255, 255, 255]
+            data.add_brick(str(brick_number_b), test_current_brick_w)
 
-    #stress_test_run() # Since apparently I've just deleted main.py if I don't keep this function smh (why the fuck would a default be a benchmark?)
+    # stress_test_run() # Since apparently I've just deleted main.py if I don't keep this function smh (why the fuck would a default be a benchmark?)
+    horn_pitch_test()
 
     # TODO make an actual default vehicle that wont cause even high end systems to kill themselves when spawned 
     # (or simply just one that doesnt drive people with low end systems away entirely)
 
-    properties = {"Position": [0,0,0], "Rotation": [0,0,0], "BrickColor": [0, 255, 255, 255]}
-    switch1 = create_brick('Switch_1sx1sx1s', properties)
-    data.add_brick("Switch1", switch1)
+    def destiny_s_test() -> None:
+        properties = {"Position": [0,0,0], "Rotation": [0,0,0], "BrickColor": [0, 255, 255, 255]}
+        switch1 = create_brick('Switch_1sx1sx1s', properties)
+        data.add_brick("Switch1", switch1)
 
-    print(f"{infoformat()}Now generating file.")
 
-    try:
+
+    print(f"{FORMATS.info} Now generating file.")
+
     # Writing stuff
-        data.write_preview()
-        data.write_metadata()
-        data.write_brv()
-        data.debug_print(False)
-        print(f"{successformat()}File successfully generated.")
-    except Exception as e:
-        print(f"{errorformat()}File generation failed. Information: ('{e}')")
+    data.write_preview()
+    data.write_metadata()
+    data.write_brv()
+    data.debug_print(True, False, True)
+    print(f"{FORMATS.success} File successfully generated.")
