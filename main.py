@@ -2,7 +2,7 @@ import os
 # from warnings import warn as raise_warning
 
 from BRAPIF import *
-
+os.system("color") # Enable color (windows only)
 # Note : every time you see unsigned_int() / signed_int() / bin_float(), byte_len * 8 is the number of bits.
 
 # TODO Add more jokes in comments because they're pretty annoying.
@@ -18,13 +18,16 @@ from BRAPIF import *
 # ------------------------------------------------------------
 
 # Setup variables
-version: str = "C18"  # String, This is equivalent to 3.__ fyi
+version: str = "C19"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
 # Colors
-class FORMATS:
+# FUCK YOU USE THE OLD SYSTEM IM NOT GOING INSANE TYPING EVERYTHING
+
+# This is the class of all of the colors. Please make it stay this way.
+class clr:
     reset = '\x1b[0m' # Reset code
     red = '\x1b[31m'
     blue = '\x1b[34m'
@@ -53,20 +56,45 @@ class FORMATS:
     remove_italic = '\x1b[23m'
     remove_reverse = '\x1b[27m'
     remove_strikethrough = '\x1b[29m'
-    info = f'{light_blue}{bold}[INFO]:{remove_bold}'
-    success = f'{light_green}{bold}[SUCCESS]:{remove_bold}'
-    error = f'{light_red}{bold}[ERROR]:{remove_bold}'
-    warning = f'{light_yellow}{bold}[WARNING]:{remove_bold}'
-    debug = f'{light_purple}{bold}[DEBUG]:{remove_bold}'
-    test = f'{light_cyan}{bold}[TEST]:{remove_bold}'
+    bg_red = '\x1b[41m'
+    bg_green = '\x1b[42m'
+    bg_blue = '\x1b[44m'
+    bg_yellow = '\x1b[43m'
+    bg_black = '\x1b[40m'
+    bg_white = '\x1b[47m'
+    bg_light_red = '\x1b[101m'
+    bg_light_green = '\x1b[102m'
+    bg_light_blue = '\x1b[104m'
+    bg_light_yellow = '\x1b[103m'
+    bg_light_black = '\x1b[100m'
+    bg_light_white = '\x1b[107m'
+    bg_purple = '\x1b[45m'
+    bg_light_purple = '\x1b[105m'
+    bg_cyan = '\x1b[46m'
+    bg_light_cyan = '\x1b[106m'
+    info = f'{reverse}{blue}{bold}[INFO]{remove_reverse}{remove_bold}'
+    success = f'{reverse}{light_green}{bold}[SUCCESS]{remove_reverse}{remove_bold}'
+    error = f'{bg_light_red}{bold}{white}[ERROR]{reset}{light_red}{remove_bold}'
+    warning = f'{reverse}{light_yellow}{bold}[WARNING]{remove_reverse}{remove_bold}'
+    debug = f'{reverse}{light_purple}{bold}[DEBUG]{remove_reverse}{remove_bold}'
+    test = f'{reverse}{light_cyan}{bold}[TEST]{remove_reverse}{remove_bold}'
+
+# Define all syntaxes (This is a legacy feature and you can simply do clr.info() instead of info_syn()) (((infact as my latest revision of these they just return those)))
+def info_syn(): return clr.info
+def success_syn(): return clr.success
+def error_syn(): return clr.error
+def warning_syn(): return clr.warning
+def debug_syn(): return clr.debug
+def test_syn(): return clr.test
 
 
 
 from builtins import print as print_ins
-# Override the built-in print function
+# Override the built-in print function (WARNING: This used to be an if statement but PyCharm complained about it. You will have to manually set the end= variable if you want it to not 
+# reset.)
 def print(*args, end='\n', reset_color=True, **kwargs):
     # I removed this comment because my IDE complained about it containing a typo (there was none :bob_troll:)
-    if reset_color: print_ins(*args, end=f"{end}{FORMATS.reset}", **kwargs)
+    if reset_color: print_ins(*args, end=f"{end}{clr.reset}", **kwargs)
     else: print_ins(*args, end=f"{end}", **kwargs)
 
 
@@ -143,7 +171,7 @@ class BRAPI:
     @property
     def vehicle_worth(self): # 32 bit float
         # TODO : CALCULATE WORTH
-        return 0.2 # I wonder if this will make it 0.2 in-game? Or does BR calculate the price itself?
+        return 0.2
 
     # Adding bricks to the brick list
     def add_brick(self, brick_name: str, new_brick: dict):
@@ -317,7 +345,7 @@ class BRAPI:
                 brick_types = list(set(item[1]['gbn'] for item in self.bricks_writing)) # List
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 """This code may be difficult to understand. Here is the old code, which does the same thing,
@@ -404,7 +432,7 @@ class BRAPI:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -432,7 +460,7 @@ class BRAPI:
 
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Give IDs
@@ -457,7 +485,7 @@ class BRAPI:
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Insert n-word here
@@ -466,20 +494,20 @@ class BRAPI:
                 self.bricks_writing = temp_bricks_writing.copy()
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
                 # Debug
                 if 'bricks' in self.debug_logs:
-                    print(f'{FORMATS.debug} Identical Excluded Brick L : {temp_iebl}')
-                    print(f'{FORMATS.debug} Property Table............ : {property_table}')
-                    print(f'{FORMATS.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
-                    print(f'{FORMATS.debug} Brick Properties Writing.. : {self.bricks_writing}')
-                    print(f'{FORMATS.debug} String Name to ID Table... : {string_name_to_id_table}')
-                    print(f'{FORMATS.debug} Brick Types............... : {brick_types}')
-                    print(f'{FORMATS.debug} Property Key Table........ : {property_key_table}')
-                    print(f'{FORMATS.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
+                    print(f'{clr.debug} Identical Excluded Brick L : {temp_iebl}')
+                    print(f'{clr.debug} Property Table............ : {property_table}')
+                    print(f'{clr.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'{clr.debug} Brick Properties Writing.. : {self.bricks_writing}')
+                    print(f'{clr.debug} String Name to ID Table... : {string_name_to_id_table}')
+                    print(f'{clr.debug} Brick Types............... : {brick_types}')
+                    print(f'{clr.debug} Property Key Table........ : {property_key_table}')
+                    print(f'{clr.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
                 brv_file.write(unsigned_int(len(property_table), 2))
@@ -491,7 +519,7 @@ class BRAPI:
                     brv_file.write(small_bin_str(brick_type))
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 temp_spl: bytes = b''
@@ -582,7 +610,7 @@ class BRAPI:
                     temp_spl: bytes = b''  # Reset
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -618,7 +646,7 @@ class BRAPI:
                 brv_file.write(b'\x00\x00')
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -634,8 +662,8 @@ class BRAPI:
                     brv_file.write(brapi_individual_appendix)
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
-                    print(f'{FORMATS.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
     def debug_print(self, summary_only=False, write=True, print_bricks=False):
 
@@ -753,11 +781,11 @@ if __name__ == '__main__':
 
 
 
-    print(f"{FORMATS.info} Now generating file.")
+    print(f"{clr.info} Now generating file.")
 
     # Writing stuff
     data.write_preview()
     data.write_metadata()
     data.write_brv()
     data.debug_print(True, False, True)
-    print(f"{FORMATS.success} File successfully generated.")
+    print(f"{clr.success} File successfully generated.")
