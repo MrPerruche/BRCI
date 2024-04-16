@@ -177,7 +177,7 @@ append_multiple(br_brick_list, ['Sensor_1sx1sx1s', 'Sensor_1x1x1s'],
                     'OutputChannel.MaxIn': 1.0,
                     'OutputChannel.MinOut': -1.0,
                     'OutputChannel.MaxOut': 1.0,
-                    'EnabledInputChannel.InputAxis': BrickInput('ConstantValue', 1.0, 'EnabledInputChannel'), # TODO
+                    'EnabledInputChannel.InputAxis': BrickInput('AlwaysOn', 1.0, 'EnabledInputChannel'), # TODO
                     'SensorType': 'Speed',
                     'TraceMask': 'All',
                     'bReturnToZero': False
@@ -187,7 +187,7 @@ append_multiple(br_brick_list, ['MathBrick_1sx1sx1s'],
                 br_brick_list['default_brick_data'] | {
                     'Operation': 'Add',
                     'InputChannelA.InputAxis': BrickInput('Custom', None, 'InputChannelA'),
-                    'InputChannelB.InputAxis': BrickInput('ConstantValue', 1.0, 'InputChannelB')
+                    'InputChannelB.InputAxis': BrickInput('AlwaysOn', 1.0, 'InputChannelB')
                 }, True)
 
 

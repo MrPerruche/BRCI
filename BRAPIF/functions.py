@@ -126,7 +126,7 @@ class BrickInput:
                         # Return both properties
                         return {
                             f'{self.prefix}.InputAxis': self.brick_input_type,
-                            f'{self.prefix}.InputValue': float(self.brick_input)
+                            f'{self.prefix}.Value': float(self.brick_input)
                         }
                     # If it's the default value
                     # Return type only

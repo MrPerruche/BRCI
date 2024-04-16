@@ -20,7 +20,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C21"  # String, This is equivalent to 3.__ fyi
+version: str = "C22"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -30,8 +30,8 @@ _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 from os import system as os_system
 os_system('color')
 
-# Fight to the end about the class name fr 
-class clr:
+# How about that?
+class FM:
     reset = '\x1b[0m' # Reset code
     red = '\x1b[31m'
     blue = '\x1b[34m'
@@ -85,11 +85,11 @@ class clr:
 
     @staticmethod
     def error_with_header(header, text):
-        print(f"{clr.error} {header}{clr.remove_reverse} \n{text}")
+        print(f"{FM.error} {header}{FM.remove_reverse} \n{text}")
 
     @staticmethod
     def warning_with_header(header, text):
-        print(f"{clr.warning} {header}{clr.remove_reverse} \n{text}")
+        print(f"{FM.warning} {header}{FM.remove_reverse} \n{text}")
 
 
 
@@ -98,7 +98,7 @@ from builtins import print as print_ins
 # Override the built-in print function
 def print(*args, end='\n', reset_color=True, **kwargs):
     # I removed this comment because my IDE complained about it containing a typo (there was none :bob_troll:)
-    if reset_color: print_ins(*args, end=f"{end}{clr.reset}", **kwargs)
+    if reset_color: print_ins(*args, end=f"{end}{FM.reset}", **kwargs)
     else: print_ins(*args, end=f"{end}", **kwargs)
 
 # ------------------------------------------------------------
@@ -203,13 +203,13 @@ class BRAPI:
         match variable_name:
             case 'write_blank':
                 if not isinstance(self.write_blank, bool):
-                    clr.error_with_header("Invalid write_blank type.",
+                    FM.error_with_header("Invalid write_blank type.",
                         f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a "
                         f"{type(self.write_blank).__name__}.\nIt is now set to False.")
                     self.write_blank = False
             case 'bricks_len':
                 if len(self.bricks) > 65535:
-                    clr.error_with_header("Too many bricks.",
+                    FM.error_with_header("Too many bricks.",
                         f"Whilst {occured_when}, the length of the list of bricks was found to exceed 65,535.\n"
                         f"Therefore, the last {len(self.bricks)-65535 :,} brick(s) were removed. 65,535 bricks left.")
                     self.bricks = self.bricks[:65535]
@@ -222,7 +222,7 @@ class BRAPI:
                 if invalid_logs_list:
                     invalid_logs_str: str =  ', '.join(invalid_logs_list)
                     logs_whitelist_str: str = ', '.join(logs_whitelist_list)
-                    clr.warning_with_header("Unknown log(s) type requested.",
+                    FM.warning_with_header("Unknown log(s) type requested.",
                         f"Whilst {occured_when}, the following log(s) type requested were found to be invalid: "
                         f"{invalid_logs_str}.\nYou may instead use the following: {logs_whitelist_str}.")
 
@@ -250,13 +250,13 @@ class BRAPI:
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            clr.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to"
+            FM.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to"
                                                          "find BR-API default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
             if os.path.exists(os.path.join(self.in_project_folder_directory, "Preview.png")):
-                clr.warning_with_header("Dest Code Activated, Project Overwritten", "If you are seeing this, Destiny's Debug code has triggered. This means that your project has been overwritten without errors.")
+                FM.error_with_header("Preview.png already created", "Whilst writing Preview.png, we noticed it was already added.\nThe old Preview.png was therefore replaced.")
                 os.remove(os.path.join(self.in_project_folder_directory, "Preview.png"))
 
             copy_file(os.path.join(_write_preview_regular_image_path),
@@ -360,42 +360,38 @@ class BRAPI:
             def brv_brick_types(bricks: list, debug: bool = False) -> list:
                 brick_types_f = list(set(item[1]['gbn'] for item in bricks))
                 if debug:
-                    print(f'{clr.debug} Brick Types......... : {brick_types_f}')
+                    print(f'{FM.debug} Brick Types......... : {brick_types_f}')
                 return brick_types_f
 
-            # FIXME DESTINY
+
             # Add missing properties. Only made for BrickInput() but there may be more stuff later on
             def add_missing_properties(bricks: list, debug: bool = False) -> None:
-                print("CALLED")
                 for brick_mp in bricks:
-                    print("FOR BRICK")
                     properties_to_add: dict = {}
-                    properties_to_remove: dict = {}
+                    properties_to_remove: list = []
                     for property_key_mp, property_value_mp in brick_mp[1].items():
-                        print("FOR PROPERTY")
-                        print(type(property_value_mp))
                         if isinstance(property_value_mp, BrickInput):
-                            print("DETECTED")
                             #print(f"{clr.debug} property_value_mp.properties() : {property_value_mp.properties()}")
                             #print(f"{clr.debug} properties_to_add : {properties_to_add}")
                             prop_mp_temp = property_value_mp.properties()
                             #print(f"{clr.debug} prop_mp_temp : {prop_mp_temp}")
                             properties_to_add.update(prop_mp_temp)
-                            print(f"{clr.debug} properties_to_remove : {properties_to_remove}")
-                            print(f"{clr.debug} property_key_mp : {property_key_mp}")
-                            properties_to_remove.update(property_key_mp)
-                    brick_mp[1].pop(properties_to_remove)
+                            print(f"{FM.debug} properties_to_remove : {properties_to_remove}")
+                            print(f"{FM.debug} property_key_mp : {property_key_mp}")
+                            properties_to_remove.append(property_key_mp)
+                    for property_to_remove in properties_to_remove:
+                        del brick_mp[1][property_to_remove]
                     #print(f"{clr.debug} properties_to_add[0] : {properties_to_add[0]}")
                     brick_mp[1].update(properties_to_add)
                 if debug:
-                    print(f'{clr.debug} Modified Brick List. : {bricks}')
+                    print(f'{FM.debug} Modified Brick List. : {bricks}')
 
 
             # Verify if there are too many bricks
             self.ensure_valid_variable_type('bricks_len', 'writing Vehicle.brv')
             self.ensure_valid_variable_type('logs', 'writing Vehicle.brv')
 
-            with open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file:
+            with (open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file):
 
 
                 self.bricks_writing = self.bricks.copy()
@@ -409,13 +405,13 @@ class BRAPI:
                 add_missing_properties(self.bricks_writing, 'bricks' in self.debug_logs)
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Missing Properties.. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Missing Properties.. : {perf_counter() - previous_time :.6f} seconds')
 
                 # Get the different bricks present in the project
                 brick_types = brv_brick_types(self.bricks_writing, 'bricks' in self.debug_logs) # List
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Write the number of different brick types
@@ -440,11 +436,17 @@ class BRAPI:
 
                     # For each data for each brick
                     for p_del_current_key, p_del_current_value in current_brick[1].items():
+
+                        fully_manage_override: bool = False
+
                         # Accept if it's in the safe list (list which gets whitelisted even if default value is identical)
                         if p_del_current_key in safe_property_list:
                             temp_iebl[-1][1][0][p_del_current_key] = p_del_current_value
                         # Otherwise regular process: if not default, get rid of it
-                        elif p_del_current_value != br_brick_list[current_brick[1]['gbn']][p_del_current_key]:
+                        elif p_del_current_key not in br_brick_list[current_brick[1]['gbn']]:
+
+                            # THE SAME THING AS DOWN BELOW
+
                             temp_iebl[-1][1][1][p_del_current_key] = p_del_current_value
                             # Make sure key in the dict exists
                             property_table.setdefault(p_del_current_key, [])
@@ -452,8 +454,18 @@ class BRAPI:
                             if p_del_current_value not in property_table[p_del_current_key]:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
+                        elif p_del_current_value != br_brick_list[current_brick[1]['gbn']][p_del_current_key]:
+
+                            temp_iebl[-1][1][1][p_del_current_key] = p_del_current_value
+                            # Make sure key in the dict exists
+                            property_table.setdefault(p_del_current_key, [])
+                            # Setup property table
+                            if p_del_current_value not in property_table[p_del_current_key]:
+                                property_table[p_del_current_key].append(p_del_current_value)
+
+
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -481,7 +493,7 @@ class BRAPI:
 
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Give IDs
@@ -506,7 +518,7 @@ class BRAPI:
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Insert n-word here
@@ -515,20 +527,20 @@ class BRAPI:
                 self.bricks_writing = temp_bricks_writing.copy()
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
                 # Debug
                 if 'bricks' in self.debug_logs:
-                    print(f'{clr.debug} Identical Excluded Brick L : {temp_iebl}')
-                    print(f'{clr.debug} Property Table............ : {property_table}')
-                    print(f'{clr.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
-                    print(f'{clr.debug} Brick Properties Writing.. : {self.bricks_writing}')
-                    print(f'{clr.debug} String Name to ID Table... : {string_name_to_id_table}')
-                    print(f'{clr.debug} Brick Types............... : {brick_types}')
-                    print(f'{clr.debug} Property Key Table........ : {property_key_table}')
-                    print(f'{clr.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
+                    print(f'{FM.debug} Identical Excluded Brick L : {temp_iebl}')
+                    print(f'{FM.debug} Property Table............ : {property_table}')
+                    print(f'{FM.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'{FM.debug} Brick Properties Writing.. : {self.bricks_writing}')
+                    print(f'{FM.debug} String Name to ID Table... : {string_name_to_id_table}')
+                    print(f'{FM.debug} Brick Types............... : {brick_types}')
+                    print(f'{FM.debug} Property Key Table........ : {property_key_table}')
+                    print(f'{FM.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
                 brv_file.write(unsigned_int(len(property_table), 2))
@@ -540,12 +552,13 @@ class BRAPI:
                     brv_file.write(small_bin_str(brick_type))
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 temp_spl: bytes = b''
 
                 # Write properties
+                property_length_list: list[int] = []
                 for property_type_key, property_type_value in property_table.items():
                     # Writing keys
                     brv_file.write(unsigned_int(len(property_type_key), 1))
@@ -554,36 +567,32 @@ class BRAPI:
                     brv_file.write(unsigned_int(len(property_type_value), 2))
 
                     # Summing values
-                    property_length_precised: bool = False
-                    for pt_c_val in property_type_value: # property_table_current_value
+                    for pt_c_val in property_type_value:  # property_table_current_value
                         if property_type_key not in br_special_property_instance_list:
-
 
                             # If it's an integer (uint 16 bit by default)
                             if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
                                 temp_spl += unsigned_int(pt_c_val, 2)
 
-
                             # If it's a float (float 32 bit by default)
                             if isinstance(pt_c_val, float):
                                 temp_spl += bin_float(pt_c_val, 4)
-
 
                             # If it's a bool
                             if isinstance(pt_c_val, bool):
                                 temp_spl += unsigned_int(int(pt_c_val), 1)
 
-
                             # If it's a string (converting to utf-16)
                             if isinstance(pt_c_val, str):
-                                temp_spl += signed_int(-len(pt_c_val), 2)
-                                temp_spl += bin_str(pt_c_val)
+                                temp_spl += signed_int(len(pt_c_val), 1)
+                                temp_spl += small_bin_str(pt_c_val)
                         else:
                             match br_special_property_instance_list[property_type_key]:
                                 case 'INT8':
                                     temp_spl += unsigned_int(pt_c_val, 1)
                                 case '6xINT2':
-                                    temp_w_spl_connector = pt_c_val[0] + (pt_c_val[1]<<2) + (pt_c_val[2]<<4) + (pt_c_val[3]<<6) + (pt_c_val[4]<<8) + (pt_c_val[5]<<10)
+                                    temp_w_spl_connector = pt_c_val[0] + (pt_c_val[1] << 2) + (pt_c_val[2] << 4) + (
+                                                pt_c_val[3] << 6) + (pt_c_val[4] << 8) + (pt_c_val[5] << 10)
                                     temp_spl += unsigned_int(temp_w_spl_connector, 2)
                                 case '3xINT16':
                                     temp_spl += unsigned_int(pt_c_val[0], 2)
@@ -599,22 +608,21 @@ class BRAPI:
                                     temp_spl += unsigned_int(pt_c_val[2], 1)
                                     temp_spl += unsigned_int(pt_c_val[3], 1)
 
-                        if not property_length_precised :
-                            property_length = len(temp_spl)
-                            property_length_precised = True
-
-
                     brv_file.write(unsigned_int(len(temp_spl), 4))
                     brv_file.write(temp_spl)
 
                     # Indicating property length if there's more than one property value.
-                    if len(property_type_value) > 1:
-                        brv_file.write(unsigned_int(property_length, 2))
+                    if len(property_length_list) > 1:
+                        property_length_set: set = set(property_length_list)
+                        if len(property_length_set) > 1:
+                            brv_file.write(unsigned_int(0, 2))
+                        for property_length in property_length_set:
+                            brv_file.write(unsigned_int(property_length, 2))
 
                     temp_spl: bytes = b''  # Reset
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -650,7 +658,7 @@ class BRAPI:
                 brv_file.write(b'\x00\x00')
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -666,8 +674,8 @@ class BRAPI:
                     brv_file.write(brapi_individual_appendix)
 
                 if 'time' in self.debug_logs:
-                    print(f'{clr.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
-                    print(f'{clr.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{FM.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
     def debug_print(self, summary_only=False, write=True, print_bricks=False):
 
@@ -787,13 +795,14 @@ if __name__ == '__main__':
 
     def input_channel_test():
         my_math_brick = create_brick('MathBrick_1sx1sx1s')
-        my_math_brick['InputChannelB.InputAxis'] = BrickInput('AlwaysOn', 2_000_000, 'InputChannelB')
+        my_math_brick['InputChannelA.InputAxis'] = BrickInput('AlwaysOn', -2_000_000.0, 'InputChannelA')
+        my_math_brick['InputChannelB.InputAxis'] = BrickInput('AlwaysOn', 2_000_000.0, 'InputChannelB')
         data.add_brick("my_math_brick", my_math_brick)
 
     input_channel_test()
 
 
-    print(f"{clr.info} Now generating file.")
+    print(f"{FM.info} Now generating file.")
 
     # Writing stuff
     data.write_metadata()
