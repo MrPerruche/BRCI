@@ -20,7 +20,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C20"  # String, This is equivalent to 3.__ fyi
+version: str = "C21"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
