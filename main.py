@@ -29,7 +29,9 @@ _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
 from os import system as os_system
 os_system('color')
-class FORMATS:
+
+# Fight to the end about the class name fr 
+class clr:
     reset = '\x1b[0m' # Reset code
     red = '\x1b[31m'
     blue = '\x1b[34m'
@@ -83,11 +85,11 @@ class FORMATS:
 
     @staticmethod
     def error_with_header(header, text):
-        print(f"{FORMATS.error} {header}{FORMATS.remove_reverse} \n{text}")
+        print(f"{clr.error} {header}{clr.remove_reverse} \n{text}")
 
     @staticmethod
     def warning_with_header(header, text):
-        print(f"{FORMATS.warning} {header}{FORMATS.remove_reverse} \n{text}")
+        print(f"{clr.warning} {header}{clr.remove_reverse} \n{text}")
 
 
 
@@ -96,9 +98,8 @@ from builtins import print as print_ins
 # Override the built-in print function
 def print(*args, end='\n', reset_color=True, **kwargs):
     # I removed this comment because my IDE complained about it containing a typo (there was none :bob_troll:)
-    if reset_color: print_ins(*args, end=f"{end}{FORMATS.reset}", **kwargs)
+    if reset_color: print_ins(*args, end=f"{end}{clr.reset}", **kwargs)
     else: print_ins(*args, end=f"{end}", **kwargs)
-
 
 # ------------------------------------------------------------
 # DATA WRITING
@@ -202,13 +203,13 @@ class BRAPI:
         match variable_name:
             case 'write_blank':
                 if not isinstance(self.write_blank, bool):
-                    FORMATS.error_with_header("Invalid write_blank type.",
+                    clr.error_with_header("Invalid write_blank type.",
                         f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a "
                         f"{type(self.write_blank).__name__}.\nIt is now set to False.")
                     self.write_blank = False
             case 'bricks_len':
                 if len(self.bricks) > 65535:
-                    FORMATS.error_with_header("Too many bricks.",
+                    clr.error_with_header("Too many bricks.",
                         f"Whilst {occured_when}, the length of the list of bricks was found to exceed 65,535.\n"
                         f"Therefore, the last {len(self.bricks)-65535 :,} brick(s) were removed. 65,535 bricks left.")
                     self.bricks = self.bricks[:65535]
@@ -221,7 +222,7 @@ class BRAPI:
                 if invalid_logs_list:
                     invalid_logs_str: str =  ', '.join(invalid_logs_list)
                     logs_whitelist_str: str = ', '.join(logs_whitelist_list)
-                    FORMATS.warning_with_header("Unknown log(s) type requested.",
+                    clr.warning_with_header("Unknown log(s) type requested.",
                         f"Whilst {occured_when}, the following log(s) type requested were found to be invalid: "
                         f"{invalid_logs_str}.\nYou may instead use the following: {logs_whitelist_str}.")
 
@@ -249,14 +250,17 @@ class BRAPI:
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            FORMATS.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to"
+            clr.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to"
                                                          "find BR-API default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
-            copy_file(os.path.join(_write_preview_regular_image_path),
-                      os.path.join(self.in_project_folder_directory, "Preview.png"))
+            if os.path.exists(os.path.join(self.in_project_folder_directory, "Preview.png")):
+                clr.warning_with_header("Dest Code Activated, Project Overwritten", "If you are seeing this, Destiny's Debug code has triggered. This means that your project has been overwritten without errors.")
+                os.remove(os.path.join(self.in_project_folder_directory, "Preview.png"))
 
+            copy_file(os.path.join(_write_preview_regular_image_path),
+                os.path.join(self.in_project_folder_directory, "Preview.png"))
 
     # Writing metadata.brm file
     def write_metadata(self):
@@ -304,7 +308,7 @@ class BRAPI:
                 metadata_file.write(bin_float(self.vehicle_worth, 4))
 
                 # Writes the author. We don't want it to be listed, so we write invalid data.
-                metadata_file.write(bytes.fromhex('FFFFFFFFFFFFFFFF'))
+                metadata_file.write(bytes.fromhex('FFFFFFFFFFFFFFFF')) # What if a steam ID someday reaches this limit? Never!
 
                 # I have no fucking clue of what I'm writing but hey it's something right?
                 metadata_file.write(bytes.fromhex("14686300000000B034B6C7382ADC08E079251F392ADC08")) # Peak programming. TODO Figure out what the fuck we're writing here
@@ -356,7 +360,7 @@ class BRAPI:
             def brv_brick_types(bricks: list, debug: bool = False) -> list:
                 brick_types_f = list(set(item[1]['gbn'] for item in bricks))
                 if debug:
-                    print(f'{FORMATS.debug} Brick Types......... : {brick_types_f}')
+                    print(f'{clr.debug} Brick Types......... : {brick_types_f}')
                 return brick_types_f
 
             # FIXME DESTINY
@@ -366,18 +370,25 @@ class BRAPI:
                 for brick_mp in bricks:
                     print("FOR BRICK")
                     properties_to_add: dict = {}
-                    if isinstance(brick_mp[1], dict):
-                        for property_key_mp, property_value_mp in brick_mp[1].items():
-                            if property_key_mp is not None:  # Skip over None key
-                                print("FOR PROPERTY")
-                                print(type(property_value_mp))
-                                if isinstance(property_value_mp, BrickInput):
-                                    print("DETECTED")
-                                    properties_to_add.update(property_value_mp.properties())
-                                    brick_mp[1].remove(property_key_mp)
-                        brick_mp[1].update(properties_to_add)
+                    properties_to_remove: dict = {}
+                    for property_key_mp, property_value_mp in brick_mp[1].items():
+                        print("FOR PROPERTY")
+                        print(type(property_value_mp))
+                        if isinstance(property_value_mp, BrickInput):
+                            print("DETECTED")
+                            #print(f"{clr.debug} property_value_mp.properties() : {property_value_mp.properties()}")
+                            #print(f"{clr.debug} properties_to_add : {properties_to_add}")
+                            prop_mp_temp = property_value_mp.properties()
+                            #print(f"{clr.debug} prop_mp_temp : {prop_mp_temp}")
+                            properties_to_add.update(prop_mp_temp)
+                            print(f"{clr.debug} properties_to_remove : {properties_to_remove}")
+                            print(f"{clr.debug} property_key_mp : {property_key_mp}")
+                            properties_to_remove.update(property_key_mp)
+                    brick_mp[1].pop(properties_to_remove)
+                    #print(f"{clr.debug} properties_to_add[0] : {properties_to_add[0]}")
+                    brick_mp[1].update(properties_to_add)
                 if debug:
-                    print(f'{FORMATS.debug} Modified Brick List. : {bricks}')
+                    print(f'{clr.debug} Modified Brick List. : {bricks}')
 
 
             # Verify if there are too many bricks
@@ -398,13 +409,13 @@ class BRAPI:
                 add_missing_properties(self.bricks_writing, 'bricks' in self.debug_logs)
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Missing Properties.. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Missing Properties.. : {perf_counter() - previous_time :.6f} seconds')
 
                 # Get the different bricks present in the project
                 brick_types = brv_brick_types(self.bricks_writing, 'bricks' in self.debug_logs) # List
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Write the number of different brick types
@@ -442,7 +453,7 @@ class BRAPI:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -470,7 +481,7 @@ class BRAPI:
 
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Give IDs
@@ -495,7 +506,7 @@ class BRAPI:
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Insert n-word here
@@ -504,20 +515,20 @@ class BRAPI:
                 self.bricks_writing = temp_bricks_writing.copy()
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
                 # Debug
                 if 'bricks' in self.debug_logs:
-                    print(f'{FORMATS.debug} Identical Excluded Brick L : {temp_iebl}')
-                    print(f'{FORMATS.debug} Property Table............ : {property_table}')
-                    print(f'{FORMATS.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
-                    print(f'{FORMATS.debug} Brick Properties Writing.. : {self.bricks_writing}')
-                    print(f'{FORMATS.debug} String Name to ID Table... : {string_name_to_id_table}')
-                    print(f'{FORMATS.debug} Brick Types............... : {brick_types}')
-                    print(f'{FORMATS.debug} Property Key Table........ : {property_key_table}')
-                    print(f'{FORMATS.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
+                    print(f'{clr.debug} Identical Excluded Brick L : {temp_iebl}')
+                    print(f'{clr.debug} Property Table............ : {property_table}')
+                    print(f'{clr.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'{clr.debug} Brick Properties Writing.. : {self.bricks_writing}')
+                    print(f'{clr.debug} String Name to ID Table... : {string_name_to_id_table}')
+                    print(f'{clr.debug} Brick Types............... : {brick_types}')
+                    print(f'{clr.debug} Property Key Table........ : {property_key_table}')
+                    print(f'{clr.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
                 brv_file.write(unsigned_int(len(property_table), 2))
@@ -529,7 +540,7 @@ class BRAPI:
                     brv_file.write(small_bin_str(brick_type))
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 temp_spl: bytes = b''
@@ -603,7 +614,7 @@ class BRAPI:
                     temp_spl: bytes = b''  # Reset
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -639,7 +650,7 @@ class BRAPI:
                 brv_file.write(b'\x00\x00')
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
@@ -655,8 +666,8 @@ class BRAPI:
                     brv_file.write(brapi_individual_appendix)
 
                 if 'time' in self.debug_logs:
-                    print(f'{FORMATS.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
-                    print(f'{FORMATS.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
+                    print(f'{clr.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
     def debug_print(self, summary_only=False, write=True, print_bricks=False):
 
@@ -726,10 +737,10 @@ if __name__ == '__main__':
 
     # Setting up BR-API
     data = BRAPI()
-    data.project_name = 'BR-API test'
-    data.project_display_name = 'BR-API test'
-    data.project_folder_directory = os.path.join(_cwd, 'Projects')
-    data.file_description = '....fuck..'
+    data.project_name = 'Input-Channel-Test'
+    data.project_display_name = 'Input Channel Test'
+    data.project_folder_directory = os.path.join(_cwd, 'Projects') # Do not touch
+    data.file_description = 'A test for input channels.'
     data.debug_logs = ['time', 'bricks']
     data.write_blank = None
 
@@ -774,14 +785,15 @@ if __name__ == '__main__':
     # TODO make an actual default vehicle that wont cause even high end systems to kill themselves when spawned 
     # (or simply just one that doesnt drive people with low end systems away entirely)
 
+    def input_channel_test():
+        my_math_brick = create_brick('MathBrick_1sx1sx1s')
+        my_math_brick['InputChannelB.InputAxis'] = BrickInput('AlwaysOn', 2_000_000, 'InputChannelB')
+        data.add_brick("my_math_brick", my_math_brick)
 
-    my_math_brick = create_brick('MathBrick_1sx1sx1s')
-    my_math_brick['InputChannelB.InputAxis'] = BrickInput('AlwaysOn', 2_000_000, 'InputChannelB')
-    data.add_brick("my_math_brick", my_math_brick)
+    input_channel_test()
 
 
-
-    print(f"{FORMATS.info} Now generating file.")
+    print(f"{clr.info} Now generating file.")
 
     # Writing stuff
     data.write_metadata()
@@ -790,15 +802,15 @@ if __name__ == '__main__':
     data.debug_print(False, True, False) # Writes all data
 
     """
-    print(f"\n\n{FORMATS.error} An error occurred.")
-    print(f"{FORMATS.warning} Press enter to exit.")
-    print(f"{FORMATS.info} Press enter to continue.")
-    print(f"{FORMATS.success} File successfully generated.")
-    print(f"{FORMATS.debug} print(f'" + "{FORMATS.info} Hello world')")
-    print(f"{FORMATS.test} Something\n\n")
+    print(f"\n\n{clr.error} An error occurred.")
+    print(f"{clr.warning} Press enter to exit.")
+    print(f"{clr.info} Press enter to continue.")
+    print(f"{clr.success} File successfully generated.")
+    print(f"{clr.debug} print(f'" + "{clr.info} Hello world')")
+    print(f"{clr.test} Something\n\n")
 
-    FORMATS.error_with_header("Your creation contains too many bricks.", "Brick Rigs limit all creations to 65,535 bricks (16 bit unsigned integer limit).\nYour creation contains 68,194 bricks. 2,649 bricks were removed.")
-    FORMATS.warning_with_header("You suck", "And you will never ever get bitches\nBecause you're gay")=)
+    clr.error_with_header("Your creation contains too many bricks.", "Brick Rigs limit all creations to 65,535 bricks (16 bit unsigned integer limit).\nYour creation contains 68,194 bricks. 2,649 bricks were removed.")
+    clr.warning_with_header("You suck", "And you will never ever get bitches\nBecause you're gay")=)
     
     input(f'\n\n\nwait')
     """

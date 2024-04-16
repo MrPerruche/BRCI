@@ -134,3 +134,5 @@ class BrickInput:
                 # Or if its invalid
                 # Return type only
                 else: return { f'{self.prefix}.InputAxis': self.brick_input_type }
+            case 'Custom':
+                return { f'{self.prefix}.InputAxis': self.brick_input_type, f'{self.prefix}.InputValue': self.brick_input }
