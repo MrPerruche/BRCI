@@ -20,7 +20,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C24"  # String, This is equivalent to 3.__ fyi
+version: str = "C25"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -29,16 +29,6 @@ _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
 from os import system as os_system
 os_system('color')
-
-
-
-
-from builtins import print as print_ins
-# Override the built-in print function
-def print(*args, end='\n', reset_color=True, **kwargs):
-    # I removed this comment because my IDE complained about it containing a typo (there was none :bob_troll:)
-    if reset_color: print_ins(*args, end=f"{end}{FM.reset}", **kwargs)
-    else: print_ins(*args, end=f"{end}", **kwargs)
 
 # ------------------------------------------------------------
 # DATA WRITING
@@ -142,9 +132,7 @@ class BRAPI:
         match variable_name:
             case 'write_blank':
                 if not isinstance(self.write_blank, bool):
-                    FM.error_with_header("Invalid write_blank type.",
-                        f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a "
-                        f"{type(self.write_blank).__name__}.\nIt is now set to False.")
+                    FM.error_with_header("Invalid write_blank type.", f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a {type(self.write_blank).__name__}.\nIt is now set to False.")
                     self.write_blank = False
             case 'bricks_len':
                 if len(self.bricks) > 65535:
@@ -189,13 +177,12 @@ class BRAPI:
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            FM.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to"
-                                                         "find BR-API default image. Please retry.")
+            FM.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to find BR-API default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
             if os.path.exists(os.path.join(self.in_project_folder_directory, "Preview.png")):
-                FM.error_with_header("Preview.png already created", "Whilst writing Preview.png, we noticed it was already added.\nThe old Preview.png was therefore replaced.")
+                FM.warning_with_header("Preview.png already created", "Whilst writing Preview.png, we noticed it was already added.\nThe old Preview.png was therefore replaced.")
                 os.remove(os.path.join(self.in_project_folder_directory, "Preview.png"))
 
             copy_file(os.path.join(_write_preview_regular_image_path),
@@ -701,89 +688,4 @@ class BRAPI:
 
 
 # Try it out
-if __name__ == '__main__':
-
-    # Setting up BR-API
-    data = BRAPI()
-    data.project_name = 'Input-Channel-Test'
-    data.project_display_name = 'Input Channel Test'
-    data.project_folder_directory = os.path.join(_cwd, 'Projects') # Do not touch
-    data.file_description = 'A test for input channels.'
-    data.debug_logs = ['time', 'bricks', 'all']
-    data.write_blank = None
-
-    def stress_test_run() -> None:
-        import random
-        for brick_number in range(100_000):
-            try:
-                test_brick = create_brick(random.choice(list(br_brick_list.keys())))
-                temp_test_selected_property = random.choice(list(test_brick.keys()))
-                if isinstance(test_brick[temp_test_selected_property], float):
-                    test_brick[temp_test_selected_property] = random.uniform(0.0, 1000.0)
-                test_brick['Position'] = [random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0), random.uniform(0.0, 25000.0)]
-                test_brick['Rotation'] = [random.uniform(0.0, 360.0), random.uniform(0.0, 360.0), random.uniform(0.0, 360.0)]
-                if 'gbn' in test_brick:
-                    data.add_brick(str(brick_number), test_brick)
-            except KeyError:
-                raise KeyError(f'GBN INVALID BRICK')
-
-    def horn_pitch_test() -> None:
-        test_pitch = 0.5
-        position_x = 0
-        hue = 0
-        for brick_number_b in range(20):
-            test_pitch -= 0.025
-            position_x += 10
-            hue += 10
-            test_current_brick_w = create_brick('DoubleSiren_1x2x1s')
-            test_current_brick_w['HornPitch'] = test_pitch
-            test_current_brick_w['Position'] = [position_x, 0, 0]
-            test_current_brick_w['BrickColor'] = [hue, 255, 255, 255]
-            data.add_brick(str(brick_number_b), test_current_brick_w)
-
-
-    def destiny_s_test() -> None:
-        properties = {"Position": [0,0,0], "Rotation": [0,0,0], "BrickColor": [0, 255, 255, 255]}
-        switch1 = create_brick('Switch_1sx1sx1s', properties)
-        data.add_brick("Switch1", switch1)
-
-
-    def input_channel_test():
-        my_scalable = create_brick('ScalableBrick')
-        data.add_brick('my_scalable', my_scalable)
-        my_math_brick = create_brick('MathBrick_1sx1sx1s')
-        my_math_brick['InputChannelA.InputAxis'] = BrickInput('AlwaysOn', -2_000_000.0, 'InputChannelA')
-        my_math_brick['InputChannelB.InputAxis'] = BrickInput('Custom', ['my_math_brick'], 'InputChannelB')
-        data.add_brick("my_math_brick", my_math_brick)
-
-
-    data.write_preview()
-
-    # TODO make an actual default vehicle that wont cause even high end systems to kill themselves when spawned 
-    # (or simply just one that doesnt drive people with low end systems away entirely)
-
-
-    input_channel_test()
-
-
-    print(f"{FM.info} Now generating file.")
-
-    # Writing stuff
-    data.write_metadata()
-    data.write_brv()
-    # data.debug_print(True, False, True) # Prints summary only
-    data.debug_print(False, True, False) # Writes all data
-
-    """
-    print(f"\n\n{clr.error} An error occurred.")
-    print(f"{clr.warning} Press enter to exit.")
-    print(f"{clr.info} Press enter to continue.")
-    print(f"{clr.success} File successfully generated.")
-    print(f"{clr.debug} print(f'" + "{clr.info} Hello world')")
-    print(f"{clr.test} Something\n\n")
-
-    clr.error_with_header("Your creation contains too many bricks.", "Brick Rigs limit all creations to 65,535 bricks (16 bit unsigned integer limit).\nYour creation contains 68,194 bricks. 2,649 bricks were removed.")
-    clr.warning_with_header("You suck", "And you will never ever get bitches\nBecause you're gay")=)
-    
-    input(f'\n\n\nwait')
-    """
+#if __name__ == '__main__':

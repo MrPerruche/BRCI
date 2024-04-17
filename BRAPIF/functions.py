@@ -1,6 +1,13 @@
 import struct
 from dataclasses import dataclass
 
+# whoops, someone forgot to move this over here.
+from builtins import print as print_ins
+# Override the built-in print function
+def print(*args, end='\n', reset_color=True, **kwargs):
+    # I removed this comment because my IDE complained about it containing a typo (there was none :bob_troll:)
+    if reset_color: print_ins(*args, end=f"{end}{FM.reset}", **kwargs)
+    else: print_ins(*args, end=f"{end}", **kwargs)
 
 class FM:
     reset = '\x1b[0m' # Reset code
@@ -204,7 +211,7 @@ class BrickInput:
                 else: return { f'{self.prefix}.InputAxis': self.brick_input_type }
 
             # Anything having as an input multiple bricks
-            case 'Custom', 'Steering', 'SteeringAlt', 'Throttle', 'ThrottleAlt', 'Brake', 'BrakeAlt', 'Auxiliary', 'AuxiliaryAlt', 'Pitch', 'PitchAlt', 'ViewPitch', 'ViewPitchAlt', 'ViewYaw', 'Horn', 'DisableSteering', 'HandBrake', 'OperationMode', 'Headlight', 'Beacon', 'WarningLight', 'Taillight', 'BrakeLight', 'ReversingLight', 'Action1', 'Action2', 'Action3', 'Action4', 'Action5', 'Action6', 'Action7', 'Action8':
+            case _:
                 if self.brick_input is None:
                     self.brick_input: list = []
                 if isinstance(self.brick_input, list):
