@@ -2,6 +2,67 @@ import struct
 from dataclasses import dataclass
 
 
+class FM:
+    reset = '\x1b[0m' # Reset code
+    red = '\x1b[31m'
+    blue = '\x1b[34m'
+    green = '\x1b[32m'
+    yellow = '\x1b[33m'
+    purple = '\x1b[35m'
+    cyan = '\x1b[36m'
+    white = '\x1b[37m'
+    black = '\x1b[30m'
+    light_blue = '\x1b[94m'
+    light_green = '\x1b[92m'
+    light_red = '\x1b[91m'
+    light_purple = '\x1b[95m'
+    light_white = '\x1b[97m'
+    light_black = '\x1b[90m'
+    light_cyan = '\x1b[96m'
+    light_yellow = '\x1b[93m'
+    bold = '\x1b[1m'
+    underline = '\x1b[4m'
+    italic = '\x1b[3m'
+    reverse = '\x1b[7m'
+    strikethrough = '\x1b[9m'
+    remove_color = '\x1b[39m'
+    remove_bold = '\x1b[22m'
+    remove_underline = '\x1b[24m'
+    remove_italic = '\x1b[23m'
+    remove_reverse = '\x1b[27m'
+    remove_strikethrough = '\x1b[29m'
+    bg_red = '\x1b[41m'
+    bg_green = '\x1b[42m'
+    bg_blue = '\x1b[44m'
+    bg_yellow = '\x1b[43m'
+    bg_black = '\x1b[40m'
+    bg_white = '\x1b[47m'
+    bg_light_red = '\x1b[101m'
+    bg_light_green = '\x1b[102m'
+    bg_light_blue = '\x1b[104m'
+    bg_light_yellow = '\x1b[103m'
+    bg_light_black = '\x1b[100m'
+    bg_light_white = '\x1b[107m'
+    bg_purple = '\x1b[45m'
+    bg_light_purple = '\x1b[105m'
+    bg_cyan = '\x1b[46m'
+    bg_light_cyan = '\x1b[106m'
+    info = f'{reverse}{light_blue}[INFO]{remove_reverse}'
+    success = f'{reverse}{light_green}[SUCCESS]{remove_reverse}'
+    error = f'{reverse}{light_red}[ERROR]'
+    warning = f'{reverse}{yellow}[WARNING]'
+    debug = f'{reverse}{light_purple}[DEBUG]{remove_reverse}'
+    test = f'{reverse}{light_cyan}[TEST]{remove_reverse}'
+
+    @staticmethod
+    def error_with_header(header, text):
+        print(f"{FM.error} {header}{FM.remove_reverse} \n{text}")
+
+    @staticmethod
+    def warning_with_header(header, text):
+        print(f"{FM.warning} {header}{FM.remove_reverse} \n{text}")
+
+
 def unsigned_int(integer, byte_len):
 
     if integer >= 2**(byte_len*8):
@@ -113,10 +174,13 @@ class BrickInput:
     brick_input_type: str
     brick_input: any
     prefix: str
+    last_chance: bool = False
+
 
     def properties(self):
 
         match self.brick_input_type:
+
             # For Always On (Constant Value)
             case 'AlwaysOn':
                 # If its valid
@@ -134,5 +198,15 @@ class BrickInput:
                 # Or if its invalid
                 # Return type only
                 else: return { f'{self.prefix}.InputAxis': self.brick_input_type }
+
+            # Anything having as an input multiple bricks
             case 'Custom':
-                return { f'{self.prefix}.InputAxis': self.brick_input_type, f'{self.prefix}.InputValue': self.brick_input }
+                if self.brick_input is None:
+                    self.brick_input: list = []
+                if isinstance(self.brick_input, list):
+                    if self.brick_input: return {
+                        f'{self.prefix}.InputAxis': self.brick_input_type,
+                        f'{self.prefix}.SourceBricks': self.brick_input
+                    }
+                    else: return { f'{self.prefix}.InputAxis': self.brick_input_type }
+                else: return 'invalid_source_bricks'

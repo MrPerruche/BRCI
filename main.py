@@ -20,7 +20,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C22"  # String, This is equivalent to 3.__ fyi
+version: str = "C23"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -29,67 +29,6 @@ _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
 
 from os import system as os_system
 os_system('color')
-
-# How about that?
-class FM:
-    reset = '\x1b[0m' # Reset code
-    red = '\x1b[31m'
-    blue = '\x1b[34m'
-    green = '\x1b[32m'
-    yellow = '\x1b[33m'
-    purple = '\x1b[35m'
-    cyan = '\x1b[36m'
-    white = '\x1b[37m'
-    black = '\x1b[30m'
-    light_blue = '\x1b[94m'
-    light_green = '\x1b[92m'
-    light_red = '\x1b[91m'
-    light_purple = '\x1b[95m'
-    light_white = '\x1b[97m'
-    light_black = '\x1b[90m'
-    light_cyan = '\x1b[96m'
-    light_yellow = '\x1b[93m'
-    bold = '\x1b[1m'
-    underline = '\x1b[4m'
-    italic = '\x1b[3m'
-    reverse = '\x1b[7m'
-    strikethrough = '\x1b[9m'
-    remove_color = '\x1b[39m'
-    remove_bold = '\x1b[22m'
-    remove_underline = '\x1b[24m'
-    remove_italic = '\x1b[23m'
-    remove_reverse = '\x1b[27m'
-    remove_strikethrough = '\x1b[29m'
-    bg_red = '\x1b[41m'
-    bg_green = '\x1b[42m'
-    bg_blue = '\x1b[44m'
-    bg_yellow = '\x1b[43m'
-    bg_black = '\x1b[40m'
-    bg_white = '\x1b[47m'
-    bg_light_red = '\x1b[101m'
-    bg_light_green = '\x1b[102m'
-    bg_light_blue = '\x1b[104m'
-    bg_light_yellow = '\x1b[103m'
-    bg_light_black = '\x1b[100m'
-    bg_light_white = '\x1b[107m'
-    bg_purple = '\x1b[45m'
-    bg_light_purple = '\x1b[105m'
-    bg_cyan = '\x1b[46m'
-    bg_light_cyan = '\x1b[106m'
-    info = f'{reverse}{light_blue}[INFO]{remove_reverse}'
-    success = f'{reverse}{light_green}[SUCCESS]{remove_reverse}'
-    error = f'{reverse}{light_red}[ERROR]'
-    warning = f'{reverse}{yellow}[WARNING]'
-    debug = f'{reverse}{light_purple}[DEBUG]{remove_reverse}'
-    test = f'{reverse}{light_cyan}[TEST]{remove_reverse}'
-
-    @staticmethod
-    def error_with_header(header, text):
-        print(f"{FM.error} {header}{FM.remove_reverse} \n{text}")
-
-    @staticmethod
-    def warning_with_header(header, text):
-        print(f"{FM.warning} {header}{FM.remove_reverse} \n{text}")
 
 
 
@@ -366,22 +305,29 @@ class BRAPI:
 
             # Add missing properties. Only made for BrickInput() but there may be more stuff later on
             def add_missing_properties(bricks: list, debug: bool = False) -> None:
+                # For each brick
                 for brick_mp in bricks:
+                    # Initialising required variables
                     properties_to_add: dict = {}
                     properties_to_remove: list = []
+                    # For each property
                     for property_key_mp, property_value_mp in brick_mp[1].items():
+                        # If it's set to the BrickInput class
                         if isinstance(property_value_mp, BrickInput):
-                            #print(f"{clr.debug} property_value_mp.properties() : {property_value_mp.properties()}")
-                            #print(f"{clr.debug} properties_to_add : {properties_to_add}")
+                            # Get the right property list
                             prop_mp_temp = property_value_mp.properties()
-                            #print(f"{clr.debug} prop_mp_temp : {prop_mp_temp}")
+                            # If it's incorrect
+                            if isinstance(prop_mp_temp, str) and prop_mp_temp == 'invalid_source_bricks':
+                                FM.error_with_header("Invalid type for brick list.",f"Whilst writing Vehicle.brv,"
+                                    f"we noticed {property_key_mp} (from brick {brick_mp[0]!r}) was not set to a list."
+                                    f"\nIt was set to type {type(property_value_mp).__name__}. It is now set to None, corresponding to no inputs.")
+                                property_value_mp.brick_input = []
+                                prop_mp_temp = property_value_mp.properties()
+                            # Get rid of the old, put the new instead
                             properties_to_add.update(prop_mp_temp)
-                            print(f"{FM.debug} properties_to_remove : {properties_to_remove}")
-                            print(f"{FM.debug} property_key_mp : {property_key_mp}")
                             properties_to_remove.append(property_key_mp)
                     for property_to_remove in properties_to_remove:
                         del brick_mp[1][property_to_remove]
-                    #print(f"{clr.debug} properties_to_add[0] : {properties_to_add[0]}")
                     brick_mp[1].update(properties_to_add)
                 if debug:
                     print(f'{FM.debug} Modified Brick List. : {bricks}')
@@ -436,8 +382,6 @@ class BRAPI:
 
                     # For each data for each brick
                     for p_del_current_key, p_del_current_value in current_brick[1].items():
-
-                        fully_manage_override: bool = False
 
                         # Accept if it's in the safe list (list which gets whitelisted even if default value is identical)
                         if p_del_current_key in safe_property_list:
@@ -560,6 +504,7 @@ class BRAPI:
                 # Write properties
                 property_length_list: list[int] = []
                 for property_type_key, property_type_value in property_table.items():
+                    property_length_list: list[int] = []
                     # Writing keys
                     brv_file.write(unsigned_int(len(property_type_key), 1))
                     brv_file.write(small_bin_str(property_type_key))
@@ -568,45 +513,60 @@ class BRAPI:
 
                     # Summing values
                     for pt_c_val in property_type_value:  # property_table_current_value
+
+                        temp_pre_spl: bytes = b''
+
                         if property_type_key not in br_special_property_instance_list:
 
                             # If it's an integer (uint 16 bit by default)
                             if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
-                                temp_spl += unsigned_int(pt_c_val, 2)
+                                temp_pre_spl += unsigned_int(pt_c_val, 2)
 
                             # If it's a float (float 32 bit by default)
                             if isinstance(pt_c_val, float):
-                                temp_spl += bin_float(pt_c_val, 4)
+                                temp_pre_spl += bin_float(pt_c_val, 4)
 
                             # If it's a bool
                             if isinstance(pt_c_val, bool):
-                                temp_spl += unsigned_int(int(pt_c_val), 1)
+                                temp_pre_spl += unsigned_int(int(pt_c_val), 1)
 
-                            # If it's a string (converting to utf-16)
+                            # If it's a string (converting to utf-8)
                             if isinstance(pt_c_val, str):
-                                temp_spl += signed_int(len(pt_c_val), 1)
-                                temp_spl += small_bin_str(pt_c_val)
+                                temp_pre_spl += signed_int(len(pt_c_val), 1)
+                                temp_pre_spl += small_bin_str(pt_c_val)
+
+                            # If it's a list of strings (=> generally list of bricks)
+                            if isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
+                                temp_pre_spl += unsigned_int(len(pt_c_val), 2) # TODO UNSURE: *2?
+                                for pt_c_sub_val in pt_c_val:
+                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
+
+
                         else:
                             match br_special_property_instance_list[property_type_key]:
                                 case 'INT8':
-                                    temp_spl += unsigned_int(pt_c_val, 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val, 1)
                                 case '6xINT2':
                                     temp_w_spl_connector = pt_c_val[0] + (pt_c_val[1] << 2) + (pt_c_val[2] << 4) + (
                                                 pt_c_val[3] << 6) + (pt_c_val[4] << 8) + (pt_c_val[5] << 10)
-                                    temp_spl += unsigned_int(temp_w_spl_connector, 2)
+                                    temp_pre_spl += unsigned_int(temp_w_spl_connector, 2)
                                 case '3xINT16':
-                                    temp_spl += unsigned_int(pt_c_val[0], 2)
-                                    temp_spl += unsigned_int(pt_c_val[1], 2)
-                                    temp_spl += unsigned_int(pt_c_val[2], 2)
+                                    temp_pre_spl += unsigned_int(pt_c_val[0], 2)
+                                    temp_pre_spl += unsigned_int(pt_c_val[1], 2)
+                                    temp_pre_spl += unsigned_int(pt_c_val[2], 2)
                                 case '3xINT8':
-                                    temp_spl += unsigned_int(pt_c_val[0], 1)
-                                    temp_spl += unsigned_int(pt_c_val[1], 1)
-                                    temp_spl += unsigned_int(pt_c_val[2], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[0], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[1], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[2], 1)
                                 case '4xINT8':
-                                    temp_spl += unsigned_int(pt_c_val[0], 1)
-                                    temp_spl += unsigned_int(pt_c_val[1], 1)
-                                    temp_spl += unsigned_int(pt_c_val[2], 1)
-                                    temp_spl += unsigned_int(pt_c_val[3], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[0], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[1], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[2], 1)
+                                    temp_pre_spl += unsigned_int(pt_c_val[3], 1)
+
+                        property_length_list.append(len(temp_pre_spl))
+                        temp_spl += temp_pre_spl
+
 
                     brv_file.write(unsigned_int(len(temp_spl), 4))
                     brv_file.write(temp_spl)
@@ -749,7 +709,7 @@ if __name__ == '__main__':
     data.project_display_name = 'Input Channel Test'
     data.project_folder_directory = os.path.join(_cwd, 'Projects') # Do not touch
     data.file_description = 'A test for input channels.'
-    data.debug_logs = ['time', 'bricks']
+    data.debug_logs = ['time', 'bricks', 'all']
     data.write_blank = None
 
     def stress_test_run() -> None:
@@ -788,16 +748,20 @@ if __name__ == '__main__':
         data.add_brick("Switch1", switch1)
 
 
+    def input_channel_test():
+        my_scalable = create_brick('ScalableBrick')
+        data.add_brick('my_scalable', my_scalable)
+        my_math_brick = create_brick('MathBrick_1sx1sx1s')
+        my_math_brick['InputChannelA.InputAxis'] = BrickInput('AlwaysOn', -2_000_000.0, 'InputChannelA')
+        my_math_brick['InputChannelB.InputAxis'] = BrickInput('Custom', ['my_math_brick'], 'InputChannelB')
+        data.add_brick("my_math_brick", my_math_brick)
+
+
     data.write_preview()
 
     # TODO make an actual default vehicle that wont cause even high end systems to kill themselves when spawned 
     # (or simply just one that doesnt drive people with low end systems away entirely)
 
-    def input_channel_test():
-        my_math_brick = create_brick('MathBrick_1sx1sx1s')
-        my_math_brick['InputChannelA.InputAxis'] = BrickInput('AlwaysOn', -2_000_000.0, 'InputChannelA')
-        my_math_brick['InputChannelB.InputAxis'] = BrickInput('AlwaysOn', 2_000_000.0, 'InputChannelB')
-        data.add_brick("my_math_brick", my_math_brick)
 
     input_channel_test()
 
