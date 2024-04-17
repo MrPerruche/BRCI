@@ -181,6 +181,10 @@ class BrickInput:
 
         match self.brick_input_type:
 
+            # None
+            case 'None':
+                return {f'{self.prefix}.InputAxis': self.brick_input_type}
+
             # For Always On (Constant Value)
             case 'AlwaysOn':
                 # If its valid
@@ -200,7 +204,7 @@ class BrickInput:
                 else: return { f'{self.prefix}.InputAxis': self.brick_input_type }
 
             # Anything having as an input multiple bricks
-            case 'Custom':
+            case 'Custom', 'Steering', 'SteeringAlt', 'Throttle', 'ThrottleAlt', 'Brake', 'BrakeAlt', 'Auxiliary', 'AuxiliaryAlt', 'Pitch', 'PitchAlt', 'ViewPitch', 'ViewPitchAlt', 'ViewYaw', 'Horn', 'DisableSteering', 'HandBrake', 'OperationMode', 'Headlight', 'Beacon', 'WarningLight', 'Taillight', 'BrakeLight', 'ReversingLight', 'Action1', 'Action2', 'Action3', 'Action4', 'Action5', 'Action6', 'Action7', 'Action8':
                 if self.brick_input is None:
                     self.brick_input: list = []
                 if isinstance(self.brick_input, list):

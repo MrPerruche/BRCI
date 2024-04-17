@@ -77,16 +77,6 @@ Defined values not corresponding to what's expected.
 Modifying this "property" will not in any way update this brick's property list. To change what brick type your variable
 is defined to, use `create_brick(brick_type)` again. Be aware this command will clear any previously edited properties
 
-### `InputChannel.InputAxis`
-This property corresponds to the brick's input : Either another brick, a constant value, throttle etc.
-It has various names depending on the brick (such as `AutoHoverInputChannel.InputAxis` etc.).
-It is set to the BrickInput class (custom class) : `INPUT (BrickInput(brick_input_type, brick_input))`. Input list:
-###### In Brick Rigs 1.6.3 UI order
-## <span style="color: lime;">TODO</span>
-```
-BrickInput('AlwaysOn', brick_input).. : Value, (f32)
-```
-
 ### `InputScale`
 This property corresponds to what is technically referred as input scale. It is however counterintuitive,
 as it refers to various things related to the brick's efficiency (thrust, speed etc.).
@@ -122,6 +112,65 @@ in the following order: `[ROT_Y (deg) (f32), ROT_Z (deg) (f32), ROT_X (deg) (f32
 
 ### `SpeedFactor`
 This property corresponds to actuators' speed. It is a single float 32 : `SPEED (f32)`.
+
+### `[...].InputAxis`
+This property corresponds to the brick's input : Either another brick, a constant value, throttle etc.
+It has various prefixes depending on the brick (such as `AutoHoverInputChannel.InputAxis` etc.).
+It is set to the BrickInput class (custom class) : `INPUT (BrickInput(brick_input_type: str, brick_input: any, prefix: str))`.
+BR-API does not care about the property name at all. However what it cares about is the class defining it : `BrickInput`.
+It has 3 arguments :
+`brick_input_type`: the input type;
+`brick_input`: may be the input value, or source bricks, or anything else.
+`prefix`: this is what comes before `.InputAxis`. It is part of the property's in-game name.
+Input list:
+###### In Brick Rigs 1.6.3 UI order
+```
+BrickInput('None', brick_input, prefix)........... : None (can be anything), prefix
+BrickInput('AlwaysOn', brick_input, prefix)....... : Value (f32), prefix
+BrickInput('Custom', brick_input, prefix)......... : List of all str brick names (list[str]), prefix
+
+BrickInput('Steering', brick_input, prefix)....... : List of all str brick names (list[str]), prefix
+BrickInput('SteeringAlt', brick_input, prefix).... : List of all str brick names (list[str]), prefix
+BrickInput('Throttle', brick_input, prefix)....... : List of all str brick names (list[str]), prefix
+
+BrickInput('ThrottleAlt', brick_input, prefix).... : List of all str brick names (list[str]), prefix
+BrickInput('Brake', brick_input, prefix).......... : List of all str brick names (list[str]), prefix
+BrickInput('BrakeAlt', brick_input, prefix)....... : List of all str brick names (list[str]), prefix
+
+BrickInput('Auxiliary', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+BrickInput('AuxiliaryAlt', brick_input, prefix)... : List of all str brick names (list[str]), prefix
+BrickInput('ViewPitch', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+
+BrickInput('ViewPitchAlt', brick_input, prefix)... : List of all str brick names (list[str]), prefix
+BrickInput('ViewYaw', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('ViewYawAlt', brick_input, prefix)..... : List of all str brick names (list[str]), prefix
+
+BrickInput('Horn', brick_input, prefix)........... : List of all str brick names (list[str]), prefix
+BrickInput('DisableSteering', brick_input, prefix) : List of all str brick names (list[str]), prefix
+BrickInput('InvertSteering', brick_input, prefix). : List of all str brick names (list[str]), prefix
+
+BrickInput('HandBrake', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+BrickInput('OperationMode', brick_input, prefix).. : List of all str brick names (list[str]), prefix
+BrickInput('Headlight', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+
+BrickInput('Beacon', brick_input, prefix)......... : List of all str brick names (list[str]), prefix
+BrickInput('WarningLight', brick_input, prefix)... : List of all str brick names (list[str]), prefix
+BrickInput('Taillight', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+
+BrickInput('BrakeLight', brick_input, prefix)..... : List of all str brick names (list[str]), prefix
+BrickInput('ReversingLight', brick_input, prefix). : List of all str brick names (list[str]), prefix
+BrickInput('Action1', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+
+BrickInput('Action2', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action3', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action4', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+
+BrickInput('Action5', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action6', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action7', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+
+BrickInput('Action8', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+```
 
 ## Actuators
 
