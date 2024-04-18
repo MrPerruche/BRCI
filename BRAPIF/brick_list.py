@@ -431,16 +431,28 @@ append_multiple(br_brick_list, ['Wheel_1sx1sx1s', 'Wheel_1x1x1'], br_brick_list[
 
 
 # --------------------------------------------------
-# UNCATEGORIZED TODO
+# UNCATEGORIZED [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
 
+# Archs, Ledges and more
+append_multiple(br_brick_list, ['Arch_2x1x2', 'Arch_4x1x2', 'Arch_6x1x1', 'Arch_8x1x8', 'CornerLedge_1x1x1',
+                                'Ledge_1x1x1', 'Ledge_1x2x1', 'Ledge_1x4x1', 'PlaneTail_10x10x6'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False
+                }, True)
 
-# TODO FOLLOWING BRICK. NO DOCUMENTATION ETC. ONLY USED FOR A TEST.
+# Horn
 append_multiple(br_brick_list, ['DoubleSiren_1x2x1s'],
                 br_brick_list['default_brick_data'] | {
                     'SirenType': 'Car',
                     'HornPitch': 1.0,
                     'InputChannel.InputAxis': BrickInput('Horn', None, 'InputChannel')
+                }, True)
+
+append_multiple(br_brick_list, ['Winch_3x2x1'],
+                br_brick_list['default_brick_data'] | {
+                    'InputChannel.InputAxis': BrickInput('Auxiliary', None, 'InputChannel'),
+                    'WinchSpeed': 100.0 # 100 = 1 meter/s
                 }, True)
 
 

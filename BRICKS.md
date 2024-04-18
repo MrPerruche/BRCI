@@ -312,6 +312,16 @@ Yaw
 Roll
 ```
 
+### `SirenType`
+This property correspond to what siren is being played. It is a single string : `SIREN (str)`. Input list:
+```
+Car
+EmsUS
+FireDeptGerman
+PoliceGerman
+TruckHorn
+```
+
 ### `SteeringAngle`
 This property correspond to the maximum angle at which the axle will rotate the wheel.
 It is a single float 32 : `STEERING ANGLE (deg) (f32)`.
@@ -345,6 +355,10 @@ OtherVehicles
 Pawn
 Water
 ```
+
+### `WinchSpeed`
+This property correspond to the winch's speed. 100 corresponds to 1 meter per second (3.6 km/h).
+It is a single float 32 : `SPEED (f32)`
 
 ### `[...].InputAxis`
 This property corresponds to the brick's input : Either another brick, a constant value, throttle etc.
@@ -913,3 +927,40 @@ Wheel_1x1x1...... : H
 
 #### Properties : H
 - Default Brick Properties
+
+## Uncategorized
+
+###### In Brick Rigs 1.6.3 UI order
+
+```
+Arch_2x1x2......... : A
+Arch_4x1x4......... : A
+Arch_6x1x1......... : A
+
+Arch_8x1x8......... : A
+CornerLedge_1x1x1.. : A
+Ledge_1x1x1........ : A
+
+Ledge_1x2x1........ : A
+Ledge_1x4x1........ : A
+DoubleSiren_1x2x1s. : B
+
+PlaneTail_10x10x16. : A
+CraneSupport_6x6x20 : A
+Winch_3x2x1s....... : C
+```
+
+#### Properties : A
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
+#### Properties : B
+- Default Brick Properties
+- `SirenType` (`str`) (`'Car'`)
+- `HornPitch` (`f32`) (`1.0`)
+- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Horn', None, 'InputChannel')`)
+
+#### Properties : C
+- Default Brick Properties
+- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Auxiliary', None, 'InputChannel')`)
+- `WinchSpeed` (`f32`) (`100.0`)
