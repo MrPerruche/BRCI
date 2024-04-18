@@ -20,7 +20,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C25"  # String, This is equivalent to 3.__ fyi
+version: str = "C26"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -59,7 +59,8 @@ class BRAPI:
                  project_display_name='',
                  file_description='',
                  debug_logs=None,
-                 user_appendix=b''):
+                 user_appendix=b'',
+                 seat_brick=''):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -74,6 +75,7 @@ class BRAPI:
             debug_logs = []
         self.debug_logs = debug_logs # List of logs to print
         self.user_appendix = user_appendix # List (User appendix)
+        self.seat_brick = seat_brick
 
 
     # Creating more variables
@@ -105,11 +107,35 @@ class BRAPI:
         # TODO : CALCULATE WORTH
         return 0.2 # I wonder if this will make it 0.2 in-game? Or does BR calculate the price itself?
 
+
     # Adding bricks to the brick list
-    def add_brick(self, brick_name: str, new_brick: dict):
-        self.bricks.append([str(brick_name), new_brick]) # TODO : CHECK IF NAME IS INVALID (probably by using BRAPIF)
+    def add_brick(self, brick_name: str | list[dict], brick: dict | list[dict]):
+        if isinstance(brick_name, str):
+            self.bricks.append([str(brick_name), brick])
+        else:
+            for add_brick_i in range(len(brick)):
+                self.bricks.append([str(brick_name[add_brick_i]), brick[add_brick_i]])
 
         return self
+
+
+    def add_new_brick(self, brick_name: str | list[str], brick_type: str | list[str], brick: dict | list[dict]):
+        if isinstance(brick_type, str):
+            self.bricks.append([str(brick_name), create_brick(brick_type, brick)])
+        else:
+            for add_new_brick_i in range(len(brick_type)):
+                self.bricks.append([str(brick_name[add_new_brick_i]), create_brick(brick_type[add_new_brick_i], brick[add_new_brick_i])])
+
+    
+    def add_all_bricks(self, local_variables: list[dict]):
+
+        iteration_count = len(self.bricks)
+        for var in local_variables:
+            # Check if it is a dict
+            if isinstance(var, dict):
+                # Check if it is from create_brick()
+                if 'default_brick_data' in var:
+                    iteration_count += 1; self.add_brick(str(iteration_count), var)
 
 
     # Removing bricks from the brick list
@@ -550,6 +576,12 @@ class BRAPI:
                                     temp_pre_spl += unsigned_int(pt_c_val[1], 1)
                                     temp_pre_spl += unsigned_int(pt_c_val[2], 1)
                                     temp_pre_spl += unsigned_int(pt_c_val[3], 1)
+                                case '3xFLOAT32/None':
+                                    temp_pre_spl += bin_float(pt_c_val[0], 4)
+                                    temp_pre_spl += bin_float(pt_c_val[1], 4)
+                                    temp_pre_spl += bin_float(pt_c_val[2], 4)
+                                case 'UTF-16':
+                                    raise NotImplementedError('UTF-16 not implemented yet.')
 
                         property_length_list.append(len(temp_pre_spl))
                         temp_spl += temp_pre_spl
@@ -602,7 +634,9 @@ class BRAPI:
                     # Reset
                     brick_data_writing = b''
 
-                brv_file.write(b'\x00\x00')
+                if self.seat_brick is not None:
+                    brv_file.write(unsigned_int(string_name_to_id_table[self.seat_brick], 2))
+                else: brv_file.write(b'\x00\x00')
 
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')

@@ -7,10 +7,10 @@ from main import *
 if __name__ == "__main__":
     # Setting up BR-API
     data = BRAPI()
-    data.project_name = 'Proper-Hornwave'
-    data.project_display_name = 'Hornwave'
+    data.project_name = 'Wheel-Test'
+    data.project_display_name = 'Wheel Test'
     data.project_folder_directory = os.path.join(_cwd, 'Projects') # Do not touch
-    data.file_description = 'An impressive display of BR-API and a flex that it works.'
+    data.file_description = 'A test to see if Destiny has properly coded *all* wheels in.'
     data.debug_logs = ['time']#, 'bricks']
     data.write_blank = None
 
@@ -71,10 +71,71 @@ if __name__ == "__main__":
         base_scalable = create_brick('ScalableBrick', {'Position': [50, 0, -5], 'BrickColor': [hue+10, 255, 255, 255], 'BrickSize': [13, 6, 1]}) # 1 stud = 3 of these
         data.add_brick("base_scalable", base_scalable)
 
+    def thruster_test() -> None:
+        properties = {"Position": [0,0,0], "Rotation": [0,0,0], "BrickColor": [0, 255, 255, 255], "InputChannel.InputAxis": "AlwaysOn", "bAccumulated": True}
+        thruster = create_brick('Thruster_1sx1sx1s', properties)
+        thruster2 = create_brick('Thruster_1x1x1', properties)
+        thruster3 = create_brick('Thruster_1x1x3', properties)
+        thruster4 = create_brick('Thruster_2x2x4', properties)
+        data.add_bricks(["thruster", "thruster2", "thruster3", "thruster4"], [thruster, thruster2, thruster3, thruster4])
+    
+    def axle_test() -> None:
+        properties = {"Position": [0,0,0], "Rotation": [0,0,0]}
+        axle = data.create_add_brick('Axle_1sx1sx1s', properties)
+        axle2 = data.create_add_brick('Axle_1x1x1s_02', properties | {"Position": [10, 0, 0]})
+        axle3 = data.create_add_brick('Axle_1x1x1s', properties | {"Position": [20, 0, 0]})
+        axle4 = data.create_add_brick('Axle_1x2x1s', properties | {"Position": [30, 0, 0]})
+        axle5 = data.create_add_brick('Axle_2x2x1s', properties | {"Position": [40, 0, 0]})
+        axle6 = data.create_add_brick('Axle_2x2x1', properties | {"Position": [50, 0, 0]})
+        axle7 = data.create_add_brick('LandingGear_2x2x2', properties | {"Position": [60, 0, 0]})
+        axle8 = data.create_add_brick('Axle_2x4x1s', properties | {"Position": [70, 0, 0]})
+        axle9 = data.create_add_brick('Axle_2x6x1s', properties | {"Position": [80, 0, 0]})
+
+    def wheel_test() -> None:
+        properties = {"Position": [0,0,0], "Rotation": [0,0,0]}
+        data.add_bricks(
+            ["wheel",
+            "wheel2",
+            "wheel3",
+            "wheel4",
+            "wheel5",
+            "wheel6",
+            "wheel7",
+            "wheel8",
+            "wheel9",
+            "wheel10",
+            "wheel11",
+            "wheel12",
+            "wheel13",
+            "wheel14",
+            "wheel15",
+            "wheel16"
+            ], 
+            [create_brick('Wheel_2x2s', properties),
+             create_brick('RacingWheel_4x2s', properties | {"Position": [10, 0, 0]}),
+             create_brick('Wheel_10sx1', properties | {"Position": [20, 0, 0]}),
+             create_brick('OffroadWheel_3x4s', properties | {"Position": [30, 0, 0]}),
+             create_brick('RacingWheel_3x4s', properties | {"Position": [40, 0, 0]}),
+             create_brick('Wheel_3x4s', properties | {"Position": [50, 0, 0]}),
+             create_brick('Wheel_7sx2', properties | {"Position": [60, 0, 0]}),
+             create_brick('DragWheel_4x2', properties | {"Position": [70, 0, 0]}),
+             create_brick('Wheel_4x2', properties | {"Position": [80, 0, 0]}),
+             create_brick('OffroadWheel_5x2', properties | {"Position": [90, 0, 0]}),
+             create_brick('Wheel_10x4', properties | {"Position": [100, 0, 0]}),
+             create_brick('TrainWheel_2x2s', properties | {"Position": [110, 0, 0]}),
+             create_brick('TrainWheel_3x2s', properties | {"Position": [120, 0, 0]}),
+             create_brick('TrainWheel_4x2s', properties | {"Position": [130, 0, 0]}),
+             create_brick('Wheel_1sx1sx1s', properties | {"Position": [140, 0, 0]}),
+             create_brick('Wheel_1x1x1', properties | {"Position": [150, 0, 0]})
+             ])
+    
     data.write_preview()
 
     #input_channel_test()
-    hornwave_again()    
+    #hornwave_again()    
+    #thruster_test()
+    #axle_test()
+    wheel_test()
     
 
     print(f"{FM.info} Now generating file.")
