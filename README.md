@@ -1,4 +1,4 @@
-# BR-API (Update C26)
+# BR-API (Update C28)
 
 BR-API is an API for video game Brick Rigs.
 It allows users to create and manipulate Brick Rigs' game files that handle creations (A.K.A. vehicles).
