@@ -5,6 +5,55 @@ from main import _cwd
 from main import *
 
 if __name__ == "__main__":
+    data = BRAPI()
+    data.project_name = 'no_name'
+    data.project_display_name = 'no_name'
+    data.project_folder_directory = os.path.join(_cwd, 'Projects') # Do not touch
+    data.file_description = 'no_description'
+    data.debug_logs = ['time']#, 'bricks']
+    data.write_blank = False
+
+    def find_missing_gbn(bricks_list: dict, print_missing: bool = True) -> list:
+        missing_values: list = []
+        for key, value in bricks_list.items():
+            if 'gbn' not in value:
+                missing_values.append(key)
+        if print_missing:
+            print(missing_values)
+        return missing_values
+
+    def stress_test(bricks: int, size: float = 200.0, generate: bool = True) -> None:
+        import random
+        data.project_name = f'stress_test_{bricks}'
+        data.project_display_name = f'Stress Test ({bricks}b / {size}m)'
+        for brick_id_st in range(bricks):
+            new_brick_st = create_brick(
+                brick=random.choice( list(filter(lambda item: item != 'default_brick_data', br_brick_list.keys())) ),
+                position=[random.uniform(0.0, size), random.uniform(0.0, size), random.uniform(0.0, size)],
+                rotation=[random.uniform(0.0, 360.0), random.uniform(0.0, 360.0), random.uniform(0.0, 360.0)])
+
+            for property_st in new_brick_st.keys():
+                if isinstance(new_brick_st[property_st], float):
+                    new_brick_st[property_st] = random.uniform(-1_000_000_000.0, 1_000_000_000.0)
+
+            data.add_brick(str(brick_id_st), new_brick_st)
+
+        if generate:
+            data.write_preview()
+            data.write_metadata()
+            data.write_brv()
+
+    # --------------------------------------------------
+
+    find_missing_gbn(br_brick_list)
+    stress_test(10_000)
+
+
+
+
+
+"""
+if __name__ == "__main__":
     # Setting up BR-API
     data = BRAPI()
     data.project_name = 'Wheel-Test'
@@ -147,7 +196,7 @@ if __name__ == "__main__":
     data.debug_print(False, True, False) # Writes all data
     print(f"{FM.success} File successfully generated.")
 
-    """
+    "X""
     print(f"\n\n{clr.error} An error occurred.")
     print(f"{clr.warning} Press enter to exit.")
     print(f"{clr.info} Press enter to continue.")
@@ -159,4 +208,5 @@ if __name__ == "__main__":
     clr.warning_with_header("You suck", "And you will never ever get bitches\nBecause you're gay")=)
     
     input(f'\n\n\nwait')
-    """
+    "X""
+"""

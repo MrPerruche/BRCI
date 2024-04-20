@@ -1,5 +1,6 @@
 import os
 # from warnings import warn as raise_warning
+from copy import deepcopy
 
 from BRAPIF import *
 
@@ -20,7 +21,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C29"  # String, This is equivalent to 3.__ fyi
+version: str = "C30"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -41,10 +42,14 @@ os_system('color')
 
 # pain
 
-def create_brick(brick: str, brick_properties: dict = None) -> dict:
+def create_brick(brick: str, position: list[float] = None, rotation: list[float] = None, brick_properties: dict = None) -> dict:
     if brick_properties is None:
         brick_properties = {}
-    return br_brick_list[brick].copy() | brick_properties
+    if position is None:
+        position = [0, 0, 0]
+    if rotation is None:
+        rotation = [0, 0, 0]
+    return deepcopy(br_brick_list[brick]) | {'Position': position, 'Rotation': rotation} | brick_properties
 
 
 # Brick Rigs API Class
@@ -60,7 +65,7 @@ class BRAPI:
                  file_description='',
                  debug_logs=None,
                  user_appendix=b'',
-                 seat_brick=''):
+                 seat_brick=None):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -121,10 +126,10 @@ class BRAPI:
 
     def add_new_brick(self, brick_name: str | list[str], brick_type: str | list[str], brick: dict | list[dict]):
         if isinstance(brick_type, str):
-            self.bricks.append([str(brick_name), create_brick(brick_type, brick)])
+            self.bricks.append([str(brick_name), create_brick(brick=brick_type, brick_properties=brick)])
         else:
             for add_new_brick_i in range(len(brick_type)):
-                self.bricks.append([str(brick_name[add_new_brick_i]), create_brick(brick_type[add_new_brick_i], brick[add_new_brick_i])])
+                self.bricks.append([str(brick_name[add_new_brick_i]), create_brick(brick=brick_type[add_new_brick_i], brick_properties=brick[add_new_brick_i])])
 
     
     def add_all_bricks(self, local_variables: list[dict]):
@@ -515,7 +520,6 @@ class BRAPI:
                 temp_spl: bytes = b''
 
                 # Write properties
-                property_length_list: list[int] = []
                 for property_type_key, property_type_value in property_table.items():
                     property_length_list: list[int] = []
                     # Writing keys
@@ -533,23 +537,23 @@ class BRAPI:
 
                             # If it's an integer (uint 16 bit by default)
                             if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
-                                temp_pre_spl += unsigned_int(pt_c_val, 2)
+                                pt_c_val = float(pt_c_val)
 
                             # If it's a float (float 32 bit by default)
                             if isinstance(pt_c_val, float):
                                 temp_pre_spl += bin_float(pt_c_val, 4)
 
                             # If it's a bool
-                            if isinstance(pt_c_val, bool):
+                            elif isinstance(pt_c_val, bool):
                                 temp_pre_spl += unsigned_int(int(pt_c_val), 1)
 
                             # If it's a string (converting to utf-8)
-                            if isinstance(pt_c_val, str):
+                            elif isinstance(pt_c_val, str):
                                 temp_pre_spl += signed_int(len(pt_c_val), 1)
                                 temp_pre_spl += small_bin_str(pt_c_val)
 
                             # If it's a list of strings (=> generally list of bricks)
-                            if isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
+                            elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
                                 temp_pre_spl += unsigned_int(len(pt_c_val), 2) # TODO UNSURE: *2?
                                 for pt_c_sub_val in pt_c_val:
                                     temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
@@ -619,13 +623,13 @@ class BRAPI:
                         brick_data_writing += unsigned_int(current_property[0], 2)
                         brick_data_writing += unsigned_int(current_property[1], 2)
                     # Getting ready to write position and rotation
-                    brick_data_writing += bin_float(current_brick[1][0]['Position'][0], 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Position'][1], 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Position'][2], 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Position'][0]), 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Position'][1]), 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Position'][2]), 4)
                     # Note sure why its out of order in the brv. Whatever
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][0], 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][1], 4)
-                    brick_data_writing += bin_float(current_brick[1][0]['Rotation'][2], 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][0]), 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][1]), 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][2]), 4)
 
                     # Writing
                     brv_file.write(unsigned_int(len(brick_data_writing), 4))
@@ -719,7 +723,3 @@ class BRAPI:
 
 
 # --------------------------------------------------
-
-
-# Try it out
-#if __name__ == '__main__':

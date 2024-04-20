@@ -270,7 +270,7 @@ append_multiple(br_brick_list,
                     'FlashSequence': 'None',
                     'LightDirection': 'Off',
                     'LightConeAngle': 45.0
-                })
+                }, True)
 
 
 # --------------------------------------------------
