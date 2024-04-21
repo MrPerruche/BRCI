@@ -1,38 +1,27 @@
-# BR-API (Update C30)
+# Brick Rigs Creation Interface (Update C31)
 
-BR-API is an API for video game Brick Rigs.
-It allows users to create and manipulate Brick Rigs' game files that handle creations (A.K.A. vehicles).
+BRCI allows you to create and edit (not implemented yet) your creations though code.
 
-BR-API is closely tied to BrickLang, a programming language for Brick Rigs based using BR-API.
-Therefore, we will also include basic information on this project.
-To learn more, read [link, here];
 
-## Credits
+## Information and support
 
-#### BR-API Credits :
 
-- Metadata.brm file generation & edition :
-  - Perru (@perru_) : Development & Research
+Read `DOCUMENTATION.md` to learn how to use BRCI
 
-- Vehicle.brv file generation & edition :
-  - Perru (@perru_) : Development & Research
-  - Erzbangel Raziel (@erzbangel_raziel) : Research & Help
-  - Fluppi393 (@fluppi393) : Sharing Brick Rigs' code (BR's Dev)
+See `BRICKS.md` for Brick Rigs' brick list.
 
-- Project Lead : Destiny (@destiny_29)
+Learn more, request help and report bugs on our discord: https://discord.gg/sZXaESzDd9
 
-#### BrickLang Credits :
 
-- BrickLang Programming language :
-  - Conspicuous (@conspicuous.develops) : Development
+## Credits 
 
-- BrickLang IDE :
-  - Conspicuous (@conspicuous.develops) : Development
+BRCI is provided by :
+- Destiny (FateUnix29 / a.k.a. Copper / @destiny_29)
+- Perru (MrPerruche / @perru_)
+- Conspicuous (AbsolutelyNotConspicuous / a.k.a. ANC / @conspicuous.develops)
+- Erzbengel Raziel (@erzbengel_raziel)
+- TLM (@thelegomonstrosity)
 
- - Whole team : Suggestions
-
-#### Miscellaneous Credits :
- 
-- Project Lead : Destiny (@destiny_29)
-
-- General Help : TLM (@thelegomonstrosity)
+Thanks to:
+- Fluppi393 (@fluppi393)
+- KV (@kvthetank)

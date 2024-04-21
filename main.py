@@ -2,7 +2,7 @@ import os
 # from warnings import warn as raise_warning
 from copy import deepcopy
 
-from BRAPIF import *
+from BRCI_RF import *
 
 # Note : every time you see unsigned_int() / signed_int() / bin_float(), byte_len * 8 is the number of bits.
 
@@ -21,7 +21,7 @@ from BRAPIF import *
 
 
 # Setup variables
-version: str = "C30"  # String, This is equivalent to 3.__ fyi
+version: str = "C31"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -53,7 +53,7 @@ def create_brick(brick: str, position: list[float] = None, rotation: list[float]
 
 
 # Brick Rigs API Class
-class BRAPI:
+class BRCI:
 
     # Grab values
     def __init__(self,
@@ -241,18 +241,14 @@ class BRAPI:
                 metadata_file.write(unsigned_int(13, 1))
 
                 # Write all necessary information for the file name
-                line_feed_file_name = (((self.project_display_name.replace("\\n", "\n")).encode('utf-16'))
-                                       .replace(b'\x0A\x00', b'\x0D\x00\x0A\x00')).decode('utf-16') # String
-                metadata_file.write(signed_int(-len(line_feed_file_name), 2))
-                metadata_file.write(bin_str(line_feed_file_name)[2:])
+                metadata_file.write(signed_int(-len(self.project_display_name), 2))
+                metadata_file.write(bin_str(self.project_display_name)[2:])
 
                 # Write all necessary information for the file description
                 watermarked_file_description = f"Created using BR-API (Version {version}).\n" \
-                                               f"Join our discord for more information : [INVITE LINK]\n\n" \
-                                               f"Description:\n{self.file_description}." # String
-                watermarked_file_description = (
-                    ((watermarked_file_description.replace("\\n", "\n")).encode('utf-16'))
-                    .replace(b'\x0A\x00', b'\x0D\x00\x0A\x00')).decode('utf-16') # String
+                                               f"Join our discord for more information : [INVITE LINK]\n\n" # String
+                if self.file_description is not None:
+                    watermarked_file_description += f'Description:\n{self.file_description}.'
                 metadata_file.write(signed_int(-len(watermarked_file_description), 2))
                 metadata_file.write(bin_str(watermarked_file_description)[2:])
 
@@ -627,9 +623,9 @@ class BRAPI:
                     brick_data_writing += bin_float(float(current_brick[1][0]['Position'][1]), 4)
                     brick_data_writing += bin_float(float(current_brick[1][0]['Position'][2]), 4)
                     # Note sure why its out of order in the brv. Whatever
-                    brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][0]), 4)
                     brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][1]), 4)
                     brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][2]), 4)
+                    brick_data_writing += bin_float(float(current_brick[1][0]['Rotation'][0]), 4)
 
                     # Writing
                     brv_file.write(unsigned_int(len(brick_data_writing), 4))
@@ -662,7 +658,7 @@ class BRAPI:
                     print(f'{FM.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
                     print(f'{FM.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
-    def debug_print(self, summary_only=False, write=True, print_bricks=False):
+    def debug(self, summary_only=False, write=True, print_bricks=False):
 
         def named_spacer(name: str):
             return '=== ' + name + ' ' + '=' * (95 - len(name))

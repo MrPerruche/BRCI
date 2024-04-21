@@ -1,15 +1,14 @@
 # Define vehicles here
 
-from BRAPIF import *
+from BRCI_RF import *
 from main import _cwd
 from main import *
 
 if __name__ == "__main__":
-    data = BRAPI()
+    data = BRCI()
     data.project_name = 'no_name'
     data.project_display_name = 'no_name'
     data.project_folder_directory = os.path.join(_cwd, 'Projects') # Do not touch
-    data.file_description = 'no_description'
     data.debug_logs = ['time']#, 'bricks']
     data.write_blank = False
 
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     # --------------------------------------------------
 
     find_missing_gbn(br_brick_list)
-    stress_test(10_000)
+    stress_test(2_000)
 
 
 
