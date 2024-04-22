@@ -1,4 +1,4 @@
-from BRCI_RF import append_multiple, BrickInput
+from .functions import append_multiple, BrickInput
 
 br_brick_materials = {
     'aluminium':        {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
