@@ -21,7 +21,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C31"  # String, This is equivalent to 3.__ fyi
+version: str = "C32"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -287,7 +287,7 @@ class BRCI:
         # Get the user's home directory and expand the path
         user_home = os.path.expanduser("~")
         # Construct the full path by joining the user's home directory with the relative path
-        full_path = os.path.join(user_home, relative_path, self.stream.project_name)
+        full_path = os.path.join(user_home, relative_path, self.project_name)
 
         try:
                 # Remove the destination folder if it exists
