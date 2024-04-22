@@ -215,6 +215,11 @@ metadata is required!
 Calling this function will generate the creation : `Vehicle.brv`.
 As you may have guessed, it is necessary.
 
+### `data.write_to_br()`
+
+Calling this function will clone the project folder to brick rigs.
+Be careful using this since it does overwrite anything with the same project name.
+
 ### `data.debug()`
 
 `data.debug(summary_only, write, print_bricks)` has 3 arguments:

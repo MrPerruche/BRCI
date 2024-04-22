@@ -29,7 +29,7 @@ if __name__ == "__main__":
             data.write_preview()
             data.write_metadata()
             data.write_brv()
-
+            data.write_to_br()
     # --------------------------------------------------
 
     stress_test(10)
