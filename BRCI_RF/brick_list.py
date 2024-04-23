@@ -468,11 +468,11 @@ Order for Connector Spacing in UI:
 """
 
 br_special_property_instance_list = {
-    'BrickColor': '4xINT8',
-    'BrickSize': '3xINT16',
+    'BrickColor': '4xINT8_r',
+    'BrickSize': '3xINT16_r',
     'ConnectorSpacing': '6xINT2',
-    'DisplayColor': '3xINT8',
-    'SmokeColor': '3xINT8',
+    'DisplayColor': '3xINT8_r',
+    'SmokeColor': '3xINT8_r',
     'SwitchName': 'UTF-16',
     'NumFractionalDigits': 'INT8',
     'ExitLocation': '3xFLOAT32/None'

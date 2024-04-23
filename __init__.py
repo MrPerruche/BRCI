@@ -10,7 +10,6 @@ from .BRCI_RF import *
 # TODO Comment each variable to specify their content & classes for rust translation.
 # TODO Add all bricks in br_brick_list
 # TODO Calculate vehicle_size, vehicle_weight and vehicle_worth
-# TODO Finish Appendix System
 # TODO Implement Brick Loading (IDEA : Exclusively load user appendix)?
 
 # ------------------------------------------------------------
@@ -20,7 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C33"  # String, This is equivalent to 3.__ fyi
+version: str = "C34"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -63,7 +62,7 @@ class BRCI:
                  project_display_name='',
                  file_description='',
                  debug_logs=None,
-                 user_appendix=b'',
+                 user_appendix: list[bytes] = None,
                  seat_brick=None):
 
         # Set each self.x variable to their __init__ counterparts
@@ -77,6 +76,8 @@ class BRCI:
         self.bricks = bricks # List (Of bricks)
         if debug_logs is None:
             debug_logs = []
+        if user_appendix is None:
+            user_appendix = []
         self.debug_logs = debug_logs # List of logs to print
         self.user_appendix = user_appendix # List (User appendix)
         self.seat_brick = seat_brick
@@ -85,31 +86,31 @@ class BRCI:
     # Creating more variables
     # In project path
     @property
-    def in_project_folder_directory(self): # String
+    def in_project_folder_directory(self) -> str: # String
         return os.path.join(self.project_folder_directory, self.project_name)
 
     # Calculate brick count
     @property
-    def brick_count(self): # 16 Bit integer
+    def brick_count(self) -> int: # 16 Bit integer
         return len(self.bricks)
 
     # Calculate vehicle size
     @property
-    def vehicle_size(self): # List of 3 32-bit float
+    def vehicle_size(self) -> list[float]: # List of 3 32-bit float
         # TODO : CALCULATE SIZE
-        return [1, 2, 3]
+        return [100.0, 100.0, 100.0]
 
     # Calculate vehicle weight
     @property
-    def vehicle_weight(self): # 32 bit float
+    def vehicle_weight(self) -> float: # 32 bit float
         # TODO : CALCULATE WEIGHT
-        return 0.1
+        return 1.0
 
     # Calculate vehicle worth
     @property
-    def vehicle_worth(self): # 32 bit float
+    def vehicle_worth(self) -> float: # 32 bit float
         # TODO : CALCULATE WORTH
-        return 0.2 # I wonder if this will make it 0.2 in-game? Or does BR calculate the price itself?
+        return 1.0
 
 
     # Adding bricks to the brick list
@@ -130,6 +131,8 @@ class BRCI:
             for add_new_brick_i in range(len(brick_type)):
                 self.bricks.append([str(brick_name[add_new_brick_i]), create_brick(brick=brick_type[add_new_brick_i], brick_properties=brick[add_new_brick_i])])
 
+        return self
+
     
     def add_all_bricks(self, local_variables: list[dict]):
 
@@ -140,6 +143,8 @@ class BRCI:
                 # Check if it is from create_brick()
                 if 'default_brick_data' in var:
                     iteration_count += 1; self.add_brick(str(iteration_count), var)
+
+        return self
 
 
     # Removing bricks from the brick list
@@ -186,7 +191,7 @@ class BRCI:
 
 
     # Used to create directory for file generators
-    def ensure_project_directory_exists(self):
+    def ensure_project_directory_exists(self) -> None:
 
         # Verify for invalid inputs
         if not os.path.exists(self.project_folder_directory):
@@ -197,7 +202,7 @@ class BRCI:
 
 
     # Writing preview.png
-    def write_preview(self):
+    def write_preview(self) -> None:
 
         _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_beta.png') # Path
 
@@ -219,7 +224,7 @@ class BRCI:
                 os.path.join(self.in_project_folder_directory, "Preview.png"))
 
     # Writing metadata.brm file
-    def write_metadata(self):
+    def write_metadata(self) -> None:
 
         # Create folder if missing
         self.ensure_project_directory_exists()
@@ -279,7 +284,7 @@ class BRCI:
                 write_tags_to_file() # TODO: Add a way to input tags. For now, they are all "Other"
                 
     # Writing the project folder to brick rigs # only works on windows
-    def write_to_br(self):
+    def write_to_br(self) -> None:
         import shutil
         # Define the relative path to append to the user's home directory
         relative_path = "AppData/Local/BrickRigs/SavedRemastered/Vehicles"
@@ -308,7 +313,7 @@ class BRCI:
 
 
     # Writing Vehicle.brv
-    def write_brv(self):
+    def write_brv(self) -> None:
 
         self.ensure_project_directory_exists()
 
@@ -371,6 +376,10 @@ class BRCI:
 
             with (open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file):
 
+                # --------------------------------------------------
+                # SETUP
+                # --------------------------------------------------
+
 
                 self.bricks_writing = self.bricks.copy()
 
@@ -379,11 +388,19 @@ class BRCI:
                 # Write brick count
                 brv_file.write(unsigned_int(len(self.bricks_writing), 2))
 
+                # --------------------------------------------------
+                # MISSING PROPERTIES
+                # --------------------------------------------------
+
                 # Add all missing properties, notably inputs.
                 add_missing_properties(self.bricks_writing, 'bricks' in self.debug_logs)
 
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: Missing Properties.. : {perf_counter() - previous_time :.6f} seconds')
+
+                # --------------------------------------------------
+                # BRICK TYPES
+                # --------------------------------------------------
 
                 # Get the different bricks present in the project
                 brick_types = brv_brick_types(self.bricks_writing, 'bricks' in self.debug_logs) # List
@@ -391,6 +408,14 @@ class BRCI:
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
+                if 'bricks' in self.debug_logs:
+                    print(f'{FM.debug} Brick Types............... : {brick_types}')
+
+
+                # --------------------------------------------------
+                # TEMP IEBL, PROPERTY TABLE, STRING NAME TO ID
+                # --------------------------------------------------
+
 
                 # Write the number of different brick types
                 brv_file.write(unsigned_int(len(brick_types), 2))
@@ -443,6 +468,15 @@ class BRCI:
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
+                if 'bricks' in self.debug_logs:
+                    print(f'{FM.debug} Identical Excluded Brick L : {temp_iebl}')
+                    print(f'{FM.debug} Property Table............ : {property_table}')
+                    print(f'{FM.debug} String Name to ID Table... : {string_name_to_id_table}')
+
+
+                # --------------------------------------------------
+                # ID ASSIGNED PROP. TABLE, PROPERTY KEY TABLE, INVERTED PROPERTY KEY TABLE,
+                # --------------------------------------------------
 
 
                 # Setup property ids
@@ -471,6 +505,16 @@ class BRCI:
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
+                if 'bricks' in self.debug_logs:
+                    print(f'{FM.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
+                    print(f'{FM.debug} Property Key Table........ : {property_key_table}')
+                    print(f'{FM.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
+
+
+                # --------------------------------------------------
+                # BRICKS WRITING
+                # --------------------------------------------------
+
 
                 # Give IDs
                 temp_bricks_writing: list = []
@@ -509,14 +553,7 @@ class BRCI:
 
                 # Debug
                 if 'bricks' in self.debug_logs:
-                    print(f'{FM.debug} Identical Excluded Brick L : {temp_iebl}')
-                    print(f'{FM.debug} Property Table............ : {property_table}')
-                    print(f'{FM.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
                     print(f'{FM.debug} Brick Properties Writing.. : {self.bricks_writing}')
-                    print(f'{FM.debug} String Name to ID Table... : {string_name_to_id_table}')
-                    print(f'{FM.debug} Brick Types............... : {brick_types}')
-                    print(f'{FM.debug} Property Key Table........ : {property_key_table}')
-                    print(f'{FM.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
 
                 # Write how many properties there are
                 brv_file.write(unsigned_int(len(property_table), 2))
@@ -568,9 +605,10 @@ class BRCI:
 
                             # If it's a list of strings (=> generally list of bricks)
                             elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
-                                temp_pre_spl += unsigned_int(len(pt_c_val), 2) # TODO UNSURE: *2?
-                                for pt_c_sub_val in pt_c_val:
-                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
+                                raise NotImplementedError('str support (utf-16) is not properly implemented yet.')
+                                # temp_pre_spl += unsigned_int(len(pt_c_val), 2) # TODO UNSURE: *2?
+                                # for pt_c_sub_val in pt_c_val:
+                                #     temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
 
 
                         else:
@@ -581,19 +619,19 @@ class BRCI:
                                     temp_w_spl_connector = pt_c_val[0] + (pt_c_val[1] << 2) + (pt_c_val[2] << 4) + (
                                                 pt_c_val[3] << 6) + (pt_c_val[4] << 8) + (pt_c_val[5] << 10)
                                     temp_pre_spl += unsigned_int(temp_w_spl_connector, 2)
-                                case '3xINT16':
-                                    temp_pre_spl += unsigned_int(pt_c_val[0], 2)
-                                    temp_pre_spl += unsigned_int(pt_c_val[1], 2)
-                                    temp_pre_spl += unsigned_int(pt_c_val[2], 2)
-                                case '3xINT8':
-                                    temp_pre_spl += unsigned_int(pt_c_val[0], 1)
-                                    temp_pre_spl += unsigned_int(pt_c_val[1], 1)
-                                    temp_pre_spl += unsigned_int(pt_c_val[2], 1)
-                                case '4xINT8':
-                                    temp_pre_spl += unsigned_int(pt_c_val[0], 1)
-                                    temp_pre_spl += unsigned_int(pt_c_val[1], 1)
-                                    temp_pre_spl += unsigned_int(pt_c_val[2], 1)
-                                    temp_pre_spl += unsigned_int(pt_c_val[3], 1)
+                                case '3xINT16_r':
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[0]), 2)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[1]), 2)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[2]), 2)
+                                case '3xINT8_r':
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[0]), 1)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[1]), 1)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[2]), 1)
+                                case '4xINT8_r':
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[0]), 1)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[1]), 1)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[2]), 1)
+                                    temp_pre_spl += unsigned_int(round(pt_c_val[3]), 1)
                                 case '3xFLOAT32/None':
                                     temp_pre_spl += bin_float(pt_c_val[0], 4)
                                     temp_pre_spl += bin_float(pt_c_val[1], 4)
@@ -669,15 +707,29 @@ class BRCI:
                 self.brci_appendix.append(small_bin_str(version))
 
 
+                # BRCI Appendix
+                # Length
+                brv_file.write(unsigned_int(len(self.brci_appendix), 4))
+
+                # Data
                 for brci_individual_appendix in self.brci_appendix:
                     brv_file.write(unsigned_int(len(brci_individual_appendix), 4))
                     brv_file.write(brci_individual_appendix)
+
+                # USER Appendix
+                # Length
+                brv_file.write(unsigned_int(len(self.user_appendix), 4))
+
+                # Data
+                for user_individual_appendix in self.user_appendix:
+                    brv_file.write(unsigned_int(len(user_individual_appendix), 4))
+                    brv_file.write(user_individual_appendix)
 
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
                     print(f'{FM.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
-    def debug(self, summary_only=False, write=True, print_bricks=False):
+    def debug(self, summary_only=False, write=True, print_bricks=False) -> None:
 
         def named_spacer(name: str):
             return '=== ' + name + ' ' + '=' * (95 - len(name))
@@ -737,7 +789,7 @@ class BRCI:
         if print_bricks: print(str_to_write)
 
     @staticmethod
-    def get_missing_gbn_keys(print_missing: bool = False):
+    def get_missing_gbn_keys(print_missing: bool = False) -> list:
         missing_values: list = []
         for key, value in br_brick_list.items():
             if 'gbn' not in value:
