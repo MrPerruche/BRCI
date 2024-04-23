@@ -449,6 +449,7 @@ append_multiple(br_brick_list, ['DoubleSiren_1x2x1s'],
                     'InputChannel.InputAxis': BrickInput('Horn', None, 'InputChannel')
                 }, True)
 
+# Winch
 append_multiple(br_brick_list, ['Winch_3x2x1'],
                 br_brick_list['default_brick_data'] | {
                     'InputChannel.InputAxis': BrickInput('Auxiliary', None, 'InputChannel'),
