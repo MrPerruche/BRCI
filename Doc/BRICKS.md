@@ -1,4 +1,4 @@
-# BR-API Supported Bricks List
+# BRCI Supported Bricks List
 
 ## Default Brick Properties
 
@@ -167,13 +167,13 @@ Petrol
 RocketFuel
 ```
 
-### `gbn` (BR-API Component)
-This is not a property in Brick Rigs. It is not handled as a property by BR-API.
-It is used to indicate the API what brick this variable is corresponding to. Example : `AircraftR4`.
-Modifying it would cause issues in-game, since properties the API is trying to apply may not correspond to the brick's.
+### `gbn` (BRCI Component)
+This is not a property in Brick Rigs. It is not handled as a property by BRCI.
+It is used to indicate BRCI what brick this variable is corresponding to. Example : `AircraftR4`.
+Modifying it would cause issues in-game, since properties the BRCI is trying to apply may not correspond to the brick's.
 Modification of this element is therefore not recommended.
-If BR-API encounters any invalid property, one of the following errors may occur :
-BR-API failing to generate the creation; Brick Rigs failing to load the creation, leading to a corrupted file error;
+If BRCI encounters any invalid property, one of the following errors may occur :
+BRCI failing to generate the creation; Brick Rigs failing to load the creation, leading to a corrupted file error;
 Defined values not corresponding to what's expected.
 Modifying this "property" will not in any way update this brick's property list. To change what brick type your variable
 is defined to, use `create_brick(brick_type)` again. Be aware this command will clear any previously edited properties
@@ -269,13 +269,13 @@ Each are a single float 32 value : `VALUE (f32)`
 
 ### `Position`
 This "property" correspond to the brick's position in centimeters.
-Although position is defined as a property in BR-API, it is not a property in Brick Rigs. It is common to all bricks.
+Although position is defined as a property in BRCI, it is not a property in Brick Rigs. It is common to all bricks.
 It is a list of 3 elements corresponding to the brick's distance from origin in centimeters, in the following order:
 `[POS_X (cm) (f32), POS_Y (cm) (f32), POS_Z (cm) (f32)]`.
 
 ### `Rotation`
 This "property" correspond to the brick's rotation in degrees.
-Although rotation is defined as a property in BR-API, it is not a property in Brick Rigs. It is common to all bricks.
+Although rotation is defined as a property in BRCI, it is not a property in Brick Rigs. It is common to all bricks.
 It is a list of 3 elements corresponding to the brick's rotation relative to the origin in degrees,
 in the following order: `[ROT_Y (deg) (f32), ROT_Z (deg) (f32), ROT_X (deg) (f32)]`.
 
@@ -364,7 +364,7 @@ It is a single float 32 : `SPEED (f32)`
 This property corresponds to the brick's input : Either another brick, a constant value, throttle etc.
 It has various prefixes depending on the brick (such as `AutoHoverInputChannel.InputAxis` etc.).
 It is set to the BrickInput class (custom class) : `INPUT (BrickInput(brick_input_type: str, brick_input: any, prefix: str))`.
-BR-API does not care about the property name at all. However, what it cares about is the class defining it : `BrickInput`.
+BRCI does not care about the property name at all. However, what it cares about is the class defining it : `BrickInput`.
 It has 3 arguments :
 `brick_input_type`: the input type;
 `brick_input`: may be the input value, or source bricks, or anything else.

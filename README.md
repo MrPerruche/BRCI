@@ -1,4 +1,4 @@
-# Brick Rigs Creation Interface (Update C32)
+# Brick Rigs Creation Interface (Update C33)
 
 BRCI allows you to create and edit (not implemented yet) your creations though code.
 

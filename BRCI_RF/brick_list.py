@@ -1,6 +1,6 @@
 from .functions import append_multiple, BrickInput
 
-br_brick_materials = {
+br_brick_materials = {  # TODO put actual names
     'aluminium':        {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
     'brushed aluminum': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
     'carbon':           {'price': 6.00, 'density': 1.55,  'strength': 10.0, 'friction': 0.70, 'restitution': 0.10},

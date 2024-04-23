@@ -23,13 +23,15 @@ Additionally, we may declare a few more variables.
 - `data.user_appendix` (`bytes`) (`b''`) : This corresponds to data hidden in the .brv file you can write.
 Keep in mind once saving in-game, this data will be cleared!
 - `data.seat_brick` (`str` | `NoneType`) (`None`) : You must here insert what brick is the driver seat.
-If it is set to None, Brick Rigs (Not BRCI) will pick a random one.
+If set to None, all seats will have the "Random" setting selected, meaning the first seat brick rigs load will be the
+driver seat.
 
 At the end, it may look something like this:
 ```
-# Supposing our file is in the same directory as main.py
-from main import _cwd
-from main import *
+# Supposing we are working in example.py
+from .. import _cwd
+from .. import *
+from ..BRCI_RF import *
 import os
 
 # Mandatory :
@@ -220,6 +222,13 @@ As you may have guessed, it is necessary.
 Calling this function will clone the project folder to brick rigs.
 Be careful using this since it does overwrite anything with the same project name.
 
+### `data.write_to_br()`
+
+Calling this function will duplicate everything generated so far in Brick Rigs' folder. It only works for Windows users.
+If the project is already in Brick Rigs' vehicle folder, it will replace the previous one without causing an error.
+
+### Other functions
+
 ### `data.debug()`
 
 `data.debug(summary_only, write, print_bricks)` has 3 arguments:
@@ -227,3 +236,14 @@ Be careful using this since it does overwrite anything with the same project nam
 Name, Amount of bricks, etc. Otherwise, it will also print all generated bricks and debug information to help troubleshooting.
 - `write` (`bool`) (`True`) (Optional) : If true, it will write everything in `debug_logs.txt`. Brick Rigs will ignore this file.
 - `print_bricks` (`bool`) (`False`) (Optional) : If true, it will print all generated bricks to the console.
+
+### `data.get_missing_gbn_keys()`
+`data.get_missing_gbn_keys()` is a function that returns all missing 'gbn' keys. It is used to find a common error
+when adding bricks to the brick list : leaving argument `gbn` to false whilst using `append_multiple()`. This function
+has 1 argument:
+- `print_missing` (`bool`) (`False`) (Optional) : If true, it will not only return all missing `gbn` keys but
+also print them.
+
+If there is no issue, `['default_brick_data']` will be returned.
+Note: `'default_brick_data'` is not a brick and using it will cause an error as no `gbn` key is given to it.
+Even if it had one, which would no longer cause an error with BRCI, Brick Rigs would not be able to load this brick.

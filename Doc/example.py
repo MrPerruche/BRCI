@@ -1,15 +1,19 @@
-from BRCI.BRCI_RF import *
-from BRCI import *
+from .. import *
+from .. import _cwd
+from ..BRCI_RF import *
 
-if __name__ == "__main__":
+if not __name__ == "__main__":
     data = BRCI()
     data.project_name = 'no_name'
-    data.project_display_name = 'no_name'
-    data.project_folder_directory = os.path.join(os.getcwd(), 'Projects')
+    data.project_display_name = 'no name'
+    data.project_folder_directory = os.path.join(_cwd, 'Projects')
     data.debug_logs = ['time']
+    data.file_description = 'no\r\ndescription'
     data.write_blank = False
 
-    def stress_test(bricks: int, size: float = 200.0, generate: bool = True) -> None:
+
+    # This function creates plenty of commonly used bricks
+    def stress_test(bricks: int, size: float = 20_000.0, generate: bool = True) -> None:
         import random
         data.project_name = f'stress_test_{bricks}'
         data.project_display_name = f'Stress Test ({bricks}b / {size}m)'
@@ -30,6 +34,16 @@ if __name__ == "__main__":
             data.write_metadata()
             data.write_brv()
             data.write_to_br()
+
+
     # --------------------------------------------------
 
-    stress_test(10)
+    """
+    List of functions:
+    stress_test(bricks, float, generate)
+        bricks: int, Mandatory.
+        size: float = 200.0 (in centimeters)
+        generate: bool = True (executes write_preview(), write_metadata(), write_brv(), write_to_br())
+    """
+
+    stress_test(1_000)

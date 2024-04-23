@@ -10,7 +10,6 @@ from .BRCI_RF import *
 # TODO Comment each variable to specify their content & classes for rust translation.
 # TODO Add all bricks in br_brick_list
 # TODO Calculate vehicle_size, vehicle_weight and vehicle_worth
-# TODO Find another way to make Brick Inputs. (Perhaps they should work and I'm just an idiot?)
 # TODO Finish Appendix System
 # TODO Implement Brick Loading (IDEA : Exclusively load user appendix)?
 
@@ -21,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C32"  # String, This is equivalent to 3.__ fyi
+version: str = "C33"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -52,7 +51,7 @@ def create_brick(brick: str, position: list[float] = None, rotation: list[float]
     return deepcopy(br_brick_list[brick]) | {'Position': position, 'Rotation': rotation} | brick_properties
 
 
-# Brick Rigs API Class
+# Brick Rigs Creation Interface Class
 class BRCI:
 
     # Grab values
@@ -208,7 +207,7 @@ class BRCI:
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            FM.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to find BR-API default image. Please retry.")
+            FM.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to find BRCI default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
@@ -245,7 +244,7 @@ class BRCI:
                 metadata_file.write(bin_str(self.project_display_name)[2:])
 
                 # Write all necessary information for the file description
-                watermarked_file_description = f"Created using BR-API (Version {version}).\n" \
+                watermarked_file_description = f"Created using BRCI (Version {version}).\n" \
                                                f"Join our discord for more information : [INVITE LINK]\n\n" # String
                 if self.file_description is not None:
                     watermarked_file_description += f'Description:\n{self.file_description}.'
@@ -304,7 +303,7 @@ class BRCI:
     bricks_writing = []
     inverted_property_key_table = {}
     id_assigned_property_table = {}
-    brapi_appendix: list = []
+    brci_appendix: list = []
 
 
 
@@ -662,16 +661,17 @@ class BRCI:
                     previous_time = perf_counter()
 
 
-                #  BR-API & USER APPENDIX
+                #  BRCI & USER APPENDIX
 
 
-                brv_watermark = f'File written with BR-API version {version}. Join our discord to learn more: sZXaESzDd9'
-                self.brapi_appendix.append(small_bin_str(brv_watermark))
+                brv_watermark = f'File written with BRCI. Join our discord to learn more: sZXaESzDd9. Version:'
+                self.brci_appendix.append(small_bin_str(brv_watermark))
+                self.brci_appendix.append(small_bin_str(version))
 
 
-                for brapi_individual_appendix in self.brapi_appendix:
-                    brv_file.write(unsigned_int(len(brapi_individual_appendix), 4))
-                    brv_file.write(brapi_individual_appendix)
+                for brci_individual_appendix in self.brci_appendix:
+                    brv_file.write(unsigned_int(len(brci_individual_appendix), 4))
+                    brv_file.write(brci_individual_appendix)
 
                 if 'time' in self.debug_logs:
                     print(f'{FM.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
@@ -735,6 +735,16 @@ class BRCI:
                 file.write(str_to_write)
 
         if print_bricks: print(str_to_write)
+
+    @staticmethod
+    def get_missing_gbn_keys(print_missing: bool = False):
+        missing_values: list = []
+        for key, value in br_brick_list.items():
+            if 'gbn' not in value:
+                missing_values.append(key)
+        if print_missing:
+            print(missing_values)
+        return missing_values
 
 
 # --------------------------------------------------
