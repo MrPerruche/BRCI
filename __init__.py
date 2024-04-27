@@ -19,7 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C34"  # String, This is equivalent to 3.__ fyi
+version: str = "C36"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -637,7 +637,10 @@ class BRCI:
                                     temp_pre_spl += bin_float(pt_c_val[1], 4)
                                     temp_pre_spl += bin_float(pt_c_val[2], 4)
                                 case 'UTF-16':
-                                    raise NotImplementedError('UTF-16 not implemented yet.')
+                                    temp_pre_spl += signed_int(-len(pt_c_val), 2)
+                                    temp_pre_spl += pt_c_val.encode('utf-16')[2:]
+                                case '1BrickID':
+                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_val], 2)
 
                         property_length_list.append(len(temp_pre_spl))
                         temp_spl += temp_pre_spl

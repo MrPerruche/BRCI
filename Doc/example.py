@@ -1,12 +1,12 @@
-from .. import *
-from .. import _cwd
-from ..BRCI_RF import *
+import BRCI
+import os
 
-if not __name__ == "__main__":
+
+if __name__ == "__main__" or True:
     data = BRCI()
     data.project_name = 'no_name'
     data.project_display_name = 'no name'
-    data.project_folder_directory = os.path.join(_cwd, 'Projects')
+    data.project_folder_directory = os.path.join(os.getcwd(), 'Projects')
     data.debug_logs = ['time']
     data.file_description = 'no\r\ndescription'
     data.write_blank = False
@@ -18,7 +18,7 @@ if not __name__ == "__main__":
         data.project_name = f'stress_test_{bricks}'
         data.project_display_name = f'Stress Test ({bricks}b / {size}m)'
         for brick_id_st in range(bricks):
-            new_brick_st = create_brick(
+            new_brick_st = BRCI.create_brick(
                 brick="DoubleSiren_1x2x1s",
                 position=[random.uniform(0.0, size), random.uniform(0.0, size), random.uniform(0.0, size)],
                 rotation=[random.uniform(0.0, 360.0), random.uniform(0.0, 360.0), random.uniform(0.0, 360.0)])
@@ -46,4 +46,9 @@ if not __name__ == "__main__":
         generate: bool = True (executes write_preview(), write_metadata(), write_brv(), write_to_br())
     """
 
-    stress_test(1_000)
+    # stress_test(1_000)
+
+    text_brick = BRCI.create_brick('Nameplate_2x1sx1s')
+    text_brick['Text'] = 'Hello, World!'
+    text_brick['FontSize'] = -99
+    data.add_brick('text_brick', text_brick)

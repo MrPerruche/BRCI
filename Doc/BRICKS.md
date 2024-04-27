@@ -18,9 +18,14 @@ This section includes various data about various bricks' properties which we fin
 ### `ActuatorMode`
 This defines which mode the actuator is being set to. List :
 ###### In Brick Rigs 1.6.3 UI order
-## <span style="color: lime;">TODO</span>
 ```
 Accumulated
+Seeking
+Cycle
+
+PhysicsDriven
+Spring
+Static
 ```
 
 ### `AmmoType`
@@ -86,18 +91,78 @@ It is a list of 4 elements in the following order : `[HUE (u8), SATURATION (u8),
 This property correspond to what material the brick is made of. It is common to all bricks*.
 It is a single string : `MATERIAL (str)`. Input list:
 ###### In Brick Rigs 1.6.3 UI order
-## <span style="color: lime;">TODO</span>
 ```
+Aluminium
+BrushedAlu
+Carbon
+
+ChannelledAlu
+Chrome
+CloudyGlass
+
+Copper
+Foam
+Glass
+
+Glow
+Gold
+Oak
+
+Pine
 Plastic
+RoughWood
+
+Rubber
+RustedSteel
+Steel
+
+Tungsten
 ```
 
 ### `BrickPattern`
 This property correspond to what pattern is applied to the brick, and/or if none is being applied.
 It is common to all bricks*. It is a single string : `PATTERN (str)`. Input list:
 ###### In Brick Rigs 1.6.3 UI order
-## <span style="color: lime;">TODO</span>
 ```
 Default
+C_Army
+C_Army_Digital
+
+C_Autumn
+C_Berlin_2
+C_Berlin
+
+C_Berlin_Digital
+C_Cristal_Contrast
+C_Cristal_Red
+
+C_Dark
+C_Desert_2
+C_Desert
+
+C_Desert_Digital
+C_Flecktarn
+C_Heat
+
+C_Navy
+C_Sharp
+C_Sky
+
+C_Sweden
+C_Swirl
+C_Tiger
+
+C_Urban
+C_Yellow
+P_Burnt
+
+P_Fire
+P_Hexagon
+P_Swirl_Arabica
+
+P_Warning
+P_Warning_Red
+P_YellowCircles
 ```
 
 ### `BrickSize`
@@ -177,6 +242,48 @@ BRCI failing to generate the creation; Brick Rigs failing to load the creation, 
 Defined values not corresponding to what's expected.
 Modifying this "property" will not in any way update this brick's property list. To change what brick type your variable
 is defined to, use `create_brick(brick_type)` again. Be aware this command will clear any previously edited properties
+
+### `Image`
+This property corresponds to what image is being displayed. It is a single string `IMAGE (str)`. Input list:
+```
+Arrow
+Biohazard
+BRAF
+
+BrickRigs
+BrickRigsArms
+Caution
+
+Criminals
+Crosshair
+DesertWorms
+
+Dummy
+ElectricHazard
+ExplosiveHazard
+
+FireDept
+FireHazard
+
+Gauge
+Limit80
+NoEntrance
+
+OneWay
+Phone
+Police
+
+Radioactive
+Star
+Stop
+
+Tank
+Virus
+```
+
+### `ImageColor`
+This property correspond to what color the image is given.
+It is a list of 3 unsigned 8-bit int values in the following order : `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
 
 ### `InputScale`
 This property corresponds to what is technically referred as input scale. It is however counterintuitive,
@@ -266,6 +373,10 @@ Atan
 ### `OutputChannel.MinIn`, `OutputChannel.MaxIn`, `OutputChannel.MinOut`, `OutputChannel.MaxOut` 
 These properties correspond to the brick's output channel scaling values.
 Each are a single float 32 value : `VALUE (f32)`
+
+### `OwningSeat`
+This property correspond to what seat can access that brick. It is a single string corresponding to a brick's name or
+a None (Which allows all seats to access it) : `SEAT (str)`
 
 ### `Position`
 This "property" correspond to the brick's position in centimeters.
@@ -494,7 +605,6 @@ Actuator_20x2x1s_Top.......... : A
 
 ###### In Brick Rigs 1.6.3 UI order
 
-## <span style="color: lime;">TODO</span>
 ```
 BladeHolder_2x1..... : A
 Flap_1x4x1s......... : B
@@ -558,6 +668,162 @@ Wing_6x10x1s_R...... : D
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`True`)
 
+## Bricks
+
+###### In Brick Rigs 1.6.3 UI order
+```
+[Folder]
+[Folder]
+[Folder]
+
+[Folder]
+[Folder]
+[Folder]
+
+[Folder]
+Brick_1x1x1s............. : A
+Brick_1x1x1s_Flat........ : A
+
+Brick_1x1x1.............. : A
+Brick_1x1x3.............. : A
+Brick_1x1x4.............. : A
+
+Brick_1x1x6.............. : A
+Brick_2x1x1s............. : A
+Brick_2x1x1s_Flat........ : A
+
+BrickRounded_2x1x1s...... : A
+BrickRounded_2x1x1s_Flat. : A
+Brick_2x1x1.............. : A
+
+Brick_2x1x6.............. : A
+Brick_2x2x1s............. : A
+Brick_2x2x1s_Flat........ : A
+
+BrickRoundedCorner_2x2x1s : A
+CornerBrick_2x2x1s....... : A
+Brick_2x2x1.............. : A
+
+CornerBrick_2x2x1........ : A
+Brick_3x1x1s............. : A
+Brick_3x1x1s_Flat........ : A
+
+BrickRounded_3x1x1s...... : A
+BrickRounded_3x1x1s_Flat. : A
+Brick_3x1x1.............. : A
+
+Brick_3x2x1s............. : A
+Brick_3x2x1s_Flat........ : A
+Brick_3x2x1.............. : A
+
+Brick_4x1x1s............. : A
+Brick_4x1x1s_Flat........ : A
+BrickRounded_4x1x1s...... : A
+
+BrickRounded_4x1x1s_Flat. : A
+Brick_4x1x1.............. : A
+Brick_4x2x1s............. : A
+
+Brick_4x4x1s_Flat........ : A
+Brick_5x1x1s............. : A
+Brick_5x1x1s_Flat........ : A
+
+BrickRounded_5x1x1s...... : A
+BrickRounded_5x1x1s_Flat. : A
+Brick_5x1x1.............. : A
+
+Brick_5x2x1s............. : A
+Brick_5x2x1s_Flat........ : A
+Brick_5x2x1.............. : A
+
+Brick_6x1x1s............. : A
+Brick_6x1x1s_Flat........ : A
+BrickRounded_6x1x1s...... : A
+
+BrickRounded_6x1x1s_Flat. : A
+Brick_6x1x1.............. : A
+Brick_6x2x1s............. : A
+
+Brick_6x2x1s_Flat........ : A
+Brick_6x2x1.............. : A
+Weight_6x2x3............. : A
+
+Brick_6x4x1s............. : A
+Brick_6x4x1s_Flat........ : A
+Brick_6x6x1s............. : A
+
+Brick_6x6x1s_Flat........ : A
+Brick_8x1x1s............. : A
+Brick_8x1x1s_Flat........ : A
+
+BrickRounded_8x1x1s...... : A
+BrickRounded_8x1x1s_Flat. : A
+Brick_8x1x1.............. : A
+
+Brick_8x2x1s............. : A
+Brick_8x2x1s_Flat........ : A
+Brick_8x2x1.............. : A
+
+Brick_8x4x1s............. : A
+Brick_8x4x1s_Flat........ : A
+Brick_8x6x1s............. : A
+
+Brick_8x6x1s_Flat........ : A
+Brick_8x8x1s............. : A
+Brick_8x8x1s_Flat........ : A
+
+Brick_10x1x1s............ : A
+Brick_10x1x1............. : A
+Brick_10x2x1s............ : A
+
+Brick_10x2x1s_Flat....... : A
+Brick_10x2x1............. : A
+Brick_10x4x1s............ : A
+
+Brick_10x4x1s_Flat....... : A
+Brick_10x6x1s............ : A
+Brick_10x6x1s_Flat....... : A
+
+Brick_10x8x1s............ : A
+Brick_10x8x1s_Flat....... : A
+Brick_12x1x1s............ : A
+
+Brick_12x1x1............. : A
+Brick_12x6x1s............ : A
+Brick_12x6x1s_Flat....... : A
+
+Brick_12x8x1s............ : A
+Brick_12x8x1s_Flat....... : A
+Brick_12x12x1............ : A
+
+Brick_16x1x1............. : A
+Brick_16x8x1s............ : A
+Brick_16x8x1s_Flat....... : A
+
+Brick_20x1x1............. : A
+Brick_24x12x1............ : A
+```
+
+#### Properties : A
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
+
+## Cameras
+
+###### In Brick Rigs 1.6.3 UI Order
+
+```
+Camera_1sx1sx1s.. : A
+Camera_2x1x1..... : A
+TargetMaker_1x1x1 : A
+```
+
+#### Properties : A
+- Default Brick Properties
+- `OwningSeat` (`str | None`) (`None`) 
+
+
 ## Couplings
 
 ###### In Brick Rigs 1.6.3 UI order
@@ -586,6 +852,96 @@ Coupling_6x2x1s_Male.......... : B
 - `CouplingMode` (`str`) (`Default`)
 - `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('None', None, 'InputChannel')`)
 
+
+## Decoration
+
+###### In Brick Rigs 1.6.3 UI order
+```
+Antenna_1x1x8......... : A
+Antenna_2x1x1s........ : A
+Bumper_4sx6x2......... : B
+
+Bumper_4sx8x7s........ : B
+Door_L_3x1x1.......... : B
+Door_R_3x1x1.......... : B
+
+Door_L_3x1x2.......... : B
+Door_R_3x1x2.......... : B
+WindowedDoor_L_3x1x4.. : B
+
+WindowedDoor_R_3x1x4.. : B
+Grid_2x1x1s_02........ : B
+Grid_2x1x1s........... : B
+
+GridZylinder_2x2x1s... : B
+Handle_1x2x4s......... : B
+Handle_4x1x1.......... : B
+
+Imageplate_1x1x0...... : C
+Imageplate_1x1x1s..... : C
+ImageZylinder_1x1x1s.. : C
+
+Imageplate_2x2x1s..... : C
+ImageZylinder_2x2x1s.. : C
+Flag_3x1x2............ : C
+
+Imageplate_4x4x1s..... : C
+Nameplate_1sx1sx1s.... : D
+Nameplate_1x1sx1s..... : D
+
+Nameplate_1x1x1s...... : E
+NameZylinder_1x1x1s... : E
+Nameplate_2x1sx1s..... : D
+
+Nameplate_2x1x1s...... : E
+Nameplate_2x2x1s...... : F
+NameZylinder_2x2x1s... : F
+
+Nameplate_4x1x1s...... : E
+Nameplate_4x2x1s...... : F
+Nameplate_6x1x1s...... : E
+
+Nameplate_6x2x1s...... : F
+Nameplate_8x1x1s...... : E
+Nameplate_8x2x1s...... : F
+
+SteeringWheel_5sx5sx1s : B
+SteeringWheel_2x2x1s.. : B
+```
+
+#### Properties : A
+- Default Brick Properties
+
+#### Properties : B
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
+#### Properties : C
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+- `Image` (`str`) (`'Warning'`)
+- `ImageColor` (`list[int, int, int]`) (`[0, 0, 255]`)
+
+#### Properties : D
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+- `Text` (`str`) (`'Text'`)
+- `TextColor` (`list[int, int, int]`) (`[0, 0, 0]`)
+- `FontSize` (`int`) (`10`)
+
+#### Properties : E
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+- `Text` (`str`) (`'Text'`)
+- `TextColor` (`list[int, int, int]`) (`[0, 0, 0]`)
+- `FontSize` (`int`) (`30`)
+
+#### Properties : F
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+- `Text` (`str`) (`'Text'`)
+- `TextColor` (`list[int, int, int]`) (`[0, 0, 0]`)
+- `FontSize` (`int`) (`60`)
 
 ## Fire and Water
 
@@ -747,35 +1103,228 @@ SteeringWheel_2x2x1s... : C
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
 
+## Ramps
+
+###### In Brick Rigs 1.6.3 UI order
+```
+[Folder]
+[Folder]
+[Folder]
+
+[Folder]
+Ramp_1x1x2s........... : B
+RampRounded_1x1x2s.... : B
+
+CornerRamp_1x1x1...... : A
+CornerRounded_1x1x1... : A
+Ramp_1x1x1............ : B
+
+RampN_1x1x1........... : B
+RampRounded_1x1x1..... : B
+RampRoundedN_1x1x1.... : A
+
+Ramp_1x2x2s........... : B
+RampRounded_1x2x2s.... : B
+Ramp_1x2x1............ : B
+
+RampRounded_1x2x1..... : B
+Ramp_1x4x2s........... : B
+RampRounded_1x4x2s.... : B
+
+Ramp_1x4x1............ : B
+RampRounded_1x4x1..... : B
+Ramp_2x1x1_02......... : B
+
+Ramp_2x1x1............ : B
+RampN_2x1x1........... : B
+RampRounded_2x1x1..... : B
+
+Trapezoid_2x1x1....... : B
+Ramp_2x1x2............ : B
+RampN_2x1x2........... : B
+
+RampRoundedN_2x1x2.... : B
+Ramp_2x1x3............ : B
+RampN_2x1x3........... : B
+
+Ramp_2x1x4............ : B
+RampN_2x1x4........... : B
+CornerRamp_2x2x1_02... : A
+
+CornerRamp_2x2x1...... : A
+CornerRampN_2x2x1..... : A
+CornerRounded_2x2x1_02 : A
+
+CornerRounded_2x2x1... : B
+Ramp_2x2x1............ : B
+RampN_2x2x1........... : B
+
+Ramp_2x4x1............ : B
+RampN_2x4x1........... : B
+RampRounded_3x1x2s.... : B
+
+DoubleRamp_3x1x1...... : B
+DoubleRampN_3x1x1..... : B
+Ramp_3x1x1_02......... : B
+
+Ramp_3x1x1............ : B
+RampN_3x1x1........... : B
+CornerRamp_3x2x1_L.... : A
+
+CornerRamp_3x2x1_R.... : A
+Ramp_3x2x1............ : B
+RampN_3x2x1........... : B
+
+CornerRamp_3x3x1...... : B
+Ramp_3x4x1............ : B
+RampN_3x4x1........... : B
+
+RampRounded_4x1x2s.... : B
+RampRoundedN_4x2x4.... : B
+CornerRamp_4x3x1_L.... : B
+
+CornerRamp_4x3x1_R.... : B
+CornerRamp_4x4x1...... : B
+CornerRamp_5x3x1_L.... : B
+
+CornerRamp_5x3x1_R.... : B
+```
+
+#### Properties : A
+- Default Brick Properties
+
+#### Properties : B
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
+## Redirectors
+
+###### In Brick Rigs 1.6.3 UI order
+
+```
+Redirector_1x1x0............ : A
+CornerBrick_1x1x1s_Flat..... : A
+Redirector_1x1x1s_02........ : A
+
+Redirector_1x1x1s........... : A
+RedirectorZylinder_1x1x1s_02 : A
+RedirectorZylinder_1x1x1s... : A
+
+Redirector_1x1x1_02......... : A
+Redirector_1x1x1_03......... : A
+Redirecotr_1x1x1_04......... : A
+
+Redirector_1x1x1............ : A
+Redirector_4sx1x1........... : A
+Redirector_4sx1x4s.......... : A
+
+Redirector_4sx4x1........... : A
+Redirector_4sx6x1........... : A
+Redirector_2x1x1s_02........ : A
+
+Redirector_2x1x1s_03........ : A
+Redirector_2x1x1s_04........ : A
+Redirector_2x1x1s........... : A
+
+RedirectorZylinder_2x2x1s_02 : A
+RedirectorZylinder_2x2x1s... : A
+Octagon_2x4x4s.............. : A
+
+Redirector_3x2x1s_02........ : A
+Redirector_3x2x1s........... : A
+```
+
+#### Properties : A
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
+## Rods
+
+###### In Brick Rigs 1.6.3 UI order
+```
+Rod_1x1x1. : A
+Rod_1x1x2. : A
+Rod_1x1x3. : A
+
+Rod_1x1x4. : A
+Rod_1x1x6. : A
+Rod_1x1x8. : A
+
+Rod_1x1x10 : A
+Rod_1x1x12 : A
+Rod_1x1x16 : A
+
+Rod_1x1x20 : A
+```
+
+#### Properties : A
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
+## Round Stuff
+
+###### In Brick Rigs 1.6.3 UI order
+```
+Cone_1x1x1.......... : A
+Cone_2x2x2.......... : A
+Cone_4x4x4.......... : A
+
+Zylinder_1x1x1s..... : A
+Zylinder_1x1x1s_Flat : A
+Zylinder_1x1x1...... : A
+
+Zylinder_2x2x1s..... : A
+Zylinder_2x2x1s_Flat : A
+Zylinder_2x2x1...... : A
+
+Zylinder_2x2x4s..... : A
+HalfZylinder_4x2x4.. : A
+HalfSphere_1x1...... : A
+
+HalfSphere_2x2x1.... : A
+HalfSphere_4x4x2.... : A
+```
+
+#### Properties : A
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+
 ## Scalable Bricks
 
-###### TODO: NOT IN ORDER
+###### In Brick Rigs 1.6.3 UI order
 
 ```
 ScalableBrick............... : A
 ScalableCone................ : A
 ScalableConeRounded......... : A
-ScalableZylinder............ : A
-ScalableCylinder90R0........ : A
-ScalableCylinder90R1........ : A
-ScalableHalfCone............ : A
-ScalableHalfCylinder........ : A
-ScalableHemisphere.......... : A
-ScalablePyramid............. : A
-ScalableQuarterSphere....... : A
-ScalableRamp................ : A
-ScalableRampRounded......... : A
-ScalableRampRoundedN........ : A
-ScalableWedge............... : A
-ScalableWedgeCorner......... : A
 
 ScalableCorner.............. : B
 ScalableCornerN............. : B
 ScalableCornerRounded....... : B
+
 ScalableCornerRoundedN...... : B
-ScalableQuarterCone......... : B
+ScalableZylinder............ : A
+ScalableCylinder90R0........ : A
+
+ScalableCylinder90R1........ : A
+ScalableHalfCone............ : A
+ScalableHalfCylinder........ : A
+
+ScalableHemisphere.......... : A
+ScalablePyramid............. : A
 ScalablePyramidCorner....... : B
+
 ScalablePyramidCornerRounded : B
+ScalableQuarterCone......... : B
+ScalableQuarterSphere....... : A
+
+ScalableRamp................ : A
+ScalableRampRounded......... : A
+ScalableRampRoundedN........ : A
+
+ScalableWedge............... : A
+ScalableWedgeCorner......... : A
+
 ```
 
 #### Properties : A
@@ -927,6 +1476,27 @@ Wheel_1x1x1...... : H
 
 #### Properties : H
 - Default Brick Properties
+
+## Windows
+
+###### In Brick Rigs 1.6.3 UI order
+```
+Panel_1x2x4....... : A
+Panel_1x4x4....... : A
+Panel_1x6x6....... : A
+
+Windscreen_2x4x2.. : A
+Windscreen_2x4x3.. : A
+Windscreen_2x6x2.. : A
+
+Windscreen_2x6x3.. : A
+Windscreen_2x8x3.. : A
+Windscreen_4x6x3.. : A
+```
+
+#### Properties : A
+- Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
 
 ## Uncategorized
 

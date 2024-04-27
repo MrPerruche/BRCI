@@ -1,25 +1,25 @@
 from .functions import append_multiple, BrickInput
 
-br_brick_materials = {  # TODO put actual names
-    'aluminium':        {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
-    'brushed aluminum': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
-    'carbon':           {'price': 6.00, 'density': 1.55,  'strength': 10.0, 'friction': 0.70, 'restitution': 0.10},
-    'traction plate':   {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
-    'chrome':           {'price': 2.00, 'density': 8.00,  'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
-    'cloudy glass':     {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
-    'copper':           {'price': 3.00, 'density': 9.00,  'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
-    'foam':             {'price': 0.50, 'density': 0.10,  'strength': 0.10, 'friction': 0.70, 'restitution': 0.10},
-    'glass':            {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
-    'glow':             {'price': 1.50, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
-    'gold':             {'price': 11.0, 'density': 19.3,  'strength': 7.50, 'friction': 0.50, 'restitution': 0.10},
-    'oak':              {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
-    'pine':             {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
-    'plastic':          {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
-    'old wood':         {'price': 0.75, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
-    'rubber':           {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 2.00, 'restitution': 0.10},
-    'rusted steel':     {'price': 3.00, 'density': 8.00,  'strength': 10.0, 'friction': 0.50, 'restitution': 0.10},
-    'steel':            {'price': 4.00, 'density': 8.00,  'strength': 20.0, 'friction': 0.35, 'restitution': 0.10},
-    'tungsten':         {'price': 8.50, 'density': 19.25, 'strength': 30.0, 'friction': 0.20, 'restitution': 0.10} # Damn you it was perfect!
+br_brick_materials = {
+    'Aluminium': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
+    'BrushedAlu': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
+    'Carbon': {'price': 6.00, 'density': 1.55,  'strength': 10.0, 'friction': 0.70, 'restitution': 0.10},
+    'ChanneledAlu': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
+    'Chrome': {'price': 2.00, 'density': 8.00,  'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
+    'CloudyGlass': {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
+    'Copper': {'price': 3.00, 'density': 9.00,  'strength': 10.0, 'friction': 0.35, 'restitution': 0.10},
+    'Foam': {'price': 0.50, 'density': 0.10,  'strength': 0.10, 'friction': 0.70, 'restitution': 0.10},
+    'Glass': {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
+    'Glow': {'price': 1.50, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
+    'Gold': {'price': 11.0, 'density': 19.3,  'strength': 7.50, 'friction': 0.50, 'restitution': 0.10},
+    'Oak': {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
+    'Pine': {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
+    'Plastic': {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
+    'RoughWood': {'price': 0.75, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
+    'Rubber': {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 2.00, 'restitution': 0.10},
+    'RustedSteel': {'price': 3.00, 'density': 8.00,  'strength': 10.0, 'friction': 0.50, 'restitution': 0.10},
+    'Steel': {'price': 4.00, 'density': 8.00,  'strength': 20.0, 'friction': 0.35, 'restitution': 0.10},
+    'Tungsten': {'price': 8.50, 'density': 19.25, 'strength': 30.0, 'friction': 0.20, 'restitution': 0.10} # Damn you it was perfect!
 }                                                                                                                  # Made it perfect for you :3
 
 
@@ -125,13 +125,45 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# BRICKS TODO
+# BRICKS [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
 
 
+append_multiple(br_brick_list, ['Brick_1x1x1s', 'Brick_1x1x1s_Flat', 'Brick_1x1x1', 'Brick_1x1x3', 'Brick_1x1x4',
+                                'Brick_1x1x6', 'Brick_2x1x1s', 'Brick_1x1x1s_Flat', 'BrickRounded_2x1x1s',
+                                'BrickRounded_2x1x1s_Flat', 'Brick_2x1x1', 'Brick_2x1x6', 'Brick_2x2x1s',
+                                'Brick_2x2x1s_Flat', 'BrickRoundedCorner_2x2x1s', 'CornerBrick_2x2x1s', 'Brick_2x2x1',
+                                'CornerBrick_2x2x1', 'Brick_3x1x1s', 'Brick_3x1x1s_Flat', 'BrickRounded_3x1x1s',
+                                'BrickRounded_3x1x1s_Flat', 'Brick_3x1x1', 'Brick_3x2x1s', 'Brick_3x2x1s_Flat',
+                                'Brick_3x2x1', 'Brick_4x1x1s', 'Brick_4x1x1s_Flat', 'BrickRounded_4x1x1s',
+                                'BrickRounded_4x1x1s_Flat', 'Brick_4x1x1', 'Brick_4x2x1s', 'Brick_4x4x1s_Flat',
+                                'Brick_5x1x1s', 'Brick_5x1x1s_Flat', 'BrickRounded_5x1x1s', 'BrickRounded_5x1x1s_Flat',
+                                'Brick_5x1x1', 'BrickRounded_5x1x1s', 'BrickRounded_5x1x1s_Flat', 'Brick_5x1x1',
+                                'Brick_5x2x1s', 'Brick_5x2x1s_Flat', 'Brick_5x2x1', 'Brick_6x1x1s', 'Brick_6x1x1s_Flat',
+                                'BrickRounded_6x1x1s', 'BrickRounded_6x1x1s_Flat', 'Brick_6x1x1', 'Brick_6x2x1s',
+                                'Brick_6x2x1s_Flat', 'Brick_6x2x1', 'Weight_6x2x3', 'Brick_6x4x1s', 'Brick_6x4x1s_Flat',
+                                'Brick_6x6x1s', 'Brick_6x6x1s_Flat', 'Brick_8x1x1s', 'Brick_8x1x1s_Flat',
+                                'BrickRounded_8x1x1s', 'BrickRounded_8x1x1s_Flat', 'Brick_8x1x1', 'Brick_8x2x1s',
+                                'Brick_8x2x1s_Flat', 'Brick_8x2x1', 'Brick_8x4x1s', 'Brick_8x4x1s_Flat', 'Brick_8x6x1s',
+                                'Brick_8x6x1s_Flat', 'Brick_8x8x1s', 'Brick_8x8x1s_Flat', 'Brick_10x1x1s',
+                                'Brick_10x1x1s', 'Brick_10x1x1', 'Brick_10x2x1s', 'Brick_10x2x1s_Flat', 'Brick_10x2x1',
+                                'Brick_10x4x1s', 'Brick_10x4x1s_Flat', 'Brick_10x6x1s', 'Brick_10x6x1s_Flat',
+                                'Brick_10x8x1s', 'Brick_10x8x1s_Flat', 'Brick_12x1x1s', 'Brick_12x1x1', 'Brick_12x6x1s',
+                                'Brick_12x6x1s_Flat', 'Brick_12x8x1s', 'Brick_12x8x1s_Flat', 'Brick_12x12x1',
+                                'Brick_16x1x1', 'Brick_16x8x1s', 'Brick_16x8x1s_Flat', 'Brick_20x1x1', 'Brick_24x12x1'],
+                br_brick_list['default_brick_data'] | {'bGenerateLift': False}, True)
+
+
 # --------------------------------------------------
-# CAMERAS TODO
+# CAMERAS [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
+
+
+append_multiple(br_brick_list,
+                ['Camera_1sx1sx1s', 'Camera_2x1x1', 'TargetMaker_1x1x1'],
+                br_brick_list['default_brick_data'] | {
+                    'OwningSeat': None
+                }, True)
 
 
 # --------------------------------------------------
@@ -154,8 +186,59 @@ append_multiple(br_brick_list,
                 }, True)
 
 # --------------------------------------------------
-# DECORATION TODO
+# DECORATION [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
+
+
+append_multiple(br_brick_list,
+                ['Antenna_1x1x8', 'Antenna_2x1x1s', 'Handle_1x2x4s', 'Handle_4x1x1'],
+                br_brick_list['default_brick_data'], True)
+
+
+append_multiple(br_brick_list,
+                ['Bumper_4sx6x2', 'Bumper_4sx8x7s', 'Door_L_3x1x1', 'Door_R_3x1x1', 'Door_L_3x1x2',
+                 'Door_R_3x1x2', 'WindowedDoor_3x1x2', 'WindowedDoor_R_3x1x4', 'Grid_2x1x1s_02', 'Grid_2x1x1s',
+                 'GridZylinder_2x2x1s', 'SteeringWheel_5sx5sx1s', 'SteeringWheel_2x2x1s'],
+                br_brick_list['default_brick_data'], True)
+
+append_multiple(br_brick_list,
+                ['Imageplate_1x1x0', 'Imageplate_1x1x1s', 'ImageZylinder_1x1x1s', 'Imageplate_2x2x1s',
+                 'ImageZylinder_2x2x1s', 'Flag_3x1x2', 'Imageplate_4x4x1s'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'Image': 'Caution',
+                    'ImageColor': [0, 0, 255]
+                }, True)
+
+
+append_multiple(br_brick_list,
+                ['Nameplate_1sx1sx1s', 'Nameplate_1x1sx1s', 'Nameplate_2x1sx1s'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'Text': 'Text',
+                    'TextColor': [0, 0, 0],
+                    'FontSize': 10
+                }, True)
+
+append_multiple(br_brick_list,
+                ['Nameplate_1x1x1s', 'NameZylinder_1x1x1s', 'Nameplate_2x1x1s', 'Nameplate_4x1x1s',
+                 'Nameplate_6x1x1s', 'Nameplate_8x1x1s'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'Text': 'Text',
+                    'TextColor': [0, 0, 0],
+                    'FontSize': 30
+                }, True)
+
+append_multiple(br_brick_list,
+                ['Nameplate_2x2x1s', 'NameZylinder_2x2x1s', 'Nameplate_4x2x1s', 'Nameplate_6x2x1s',
+                 'Nameplate_8x2x1s'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'Text': 'Text',
+                    'TextColor': [0, 0, 0],
+                    'FontSize': 60
+                }, True)
 
 
 # --------------------------------------------------
@@ -241,7 +324,7 @@ append_multiple(br_brick_list, ['Sensor_1sx1sx1s', 'Sensor_1x1x1s'],
                     'OutputChannel.MaxIn': 1.0,
                     'OutputChannel.MinOut': -1.0,
                     'OutputChannel.MaxOut': 1.0,
-                    'EnabledInputChannel.InputAxis': BrickInput('AlwaysOn', 1.0, 'EnabledInputChannel'), # TODO
+                    'EnabledInputChannel.InputAxis': BrickInput('AlwaysOn', 1.0, 'EnabledInputChannel'),
                     'SensorType': 'Speed',
                     'TraceMask': 'All',
                     'bReturnToZero': False
@@ -292,23 +375,68 @@ append_multiple(br_brick_list, ['SteeringWheel_5sx5sx1s', 'SteeringWheel_5x5x1s'
                 }, True)
 
 # --------------------------------------------------
-# RAMPS TODO
+# RAMPS [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
+
+# NO Fluid Dynamics
+append_multiple(br_brick_list,
+                ['CornerRamp_1x1x1', 'CornerRounded_1x1x1', 'RampRoundedN_1x1x1', 'CornerRamp_2x2x1_02',
+                 'CornerRamp_2x2x1', 'CornerRampN_2x2x1', 'CornerRounded_2x2x1_02', 'CornerRamp_3x2x1_L',
+                 'CornerRamp_3x2x1_R'],
+                br_brick_list['default_brick_data'], True)
+
+
+append_multiple(br_brick_list,
+                ['Ramp_1x1x2s', 'RampRounded_1x1x2s', 'Ramp_1x1x1', 'RampN_1x1x1', 'RampRounded_1x1x1',
+                 'Ramp_1x2x2s', 'RampRounded_1x2x2s', 'Ramp_1x2x1', 'RampRounded_1x2x1', 'Ramp_1x4x2s',
+                 'RampRounded_1x4x2s', 'Ramp_1x4x1', 'RampRounded_1x4x1', 'Ramp_2x1x1_02', 'Ramp_2x1x1', 'RampN_2x1x1',
+                 'RampRounded_2x1x1', 'Trapezoid_2x1x1', 'Ramp_2x1x2', 'RampN_2x1x2', 'RampRoundedN_2x1x2',
+                 'Ramp_2x1x3', 'RampN_2x1x3', 'Ramp_2x1x4', 'RampN_2x1x4', 'CornerRounded_2x2x1', 'Ramp_2x2x1',
+                 'RampN_2x2x1', 'Ramp_2x4x1', 'Ramp_2x4x1', 'RampN_2x4x1', 'RampRounded_3x1x2s', 'DoubleRamp_3x1x1',
+                 'DoubleRampN_3x1x1', 'Ramp_3x1x1_02', 'Ramp_3x1x1', 'RampN_3x1x1', 'Ramp_3x2x1', 'RampN_3x2x1',
+                 'CornerRamp_3x3x1', 'Ramp_3x4x1', 'RampN_3x4x1', 'RampRounded_4x1x2s', 'RampRoundedN_4x2x4',
+                 'CornerRamp_4x3x1_L', 'CornerRamp_4x3x1_R', 'CornerRamp_4x4x1', 'CornerRamp_5x3x1_L',
+                 'CornerRamp_5x3x1_R'],
+                br_brick_list['default_brick_data'] | {'bGenerateLift': False}, True)
 
 
 # --------------------------------------------------
-# REDIRECTORS TODO
+# REDIRECTORS [LAST UPDATE:  1.6.3]
 # --------------------------------------------------
 
 
+append_multiple(br_brick_list,
+                ['Redirector_1x1x0', 'CornerBrick_1x1x1s_Flat', 'Redirector_1x1x1s_02', 'Redirector_1x1x1s',
+                 'RedirectorZylinder_1x1x1s_02', 'RedirectorZylinder_1x1x1s', 'Redirector_1x1x1_02',
+                 'Redirector_1x1x1_03', 'Redirector_1x1x1_04', 'Redirector_1x1x1', 'Redirector_4sx1x1',
+                 'Redirector_4sx1x4s', 'Redirector_4sx4x1', 'Redirector_4sx6x1', 'Redirector_2x1x1s_02',
+                 'Redirector_2x1x1s_03', 'Redirector_2x1x1s_04', 'Redirector_2x1x1s', 'RedirectorZylider_2x2x1s_02',
+                 'RedirectorZylinder_2x2x1s', 'Octagon_2x4x4', 'Redirector_3x2x1s_02', 'Redirector_3x2x1s'],
+                br_brick_list['default_brick_data'] | {'bGenerateLift': False}, True)
+
+
+
 # --------------------------------------------------
-# RODS TODO
+# RODS [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
 
 
+append_multiple(br_brick_list,
+                ['Rod_1x1x1', 'Rod_1x1x2', 'Rod_1x1x3', 'Rod_1x1x4', 'Rod_1x1x6', 'Rod_1x1x8', 'Rod_1x1x10',
+                 'Rod_1x1x12', 'Rod_1x1x16', 'Rod_1x1x20'],
+                br_brick_list['default_brick_data'] | {'bGenerateLift': False}, True)
+
+
 # --------------------------------------------------
-# ROUND STUFF TODO
+# ROUND STUFF [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
+
+
+append_multiple(br_brick_list,
+                ['Cone_1x1x1', 'Cone_2x2x2', 'Cone_4x4x4', 'Zylinder_1x1x1s', 'Zylinder_1x1x1s_Flat',
+                 'Zylinder_1x1x1', 'Zylinder_2x2x1s', 'Zylinder_2x2x1s_Flat', 'Zylinder_2x2x1', 'Zylinder_2x2x4',
+                 'HalfSphere_1x1', 'HalfSphere_2x2x1', 'HalfSphere_4x4x2', 'HalfZylinder_4x2x4'],
+                br_brick_list['default_brick_data'] | {'bGenerateLift': False}, True)
 
 
 # --------------------------------------------------
@@ -426,15 +554,21 @@ append_multiple(br_brick_list, ['Wheel_1sx1sx1s', 'Wheel_1x1x1'], br_brick_list[
 
 
 # --------------------------------------------------
-# WINDOWS TODO
+# WINDOWS [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
+
+
+append_multiple(br_brick_list,
+                ['Panel_1x2x4', 'Panel_1x4x4', 'Panel_1x6x6', 'Windscreen_2x4x2', 'Windscreen_2x4x3',
+                 'Windscreen_2x6x2', 'Windscreen_2x6x3', 'Windscreen_2x8x3', 'Windscreen_4x6x3'],
+                br_brick_list['default_brick_data'] | {'bGenerateLift': False}, True)
 
 
 # --------------------------------------------------
 # UNCATEGORIZED [LAST UPDATE: 1.6.3]
 # --------------------------------------------------
 
-# Archs, Ledges and more
+# Arch, Ledges and more
 append_multiple(br_brick_list, ['Arch_2x1x2', 'Arch_4x1x2', 'Arch_6x1x1', 'Arch_8x1x8', 'CornerLedge_1x1x1',
                                 'Ledge_1x1x1', 'Ledge_1x2x1', 'Ledge_1x4x1', 'PlaneTail_10x10x6'],
                 br_brick_list['default_brick_data'] | {
@@ -462,7 +596,7 @@ append_multiple(br_brick_list, ['Winch_3x2x1'],
 # --------------------------------------------------
 
 """
-Order for Connector Spacing in UI:
+Order for Connector Spacing in UI: [1.6.3]
     [1] [0]
     [3] [2]
     [5] [4]
@@ -476,5 +610,9 @@ br_special_property_instance_list = {
     'SmokeColor': '3xINT8_r',
     'SwitchName': 'UTF-16',
     'NumFractionalDigits': 'INT8',
-    'ExitLocation': '3xFLOAT32/None'
+    'ExitLocation': '3xFLOAT32/None',
+    'OwningSeat': '1BrickID',
+    'ImageColor': '3xINT8_r',
+    'Text': 'UTF-16',
+    'TextColor': '3xINT8_r'
 }
