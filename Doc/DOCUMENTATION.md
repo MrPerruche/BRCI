@@ -7,7 +7,7 @@ create and edit (not implemented yet) creations (a.k.a. vehicles) in Brick Rigs.
 
 
 Naturally, depending on if you're working in main.py or elsewhere, you may need to import BRCI.
-First things first, we must set up BRCI. To do so, we must write the following: `data = BRCI()`.
+First things first, we must set up BRCI. To do so, we must write the following: `data = brci.BRCI()`.
 
 Then, we must declare a few variables:
 - `data.project_name` (`str`) : This corresponds to the folder's name.
@@ -29,13 +29,11 @@ driver seat.
 At the end, it may look something like this:
 ```
 # Supposing we are working in example.py
-from .. import _cwd
-from .. import *
-from ..BRCI_RF import *
-import os
+import BRCI as brci
+_cwd = os.path.dirname(os.path.realpath(__file__))
 
 # Mandatory :
-data = BRCI()
+data = brci.BRCI()
 data.project_name = 'my_project'
 data.project_display_name = 'My Project'
 data.project_folder_directory = os.path.join(_cwd, 'Projects')  # To create it in the Projects folder.
@@ -64,10 +62,10 @@ for what letter corresponds to what set of properties).
 
 ### Creating and adding bricks
 
-### `create_brick()`
+### `brci.create_brick()`
 
 We must first get a brick's information.
-To do so, we may use the `create_brick(brick, position, rotation, brick_properties)` function.
+To do so, we may use the `brci.create_brick(brick, position, rotation, brick_properties)` function.
 It comes with 4 arguments :
 - `brick` (`str`) (Mandatory) : What brick you want to create.
 - `position` (`list[float]` | `NoneType`) (`None`) (Optional) :
@@ -83,15 +81,15 @@ It may look like this, using all arguments :
 ```
 # Setting up BRCI is not required to use this function.
 
-my_brick = create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
+my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
 ```
 
-`create_brick()` will return a dictionary, containing all properties. You may edit these properties. Let's take a scalable for example:
+`brci.create_brick()` will return a dictionary, containing all properties. You may edit these properties. Let's take a scalable for example:
 
 ```
 # Setting up BRCI is not required to use this function.
 
-my_brick = create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
+my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
 my_brick['BrickColor'] = [16, 191, 127, 231]
 print(my_brick)
 
@@ -127,7 +125,7 @@ It may look like this, using all arguments:
 ```
 # Supposing BRCI is already setup
 
-my_brick = create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
+my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
 data.add_brick('my_brick', my_brick)
 ```
 
@@ -174,7 +172,7 @@ It may look like this:
 ```
 # Supposing BRCI is already setup
 
-my_brick = create_brick('Switch_1sx1sx1s')
+my_brick = brci.create_brick('Switch_1sx1sx1s')
 data.add_brick('my_brick', my_brick)
 
 my_brick['bReturnToZero'] = False
@@ -191,7 +189,7 @@ It may look like this:
 ```
 # Supposing BRCI is already setup
 
-my_brick = create_brick('Switch_1sx1sx1s')
+my_brick = brci.create_brick('Switch_1sx1sx1s')
 data.add_brick('my_brick', my_brick)
 
 data.remove_brick('my_brick')

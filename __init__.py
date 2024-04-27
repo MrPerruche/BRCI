@@ -19,7 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C36"  # String, This is equivalent to 3.__ fyi
+version: str = "C37"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -204,7 +204,7 @@ class BRCI:
     # Writing preview.png
     def write_preview(self) -> None:
 
-        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'icon_beta.png') # Path
+        _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'BRCI_Preview_Default.png') # Path
 
         # Create folder if missing
         self.ensure_project_directory_exists()
