@@ -19,7 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C37"  # String, This is equivalent to 3.__ fyi
+version: str = "C38"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
