@@ -70,7 +70,7 @@ append_multiple(br_brick_list,
                  'Actuator_20x2x1s_Bottom'],
                 br_brick_list['default_brick_data'] | {
                     'ActuatorMode': 'Accumulated',
-                    'InputChannel.InputAxis': BrickInput('Auxiliary', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Auxiliary', None),
                     'SpeedFactor': 1.0,
                     'MinLimit': 0.0,
                     'MaxLimit': 0.0
@@ -102,7 +102,7 @@ append_multiple(br_brick_list,
                 ['Flap_1x4x1s', 'Flap_2x8x1s'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': True,
-                    'InputChannel.InputAxis': BrickInput('None', None, 'InputChannel'),
+                    'InputChannel': BrickInput('None', None),
                     'InputScale': 1.0,
                     'MinAngle': -22.5,
                     'MaxAngle': 22.5,
@@ -115,12 +115,12 @@ append_multiple(br_brick_list,
 append_multiple(br_brick_list,
                 ['Turbine_6x2x2', 'Turbine_8x4x2', 'Turbine_12x8x5'],
                 br_brick_list['default_brick_data'] | {
-                    'PowerInputChannel.InputAxis': BrickInput('OperationMode', None, 'PowerInputChannel'),
-                    'AutoHoverInputChannel.InputAxis': BrickInput('DisableSteering', None, 'AutoHoverInputChannel'),
-                    'ThrottleInputChannel.InputAxis': BrickInput('ThrottleAlt', None, 'ThrottleInputChannel'),
-                    'PitchInputChannel.InputAxis': BrickInput('ViewPitchAlt', None, 'PitchInputChannel'),
-                    'YawInputChannel.InputAxis': BrickInput('SteeringAlt', None, 'YawInputChannel'),
-                    'RollInputChannel.InputAxis': BrickInput('ViewYawAlt', None, 'RollInputChannel')
+                    'PowerInputChannel': BrickInput('OperationMode', None),
+                    'AutoHoverInputChannel': BrickInput('DisableSteering', None),
+                    'ThrottleInputChannel': BrickInput('ThrottleAlt', None),
+                    'PitchInputChannel': BrickInput('ViewPitchAlt', None),
+                    'YawInputChannel': BrickInput('SteeringAlt', None),
+                    'RollInputChannel': BrickInput('ViewYawAlt', None)
                 }, True)
 
 
@@ -182,7 +182,7 @@ append_multiple(br_brick_list,
                  'Coupling_2x2x1s_Male', 'Coupling_4x1x2s_Bottom', 'Coupling_6x2x1s_Male'],
                 br_brick_list['default_brick_data'] | {
                     'CouplingMode': 'Static',
-                    'InputChannel.InputAxis': BrickInput('None', None, 'InputChannel')
+                    'InputChannel': BrickInput('None', None)
                 }, True)
 
 # --------------------------------------------------
@@ -253,12 +253,12 @@ append_multiple(br_brick_list, ['Float'], br_brick_list['default_brick_data'] | 
 
 # Detonator
 append_multiple(br_brick_list, ['Detonator_1x1x1s'], br_brick_list['default_brick_data'] | {
-    'InputChannel.InputAxis': BrickInput('Action1', None, 'InputChannel')
+    'InputChannel': BrickInput('Action1', None)
 }, True)
 
 # Pumps
 append_multiple(br_brick_list, ['PumpZylinder_2x2x2'], br_brick_list['default_brick_data'] | {
-    'InputChannel.InputAxis': BrickInput('None', None, 'InputChannel')
+    'InputChannel': BrickInput('None', None)
 }, True)
 
 # FUEL TANKS IN VEHICLE CATEGORY
@@ -274,13 +274,13 @@ append_multiple(br_brick_list,
 
 # Flamethrower
 append_multiple(br_brick_list, ['Flamethrower_2x2x2'], br_brick_list['default_brick_data'] | {
-    'InputChannel.InputAxis': BrickInput('Action1', None, 'InputChannel')
+    'InputChannel': BrickInput('Action1', None)
 }, True)
 
 # Guns
 append_multiple(br_brick_list, ['Gun_2x1x1', 'Gun_2x2x2_Ballistic', 'Gun_2x2x2', 'Gun_4x2x2'],
                 br_brick_list['default_brick_data'] | {
-                    'InputChannel.InputAxis': BrickInput('Action1', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Action1', None),
                     'AmmoType': 'Standard'
 }, True)
 
@@ -288,7 +288,7 @@ append_multiple(br_brick_list, ['Gun_2x1x1', 'Gun_2x2x2_Ballistic', 'Gun_2x2x2',
 append_multiple(br_brick_list,
                 ['Launcher_2x1sx1s', 'Launcher_4x2sx2s', 'Launcher_6x1x1'],
                 br_brick_list['default_brick_data'] | {
-                    'InputChannel.InputAxis': BrickInput('Action1', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Action1', None),
                     'AmmoType': 'HighExplosive'
                 }, True)
 
@@ -304,7 +304,7 @@ append_multiple(br_brick_list, ['Switch_1sx1sx1s', 'Switch_1x1x1s'],
                     'OutputChannel.MaxIn': 1.0,
                     'OutputChannel.MinOut': -1.0,
                     'OutputChannel.MaxOut': 1.0,
-                    'InputChannel.InputAxis': BrickInput('None', None, 'InputChannel'),
+                    'InputChannel': BrickInput('None', None),
                     'bReturnToZero': True,
                     'SwitchName': ''}, True)
 
@@ -313,7 +313,7 @@ append_multiple(br_brick_list, ['DisplayBrick'],
                     'bGenerateLift': False,
                     'BrickSize': [6, 3, 1],
                     'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
-                    'InputChannel.InputAxis': BrickInput('Custom', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Custom', None),
                     'NumFractionalDigits': 1,
                     'DisplayColor': [0, 204, 128]
                 }, True)
@@ -324,7 +324,7 @@ append_multiple(br_brick_list, ['Sensor_1sx1sx1s', 'Sensor_1x1x1s'],
                     'OutputChannel.MaxIn': 1.0,
                     'OutputChannel.MinOut': -1.0,
                     'OutputChannel.MaxOut': 1.0,
-                    'EnabledInputChannel.InputAxis': BrickInput('AlwaysOn', 1.0, 'EnabledInputChannel'),
+                    'EnabledInputChannel': BrickInput('AlwaysOn', 1.0),
                     'SensorType': 'Speed',
                     'TraceMask': 'All',
                     'bReturnToZero': False
@@ -333,8 +333,8 @@ append_multiple(br_brick_list, ['Sensor_1sx1sx1s', 'Sensor_1x1x1s'],
 append_multiple(br_brick_list, ['MathBrick_1sx1sx1s'],
                 br_brick_list['default_brick_data'] | {
                     'Operation': 'Add',
-                    'InputChannelA.InputAxis': BrickInput('Custom', None, 'InputChannelA'),
-                    'InputChannelB.InputAxis': BrickInput('AlwaysOn', 1.0, 'InputChannelB')
+                    'InputChannelA': BrickInput('Custom', None),
+                    'InputChannelB': BrickInput('AlwaysOn', 1.0)
                 }, True)
 
 
@@ -348,7 +348,7 @@ append_multiple(br_brick_list,
                  'LightZylinder_1x1x1s_Flat', 'LightCone_1x1x1', 'LightHalfSphere_1x1', 'LightRamp_1x1x1',
                  'LightRampRounded_1x1x1', 'LightZylinder_1x1x1', 'Light_2x1x1s', 'LightZylinder_2x2x1s_Flat'],
                 br_brick_list['default_brick_data'] | {
-                    'InputChannel.InputAxis': BrickInput('Headlight', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Headlight', None),
                     'Brightness': 0.5,
                     'FlashSequence': 'None',
                     'LightDirection': 'Off',
@@ -472,7 +472,7 @@ append_multiple(br_brick_list,
 append_multiple(br_brick_list,
                 ['Thruster_1sx1sx1s', 'Thruster_1x1x1', 'Thruster_1x1x3', 'Thruster_2x2x4'],
                 br_brick_list['default_brick_data'] | {
-                    'InputChannel.InputAxis': BrickInput('Throttle', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Throttle', None),
                     'InputScale' : 1.0,
                     'bAccumulated': False
                 }, True)
@@ -499,8 +499,8 @@ append_multiple(br_brick_list,
                     'bHasBrake': True,
                     'bHasHandBrake': True,
                     'BrakeStrength': 1.0,
-                    'SteeringInputChannel.InputAxis': BrickInput('Steering', None, 'SteeringInputChannel'),
-                    'BrakeInputChannel.InputAxis': BrickInput('Brake', None, 'BrakeInputChannel'),
+                    'SteeringInputChannel': BrickInput('Steering', None),
+                    'BrakeInputChannel': BrickInput('Brake', None),
                     'bCanDisableSteering': False,
                     'bCanInvertSteering': False
                 }, True)
@@ -514,7 +514,7 @@ append_multiple(br_brick_list,
 
 append_multiple(br_brick_list, ['Exhaust_1x1x1'],
                 br_brick_list['default_brick_data'] | {
-                    'InputChannel.InputAxis': BrickInput('None', None, 'InputChannel'),
+                    'InputChannel': BrickInput('None', None),
                     'SmokeColor': [0, 0, 255],
                     'SpawnScale': 1.0
                 }, True)
@@ -524,7 +524,7 @@ append_multiple(br_brick_list,
                 ['Motor_1x2x5s', 'EMotor_2x2x2', 'Motor_3x2x5s', 'AircraftR4',
                  'Motor_4x2x5s', 'DragV8', 'DieselV12'],
                 br_brick_list['default_brick_data'] | {
-                    'ThrottleInputChannel.InputAxis': BrickInput('Throttle', None, 'ThrottleInputChannel'),
+                    'ThrottleInputChannel': BrickInput('Throttle', None),
                     'GearRatioScale': 1.0,
                     'bTankDrive': False
                 }, True)
@@ -580,13 +580,13 @@ append_multiple(br_brick_list, ['DoubleSiren_1x2x1s'],
                 br_brick_list['default_brick_data'] | {
                     'SirenType': 'Car',
                     'HornPitch': 1.0,
-                    'InputChannel.InputAxis': BrickInput('Horn', None, 'InputChannel')
+                    'InputChannel': BrickInput('Horn', None)
                 }, True)
 
 # Winch
 append_multiple(br_brick_list, ['Winch_3x2x1'],
                 br_brick_list['default_brick_data'] | {
-                    'InputChannel.InputAxis': BrickInput('Auxiliary', None, 'InputChannel'),
+                    'InputChannel': BrickInput('Auxiliary', None),
                     'WinchSpeed': 100.0 # 100 = 1 meter/s
                 }, True)
 

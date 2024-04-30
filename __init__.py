@@ -19,7 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C38"  # String, This is equivalent to 3.__ fyi
+version: str = "C39"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -48,6 +48,9 @@ def create_brick(brick: str, position: list[float] = None, rotation: list[float]
     if rotation is None:
         rotation = [0, 0, 0]
     return deepcopy(br_brick_list[brick]) | {'Position': position, 'Rotation': rotation} | brick_properties
+
+def cb(b: str, pos: list[float] = None, rot: list[float] = None, p: dict = None) -> dict:
+    return create_brick(b, pos, rot, p)
 
 
 # Brick Rigs Creation Interface Class
@@ -114,7 +117,7 @@ class BRCI:
 
 
     # Adding bricks to the brick list
-    def add_brick(self, brick_name: str | list[dict], brick: dict | list[dict]):
+    def add_brick(self, brick_name: str | list[str], brick: dict | list[dict]):
         if isinstance(brick_name, str):
             self.bricks.append([str(brick_name), brick])
         else:
@@ -133,7 +136,8 @@ class BRCI:
 
         return self
 
-    
+
+    """
     def add_all_bricks(self, local_variables: list[dict]):
 
         iteration_count = len(self.bricks)
@@ -145,22 +149,43 @@ class BRCI:
                     iteration_count += 1; self.add_brick(str(iteration_count), var)
 
         return self
+    """
 
 
     # Removing bricks from the brick list
-    def remove_brick(self, brick_name: str):
-
-        self.bricks = [sublist for sublist in self.bricks if sublist[0] != str(brick_name)]
+    def remove_brick(self, brick_name: str | list[str]):
+        self.bricks = [sublist for sublist in self.bricks if sublist[0] not in brick_name]
 
         return self
 
 
     # Updating a currently existing brick
-    def update_brick(self, brick_name: str, new_brick: dict):
+    def update_brick(self, brick_name: str | list[str], new_brick: dict | list[dict]):
         self.remove_brick(brick_name)
         self.add_brick(brick_name, new_brick)
 
         return self
+
+
+    # Add Brick Alias
+    def ab(self, n: str | list[str], b: dict | list[dict]):
+        return self.add_brick(n, b)
+
+
+    # Add New Brick Alias
+    def anb(self, n: str | list[str], t: str | list[str], b: dict | list[dict]):
+        return self.add_new_brick(n, t, b)
+
+
+    # Remove Brick Alias
+    def rb(self, n: str | list[str]):
+        return self.remove_brick(n)
+
+
+    # Update brick Alias
+    def ub(self, n: str | list[str], b: dict | list[dict]):
+        return self.update_brick(n, b)
+
 
 
     def ensure_valid_variable_type(self, variable_name: str, occured_when: str) -> None:
@@ -352,6 +377,7 @@ class BRCI:
                         # If it's set to the BrickInput class
                         if isinstance(property_value_mp, BrickInput):
                             # Get the right property list
+                            property_value_mp.prefix = property_key_mp
                             prop_mp_temp = property_value_mp.properties()
                             # If it's incorrect
                             if isinstance(prop_mp_temp, str) and prop_mp_temp == 'invalid_source_bricks':

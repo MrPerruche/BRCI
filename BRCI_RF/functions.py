@@ -180,8 +180,7 @@ class BrickInput:
 
     brick_input_type: str
     brick_input: any
-    prefix: str
-    last_chance: bool = False
+    prefix: str = ''
 
 
     def properties(self):

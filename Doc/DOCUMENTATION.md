@@ -64,17 +64,19 @@ for what letter corresponds to what set of properties).
 
 ### `brci.create_brick()`
 
+Alias : `brci.cb(b, pos, rot, p)`
+
 We must first get a brick's information.
 To do so, we may use the `brci.create_brick(brick, position, rotation, brick_properties)` function.
 It comes with 4 arguments :
 - `brick` (`str`) (Mandatory) : What brick you want to create.
-- `position` (`list[float]` | `NoneType`) (`None`) (Optional) :
+- `position` (`list[float] | None`) (`None`) (Optional) :
 A list of 3 floats corresponding to the brick's position IN CENTIMETERS.
 None corresponds to position [0, 0, 0]. It may be changed later using `variable['Position'] = [X (cm) (f32), Y (cm) (f32), Z (cm) (f32)]`.
-- `rotation` (`list[float]` | `NoneType`) (`None`) (Optional) :
+- `rotation` (`list[float] | None`) (`None`) (Optional) :
 A list of 3 floats corresponding to the brick's rotation IN DEGREES.
 None corresponds to rotation [0, 0, 0]. It may be changed later using `variable['Rotation'] = [X (deg) (f32), Y (deg) (f32), Z (deg) (f32)]`.
-- `brick_properties` (`dict` | `NoneType`) (`None`) (Optional) : If you wish to save lines, you can already edit some properties with this property.
+- `brick_properties` (`dict | None`) (`None`) (Optional) : If you wish to save lines, you can already edit some properties with this property.
 
 It may look like this, using all arguments :
 
@@ -110,15 +112,17 @@ Tip : Do NOT modify 'gbn' in order to avoid any issues with invalid bricks or pr
 
 ### `data.add_brick()`
 
+Alias : `data.ab(n, b)`
+
 After creating a brick, you must add it to the list of bricks that will be generated.
 To do so, you may use `data.add_brick(brick_name, brick)`.
 It comes with 2 arguments:
-- `brick_name` (`str` | `list[str]`) (Mandatory) : This corresponds to how you want to name your brick, to interact with it later.
-We highly recommend you putting in the same name as your variable's name. You may instead use a list of strings to
-add multiple bricks simultaneously. In this case however, `brick` must also be a list, of the same length, containing
-dictionaries.
-- `brick` (`dict`) (Mandatory) :
+- `brick_name` (`str | list[str]`) (Mandatory) : This corresponds to how you want to name your brick, to interact with it later.
+We highly recommend you putting in the same name as your variable's name.
+You may use a list of strings in order to add multiple bricks simultaneously, if other inputs are also list of their respective types.
+- `brick` (`dict | list[dict]`) (Mandatory) :
 You must put here the dict (which you may modify in order to use non-default values) returned by `create_brick()`.
+You may use a list of strings in order to add multiple bricks simultaneously, if other inputs are also list of their respective types.
 
 
 It may look like this, using all arguments:
@@ -129,20 +133,21 @@ my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {
 data.add_brick('my_brick', my_brick)
 ```
 
-`data.add_brick()` will not return anything.
+`data.add_brick()` will return self.
 
 ### `data.add_new_brick()`
+
+Alias : `data.anb(n, t, b)`
 
 As doing `create_brick()` then `data.add_brick()` may be too long, we decided to create this function to create a
 brick in a single line
 This function works just like `data.add_brick()`, except it takes a third argument, in between the 2 already established, determining what kind of brick you're creating:
-- `brick_name` (`str` | `list[str]`) (Mandatory) : This corresponds to how you want to name your brick, to interact with it later.
-We highly recommend you putting in the same name as your variable's name. You may instead use a list of strings to
-add multiple bricks simultaneously. In this case however, `brick_type` and `brick` must also be a list, of the same length,
-containing strings and dictionaries respectively.
-- `brick_type` (`str` | `list[str]`) (Mandatory) : This corresponds to the type of brick you want to create.
+- `brick_name` (`str | list[str]`) (Mandatory) : This corresponds to how you want to name your brick, to interact with it later.
+We highly recommend you putting in the same name as your variable's name.
 You may use a list of strings in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
-- `brick` (`dict` | `list[dict]`) (Mandatory) : Here you must put all non-default properties for your brick.
+- `brick_type` (`str | list[str]`) (Mandatory) : This corresponds to the type of brick you want to create.
+You may use a list of strings in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
+- `brick` (`dict | list[dict]`) (Mandatory) : Here you must put all non-default properties for your brick.
 You may use a list of dictionaries in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
 
 It may look something like this, using all arguments:
@@ -154,19 +159,19 @@ data.add_new_brick(['first_brick', 'second_brick'],
                    [{}, {'bReturnToZero: False', 'Position': [10, 0, 2.5]}])
 ```
 
+`data.add_new_brick()` will return self.
 
-### `data.add_all_bricks()`
-
-You may also use `data.add_all_bricks(local_variables)`. It is however more limited, and only take one input:
-- `local_variables` (`list[dict]`) (Mandatory) : This is a list of all bricks you want to create. You may not give them
-a name, as the function does it by itself, assigning an integer correspond to the brick's id, converted to a string.
 
 ### `data.update_brick()`
 
+Alias : `data.ub(n, b)`
+
 If you have to modify an already added brick, you may use the function `data.update_brick(brick_name, new_brick)`.
 It takes 2 arguments:
-- `brick_name` (`str`) (Mandatory) : The name of the brick you want to modify.
-- `new_brick` (`dict`) (Mandatory) : The new values for the properties of the brick.
+- `brick_name` (`str | list[str]`) (Mandatory) : The name of the brick you want to modify.
+You may use a list of strings in order to add multiple bricks simultaneously, if other inputs are also list of their respective types.
+- `new_brick` (`dict | list[dict]`) (Mandatory) : The new values for the properties of the brick.
+You may use a list of strings in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
 
 It may look like this:
 ```
@@ -179,11 +184,16 @@ my_brick['bReturnToZero'] = False
 data.update_brick('my_brick', my_brick)
 ```
 
+`data.update_brick()` will return self.
+
 ### `data.remove_brick()`
+
+Alias : `data.rb(n)`
 
 If you want to remove an already added brick, you may use the function `data.remove_brick(brick_name)`.
 It takes 1 argument:
-- `brick_name` (`str`) (Mandatory) : The name of the brick you want to remove.
+- `brick_name` (`str | list[str]`) (Mandatory) : The name of the brick you want to remove.
+You may use a list of strings in order to remove multiple bricks simultaneously.
 
 It may look like this:
 ```
@@ -217,11 +227,6 @@ As you may have guessed, it is necessary.
 
 ### `data.write_to_br()`
 
-Calling this function will clone the project folder to brick rigs.
-Be careful using this since it does overwrite anything with the same project name.
-
-### `data.write_to_br()`
-
 Calling this function will duplicate everything generated so far in Brick Rigs' folder. It only works for Windows users.
 If the project is already in Brick Rigs' vehicle folder, it will replace the previous one without causing an error.
 
@@ -245,3 +250,7 @@ also print them.
 If there is no issue, `['default_brick_data']` will be returned.
 Note: `'default_brick_data'` is not a brick and using it will cause an error as no `gbn` key is given to it.
 Even if it had one, which would no longer cause an error with BRCI, Brick Rigs would not be able to load this brick.
+
+
+### Brick Inputs
+

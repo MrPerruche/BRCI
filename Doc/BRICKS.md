@@ -471,15 +471,20 @@ Water
 This property correspond to the winch's speed. 100 corresponds to 1 meter per second (3.6 km/h).
 It is a single float 32 : `SPEED (f32)`
 
-### `[...].InputAxis`
+### Other :
+
+It may be an input, or a modded property.
+
+If it is an input (They often contain `InputChannel` in their name):
+
 This property corresponds to the brick's input : Either another brick, a constant value, throttle etc.
-It has various prefixes depending on the brick (such as `AutoHoverInputChannel.InputAxis` etc.).
+It has various prefixes depending on the brick (such as `AutoHoverInputChannel` etc.).
 It is set to the BrickInput class (custom class) : `INPUT (BrickInput(brick_input_type: str, brick_input: any, prefix: str))`.
-BRCI does not care about the property name at all. However, what it cares about is the class defining it : `BrickInput`.
+Unlike previous versions of BRCI, `BrickInput()` now care about the name of the property it is assigned to.
 It has 3 arguments :
 `brick_input_type`: the input type;
 `brick_input`: may be the input value, or source bricks, or anything else.
-`prefix`: this is what comes before `.InputAxis`. It is part of the property's in-game name.
+`prefix`: this is automatically set by BRCI. You may ignore it or set it to anything.
 Input list:
 ###### In Brick Rigs 1.6.3 UI order
 ```
@@ -596,7 +601,7 @@ Actuator_20x2x1s_Top.......... : A
 #### Properties : B
 - Default Brick Properties
 - `ActuatorMode` (`str`) (`'Accumulated'`)
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Auxiliary', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Auxiliary', None)`)
 - `SpeedFactor` (`f32`) (`1.0`)
 - `MinLimit` (`f32`) (`0.0`)
 - `MaxLimit` (`f32`) (`0.0`)
@@ -649,7 +654,7 @@ Wing_6x10x1s_R...... : D
 #### Properties : B
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`True`)
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('None', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('None', None)`)
 - `InputScale` (`f32`) (`100.0`)
 - `MinAngle` (`f32`) (`-22.5`)
 - `MaxAngle` (`f32`) (`22.5`)
@@ -657,12 +662,12 @@ Wing_6x10x1s_R...... : D
 
 #### Properties : C
 - Default Brick Properties
-- `PowerInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('OperationMode', None, 'PowerInputChannel')`)
-- `AutoHoverInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('DisableSteering', None, 'AutoHoverInputChannel')`)
-- `ThrottleInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('ThrottleAlt', None, 'ThrottleInputChannel')`)
-- `PitchInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('ViewPitchAlt', None, 'PitchInputChannel')`)
-- `YawInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('SteeringAlt', None, 'YawInputChannel')`)
-- `RollInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('ViewYawAlt', None, 'RollInputChannel')`)
+- `PowerInputChannel` (`BrickInput()`) (`BrickInput('OperationMode', None)`)
+- `AutoHoverInputChannel` (`BrickInput()`) (`BrickInput('DisableSteering', None)`)
+- `ThrottleInputChannel` (`BrickInput()`) (`BrickInput('ThrottleAlt', None)`)
+- `PitchInputChannel` (`BrickInput()`) (`BrickInput('ViewPitchAlt', None)`)
+- `YawInputChannel` (`BrickInput()`) (`BrickInput('SteeringAlt', None)`)
+- `RollInputChannel` (`BrickInput()`) (`BrickInput('ViewYawAlt', None)`)
 
 #### Properties : D
 - Default Brick Properties
@@ -850,7 +855,7 @@ Coupling_6x2x1s_Male.......... : B
 #### Properties : B
 - Default Brick Properties
 - `CouplingMode` (`str`) (`Default`)
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('None', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('None', None)`)
 
 
 ## Decoration
@@ -963,11 +968,11 @@ Tank_2x2x4........ : D
 
 #### Properties : B
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Action1', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Action1', None)`)
 
 #### Properties : C
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('None', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('None', None)`)
 
 #### Properties : D
 - Default Brick Properties
@@ -992,11 +997,11 @@ Gun_4x2x2.......... : C
 
 #### Properties : B
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Action1', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Action1', None)`)
 
 #### Properties : C
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Action2', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Action2', None)`)
 - `AmmoType` (`str`) (`Standard`)
 
 ## Input and Output
@@ -1017,15 +1022,15 @@ Switch_1x1x1s..... : D
 - `bGenerateLift` (`bool`) (`False`)
 - `BrickSize` (`[u16, u16, u16]`) (`[6, 3, 1]`)
 - `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 3, 0]`)
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Custom', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Custom', None)`)
 - `NumFractionalDigits` (`u8`) (`1`)
 - `DisplayColor` (`[u8, u8, u8]`) (`[0, 204, 128]`)
 
 #### Properties : B
 - Default Brick Properties
 - `Operation`: (`str`) (`Add`)
-- `InputChannelA.InputAxis`: (`BrickInput()`) (`BrickInput('Custom', None, 'InputChannelA')`)
-- `InputChannelB.InputAxis`: (`BrickInput()`) (`BrickInput('AlwaysOn', 1.0, 'InputChannelB')`)
+- `InputChannelA`: (`BrickInput()`) (`BrickInput('Custom', None)`)
+- `InputChannelB`: (`BrickInput()`) (`BrickInput('AlwaysOn', 1.0)`)
 
 #### Properties : C
 - Default Brick Properties
@@ -1033,7 +1038,7 @@ Switch_1x1x1s..... : D
 - `OutputChannel.MaxIn` (`f32`) (`1.0`)
 - `OutputChannel.MinOut` (`f32`) (`-1.0`)
 - `OutputChannel.MaxOut` (`f32`) (`1.0`)
-- `EnabledInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('AlwaysOn', 1.0, 'EnabledInputChannel')`)
+- `EnabledInputChannel` (`BrickInput()`) (`BrickInput('AlwaysOn', 1.0)`)
 - `SensorType` (`str`) (`'Speed'`)
 - `TraceMask` (`str`) (`'All'`)
 - `bReturnToZero` (`bool`) (`False`)
@@ -1044,7 +1049,7 @@ Switch_1x1x1s..... : D
 - `OutputChannel.MaxIn` (`f32`) (`1.0`)
 - `OutputChannel.MinOut` (`f32`) (`-1.0`)
 - `OutputChannel.MaxOut` (`f32`) (`1.0`)
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('None', None, 'InputChannel')`),
+- `InputChannel` (`BrickInput()`) (`BrickInput('None', None)`),
 - `bReturnToZero` (`bool`) (`True`)
 - `SwitchName` (`str`) (`''`)
 
@@ -1073,7 +1078,7 @@ LightZylinder_2x2x1s_Flat : A
 
 #### Properties : A
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Headlight', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Headlight', None)`)
 - `Brightness` (`f32`) (`0.5`)
 - `FlashSequence` (`str`) (`None`)
 - `LightDirection` (`str`) (`Off`)
@@ -1357,7 +1362,7 @@ Tank_2x2x4....... : B
 
 #### Properties : A
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Throttle', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Throttle', None)`)
 - `InputScale` (`f32`) (`1.0`)
 - `bAccumulated` (`bool`) (`False`)
 
@@ -1439,8 +1444,8 @@ Wheel_1x1x1...... : H
 - `bHasBrake` (`bool`) (`True`),
 - `bHasHandBrake` (`bool`) (`True`)
 - `BrakeStrength` (`f32`) (`1.0`)
-- `SteeringInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Steering', None, 'SteeringInputChannel')`)
-- `BrakeInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Brake', None, 'BrakeInputChannel')`)
+- `SteeringInputChannel` (`BrickInput()`) (`BrickInput('Steering', None)`)
+- `BrakeInputChannel` (`BrickInput()`) (`BrickInput('Brake', None)`)
 - `bCanDisableSteering` (`bool`) (`False`)
 - `bCanInvertSteering` (`bool`) (`False`)
 
@@ -1451,13 +1456,13 @@ Wheel_1x1x1...... : H
 
 #### Properties : C
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Throttle', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Throttle', None)`)
 - `SmokeColor` (`[u8, u8, u8]`) (`[0, 0, 255]`)
 - `SpawnScale` (`f32`) (`1.0`)
 
 #### Properties : D
 - Default Brick Properties
-- `ThrottleInputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Throttle', None, 'ThrottleInputChannel')`)
+- `ThrottleInputChannel` (`BrickInput()`) (`BrickInput('Throttle', None)`)
 - `GearRatioScale` (`f32`) (`1.0`)
 - `bTankDrive` (`bool`) (`False`)
 
@@ -1528,9 +1533,9 @@ Winch_3x2x1s....... : C
 - Default Brick Properties
 - `SirenType` (`str`) (`'Car'`)
 - `HornPitch` (`f32`) (`1.0`)
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Horn', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Horn', None)`)
 
 #### Properties : C
 - Default Brick Properties
-- `InputChannel.InputAxis` (`BrickInput()`) (`BrickInput('Auxiliary', None, 'InputChannel')`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('Auxiliary', None)`)
 - `WinchSpeed` (`f32`) (`100.0`)
