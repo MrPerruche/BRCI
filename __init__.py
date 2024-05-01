@@ -6,9 +6,6 @@ from .BRCI_RF import *
 
 # Note : every time you see unsigned_int() / signed_int() / bin_float(), byte_len * 8 is the number of bits.
 
-# TODO Add more jokes in comments because they're pretty annoying.
-# TODO Comment each variable to specify their content & classes for rust translation.
-# TODO Add all bricks in br_brick_list
 # TODO Calculate vehicle_size, vehicle_weight and vehicle_worth
 # TODO Implement Brick Loading (IDEA : Exclusively load user appendix)?
 
@@ -19,7 +16,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-version: str = "C39"  # String, This is equivalent to 3.__ fyi
+_version: str = "C40"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -34,11 +31,8 @@ os_system('color')
 # ------------------------------------------------------------
 
 
-# Return all data about specified brick
-#def create_brick(brick: str):
-    #return br_brick_list[brick].copy()
+custom_common_properties: dict[str: any] = {}
 
-# pain
 
 def create_brick(brick: str, position: list[float] = None, rotation: list[float] = None, brick_properties: dict = None) -> dict:
     if brick_properties is None:
@@ -47,7 +41,8 @@ def create_brick(brick: str, position: list[float] = None, rotation: list[float]
         position = [0, 0, 0]
     if rotation is None:
         rotation = [0, 0, 0]
-    return deepcopy(br_brick_list[brick]) | {'Position': position, 'Rotation': rotation} | brick_properties
+    return deepcopy(br_brick_list[brick]) | {'Position': position, 'Rotation': rotation} | custom_common_properties | brick_properties
+
 
 def cb(b: str, pos: list[float] = None, rot: list[float] = None, p: dict = None) -> dict:
     return create_brick(b, pos, rot, p)
@@ -64,9 +59,10 @@ class BRCI:
                  write_blank=False,
                  project_display_name='',
                  file_description='',
-                 debug_logs=None,
+                 logs=None,
                  user_appendix: list[bytes] = None,
-                 seat_brick=None):
+                 seat_brick=None,
+                 ):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -77,11 +73,11 @@ class BRCI:
         if bricks is None:  # List (If unspecified, create an empty list)
             bricks = [] # Initialize bricks
         self.bricks = bricks # List (Of bricks)
-        if debug_logs is None:
-            debug_logs = []
+        if logs is None:
+            logs = []
         if user_appendix is None:
             user_appendix = []
-        self.debug_logs = debug_logs # List of logs to print
+        self.debug_logs = logs # List of logs to print
         self.user_appendix = user_appendix # List (User appendix)
         self.seat_brick = seat_brick
 
@@ -127,12 +123,12 @@ class BRCI:
         return self
 
 
-    def add_new_brick(self, brick_name: str | list[str], brick_type: str | list[str], brick: dict | list[dict]):
+    def add_new_brick(self, brick_name: str | list[str], brick_type: str | list[str], brick: dict | list[dict], position: list[list[float]] | list[float] = None, rotation: list[list[float]] | list[float] = None):
         if isinstance(brick_type, str):
-            self.bricks.append([str(brick_name), create_brick(brick=brick_type, brick_properties=brick)])
+            self.bricks.append([str(brick_name), create_brick(brick=brick_type, brick_properties=brick, position=position, rotation=rotation)])
         else:
             for add_new_brick_i in range(len(brick_type)):
-                self.bricks.append([str(brick_name[add_new_brick_i]), create_brick(brick=brick_type[add_new_brick_i], brick_properties=brick[add_new_brick_i])])
+                self.bricks.append([str(brick_name[add_new_brick_i]), create_brick(brick=brick_type[add_new_brick_i], brick_properties=brick[add_new_brick_i], position=position[add_new_brick_i], rotation=rotation[add_new_brick_i])])
 
         return self
 
@@ -173,8 +169,8 @@ class BRCI:
 
 
     # Add New Brick Alias
-    def anb(self, n: str | list[str], t: str | list[str], b: dict | list[dict]):
-        return self.add_new_brick(n, t, b)
+    def anb(self, n: str | list[str], t: str | list[str], b: dict | list[dict], pos: list[float] = None, rot: list[float] = None):
+        return self.add_new_brick(n, t, b, pos, rot)
 
 
     # Remove Brick Alias
@@ -274,8 +270,8 @@ class BRCI:
                 metadata_file.write(bin_str(self.project_display_name)[2:])
 
                 # Write all necessary information for the file description
-                watermarked_file_description = f"Created using BRCI (Version {version}).\n" \
-                                               f"Join our discord for more information : [INVITE LINK]\n\n" # String
+                watermarked_file_description = f"Created using BRCI (Version {_version}).\n" \
+                                               f"Join our discord for more information : sZXaESzDd9\n\n" # String
                 if self.file_description is not None:
                     watermarked_file_description += f'Description:\n{self.file_description}.'
                 metadata_file.write(signed_int(-len(watermarked_file_description), 2))
@@ -733,7 +729,7 @@ class BRCI:
 
                 brv_watermark = f'File written with BRCI. Join our discord to learn more: sZXaESzDd9. Version:'
                 self.brci_appendix.append(small_bin_str(brv_watermark))
-                self.brci_appendix.append(small_bin_str(version))
+                self.brci_appendix.append(small_bin_str(_version))
 
 
                 # BRCI Appendix

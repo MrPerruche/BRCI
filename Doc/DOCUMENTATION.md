@@ -5,207 +5,277 @@ create and edit (not implemented yet) creations (a.k.a. vehicles) in Brick Rigs.
 
 ## Setup
 
+First we must import BRCI.  
+Here we will use `import BRCI as brci`.
 
-Naturally, depending on if you're working in main.py or elsewhere, you may need to import BRCI.
-First things first, we must set up BRCI. To do so, we must write the following: `data = brci.BRCI()`.
+Then, we must initialize BRCI, by creating an instance of the class BRCI.  
+Here we will use `data = brci.BRCI()`.
 
-Then, we must declare a few variables:
-- `data.project_name` (`str`) : This corresponds to the folder's name.
-- `data.project_display_name` (`str`) : This corresponds to the creation's in-game name.
-- `data.project_folder_directory` (`str`) : It must be set to the path in which the creation's folder will be created.
-It must already exist.
+Last, we must edit some variables in order to use it.
 
-Additionally, we may declare a few more variables.
-- `data.file_description` (`str` | `NoneType`) (`None`) : It corresponds to the creation's in-game description.
-- `data.debug_logs` (`list[str]` | `NoneType`) (`None`): Allows you to print certain types of debug logs. Currently available types:
-  - `'time'` : Prints the time it takes to generate the creation.
-  - `'bricks'` : Print debug information about bricks.
-- `data.user_appendix` (`bytes`) (`b''`) : This corresponds to data hidden in the .brv file you can write.
-Keep in mind once saving in-game, this data will be cleared!
-- `data.seat_brick` (`str` | `NoneType`) (`None`) : You must here insert what brick is the driver seat.
-If set to None, all seats will have the "Random" setting selected, meaning the first seat brick rigs load will be the
-driver seat.
+Mandatory :  
+`data.project_name` (`str`) define what name is given to the file later generated.  
+`data.project_folder_directory` (`str`) define where the creation will be created.
 
-At the end, it may look something like this:
-```
-# Supposing we are working in example.py
+Optional :  
+`data.project_display_name` (`str`) (`''`) define what name will be displayed in-game.  
+`data.file_description` (`str | None`) (`None`) define what description will be displayed in-game.  
+`data.logs` (`list[str] | None`) (`None`→`[]`) define what logs will be printed :
+- `'time'` will print how long each step takes to generate.
+- `'bricks'` will print debug information about bricks.
+
+`data.user_appendix` (`bytes`) (`b''`) define what bytes are hidden in the `Vehicle.brv` file.
+This data is cleared when you save it in-game.  
+`data.seat_brick` (`str | None`) (`None`) define what brick is the driver seat. If it is set to `None`, it will set all
+seats to the "Random" setting, which set the driver seat to the first seat loaded. To set the driver seat, you must use
+the brick's name.
+
+Here's an example of how to initialize BRCI:
+```python
 import BRCI as brci
-_cwd = os.path.dirname(os.path.realpath(__file__))
+from os import getcwd
 
-# Mandatory :
+# Initializing BRCI
 data = brci.BRCI()
-data.project_name = 'my_project'
-data.project_display_name = 'My Project'
-data.project_folder_directory = os.path.join(_cwd, 'Projects')  # To create it in the Projects folder.
-data.file_description = None
+# Configuring BRCI
+# Mandatory :
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
 # Optional :
-data.debug_logs = ['time']
+data.project_display_name = 'My First Project!'
+data.file_description = 'My\r\nFirst\r\nCreation'
+data.logs = ['time']
 data.user_appendix = 'Hello World!'.encode('utf-8')
 data.seat_brick = None
 ```
 
-### Additional Information
-For strings, you may use `\r\n` to create a new line.
+## Creating Creations
 
-## Bricks
+In order to create creations (a.k.a. vehicles), you may use some of the listed functions here to help you.
 
-BRCI was made to create creations though code. That's what we're here for.
-Creations are made of bricks, so lets see how it works:
+### Assigning a brick to a variable
 
-You will need the help of `BRICKS.md` to continue.
-In this file, in the first part you may see every property in-game, and potentially some useful information about them,
-such as what input they can take etc.
-In the second part you will see all bricks' technical names (as BRCI don't use display names you can see in-game).
-They are sorted by category (In Brick Rigs' order), then placed in the same order as in-game.
-Next to them is a letter. This letter corresponds to what set of properties this brick has (see at the end of the list
-for what letter corresponds to what set of properties).
+#### How to assign a brick to a variable
 
-### Creating and adding bricks
+In order to add a brick, you may use
+`data.create_brick()` / `data.cb()`, which will return you a dictionary (`dict[str: any]`) containing all properties and important data.
 
-### `brci.create_brick()`
+This function takes 1 mandatory argument and 3 optional arguments:
 
-Alias : `brci.cb(b, pos, rot, p)`
+Mandatory :  
+`brick` / `b` (`str`) define which brick you are creating. You must indicate the `.brv` name, not the in-game name.
+You may use `BRICKS.md` to easily get their name. Instructions on how to use it down below.
 
-We must first get a brick's information.
-To do so, we may use the `brci.create_brick(brick, position, rotation, brick_properties)` function.
-It comes with 4 arguments :
-- `brick` (`str`) (Mandatory) : What brick you want to create.
-- `position` (`list[float] | None`) (`None`) (Optional) :
-A list of 3 floats corresponding to the brick's position IN CENTIMETERS.
-None corresponds to position [0, 0, 0]. It may be changed later using `variable['Position'] = [X (cm) (f32), Y (cm) (f32), Z (cm) (f32)]`.
-- `rotation` (`list[float] | None`) (`None`) (Optional) :
-A list of 3 floats corresponding to the brick's rotation IN DEGREES.
-None corresponds to rotation [0, 0, 0]. It may be changed later using `variable['Rotation'] = [X (deg) (f32), Y (deg) (f32), Z (deg) (f32)]`.
-- `brick_properties` (`dict | None`) (`None`) (Optional) : If you wish to save lines, you can already edit some properties with this property.
+Optional :  
+`position` / `pos` (`list[float]`) (`None`→`[0, 0, 0]`) define the position of the brick in centimeters (10cm = 1 third). (It can later be modified with `variable['Position'] = ...`)  
+`rotation` / `rot` (`list[float]`) (`None`→`[0, 0, 0]`) define the rotation of the brick in degrees. (It can later be modified with `variable['Rotation'] = ...`)  
+`brick_properties` / `p` (`dict | None`) (`None`) define what properties are given to the brick.
 
-It may look like this, using all arguments :
+Additionally, you may use `brci.custom_common_properties` (`dict[str: any]`) to add / overwrite properties
+that are returned whenever you use this function. Keep in mind `brick_properties` has priority over this variable.
 
-```
-# Setting up BRCI is not required to use this function.
+Here's an example on how to use `data.create_brick()` / `data.cb()`:
 
-my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
-```
+```python
+# Initializing BRCI
+import BRCI as brci
+from os import getcwd
 
-`brci.create_brick()` will return a dictionary, containing all properties. You may edit these properties. Let's take a scalable for example:
+data = brci.BRCI()
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
 
-```
-# Setting up BRCI is not required to use this function.
+# Overwriting properties returned by default by brci.create_brick()
+brci.custom_common_properties = {
+    'BrickPattern': 'P_Swirl_Arabica',
+    'BrickColor': [120, 255, 212, 255]
+}
+# Creating our new brick
+my_brick = data.create_brick('Switch_1sx1sx1s', [10, 0, 0], [0, 180, 0], {'BrickPattern': 'C_Flecktarn'})
+my_brick['BrickMaterial'] = 'ChannelledAlu'
 
-my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
-my_brick['BrickColor'] = [16, 191, 127, 231]
 print(my_brick)
 
 """
-Output (Separated into multiple lines) :
+This script will print (With new lines added):
 {
-    'BrickColor': [16, 191, 127, 231],
-    'BrickPattern': 'Default',
-    'BrickMaterial': 'Plastic',
-    'Position': [0.0, 0.0, 0.0],
-    'Rotation': [0.0, 0.0, 0.0],
-    'bGenerateLift': True,
-    'gbn': 'SteeringWheel_2x2x1s'
-} 
-Tip : Do NOT modify 'gbn' in order to avoid any issues with invalid bricks or properties. Learn more in BRICKS.md
+    'BrickColor': [120, 255, 212, 255],
+    'BrickPattern': 'C_Flecktarn',
+    'BrickMaterial': 'ChannelledAlu',
+    'Position': [10.0, 0.0, 0.0],
+    'Rotation': [0.0, 180.0, 0.0],
+    'OutputChannel.MinIn': -1.0,
+    'OutputChannel.MaxIn': 1.0,
+    'OutputChannel.MinOut': -1.0,
+    'OutputChannel.MaxOut': 1.0,
+    'InputChannel': BrickInput('None', None),
+    'bReturnToZero': True,
+    'SwitchName': ''
+    'gbn': 'Switch_1sx1sx1s'
+}
+Note : 'gbn' indicates which brick it is. We recommend you not to modify it.
 """
 ```
 
-### `data.add_brick()`
+#### How `BRICKS.md` is structured
 
-Alias : `data.ab(n, b)`
+This file helps you find brick names and information about brick names & properties.
 
-After creating a brick, you must add it to the list of bricks that will be generated.
-To do so, you may use `data.add_brick(brick_name, brick)`.
-It comes with 2 arguments:
-- `brick_name` (`str | list[str]`) (Mandatory) : This corresponds to how you want to name your brick, to interact with it later.
-We highly recommend you putting in the same name as your variable's name.
-You may use a list of strings in order to add multiple bricks simultaneously, if other inputs are also list of their respective types.
-- `brick` (`dict | list[dict]`) (Mandatory) :
-You must put here the dict (which you may modify in order to use non-default values) returned by `create_brick()`.
-You may use a list of strings in order to add multiple bricks simultaneously, if other inputs are also list of their respective types.
+It is divided in two parts:
 
+##### Every property in-game
+This part list every property in Brick Rigs. It explains what's their type, how to use them, since many properties such as `ExitLocation`
+and `BrickColor` are fairly counter-intuitive at first, and more.
+Additionally, it explains what we mean by "Default Brick Properties" at the beginning
 
-It may look like this, using all arguments:
-```
-# Supposing BRCI is already setup
+##### Every brick in-game
+This part list every brick and what property are assigned to them. It is sorted as such:
+It is separated by categories, and then listed one by one in UI order, skipping a line every time UI changes line.
+We ignore folders. For each brick a letter is assigned to them after many dots.  
+This letter define what properties this brick has. It can be seen at the bottom of the list, along with
+their default value and type (in order to avoid constantly scrolling back up)
 
-my_brick = brci.create_brick('SteeringWheel_2x2x1s', [10, 0, 120], [0, 90, 0], {'bGenerateLift': True})
+### Get a brick ready for generation
+
+In order to make a brick you've created using the previously demonstrated method,
+you must use `data.add_brick()` / `data.ab()` which will return self.
+
+It has 2 mandatory arguments :
+
+Mandatory :  
+`brick_name` / `n` (`str | list[str]`) define what name you want to give your brick, in order to interact with it in various
+ways such as deleting / editing it, using it as an input for some bricks, etc.  
+`brick` / `b` (`dict[str: any] | list[dict[str: any]]`) define what properties are given to the brick (What is returned
+by `data.create_brick()` / `data.cb()`).
+
+If the arguments are provided as a list, then all arguments must be in list form to affect multiple bricks concurrently.
+Additionally, all lists must be of the same length.
+
+Here's an example on how to use `data.add_brick()` / `data.ab()`:
+
+```python
+# Initializing BRCI
+import BRCI as brci
+from os import getcwd
+
+data = brci.BRCI()
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
+
+# Creating our new brick
+my_brick = data.add_brick('Switch_1sx1sx1s', [10, 0, 0], [0, 180, 0], {'BrickPattern': 'C_Flecktarn'})
+my_brick['BrickMaterial'] = 'ChannelledAlu'
+
+# Adding our brick to the list of bricks that will be generated
 data.add_brick('my_brick', my_brick)
 ```
 
-`data.add_brick()` will return self.
+### Creating a new brick already ready for generation
 
-### `data.add_new_brick()`
+You may do the two previous steps (`data.cb()` + `data.ab()`) in one line using `data.add_new_brick()` / `data.anb()`,
+which returns self.
 
-Alias : `data.anb(n, t, b)`
+It has 3 mandatory arguments and 2 optional arguments :
 
-As doing `create_brick()` then `data.add_brick()` may be too long, we decided to create this function to create a
-brick in a single line
-This function works just like `data.add_brick()`, except it takes a third argument, in between the 2 already established, determining what kind of brick you're creating:
-- `brick_name` (`str | list[str]`) (Mandatory) : This corresponds to how you want to name your brick, to interact with it later.
-We highly recommend you putting in the same name as your variable's name.
-You may use a list of strings in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
-- `brick_type` (`str | list[str]`) (Mandatory) : This corresponds to the type of brick you want to create.
-You may use a list of strings in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
-- `brick` (`dict | list[dict]`) (Mandatory) : Here you must put all non-default properties for your brick.
-You may use a list of dictionaries in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
+Mandatory :
 
-It may look something like this, using all arguments:
+`brick_name` / `n` (`str | list[str]`) define what name you want to give your brick, in order to interact with it in various
+ways such as deleting / editing it, using it as an input for some bricks, etc.  
+`brick_type` / `t` (`str | list[str]`) define what type of brick you want to create.  
+`brick` / `b` (`dict[str: any] | list[dict[str: any]]`) define what properties are given to the brick.  
+`position` / `pos` (`list[float] | list[list[float]]`) define where the brick will be placed.  
+`rotation` / `rot` (`list[float] | list[list[float]]`) define how the brick will be rotated.
+
+If the arguments are provided as a list, then all arguments must be in list form to affect multiple bricks concurrently.
+Additionally, all lists must be of the same length.
+
+Here's an example on how to use `data.add_new_brick()` / `data.anb()`:
+
+```python
+# Initializing BRCI
+import BRCI as brci
+from os import getcwd
+
+data = brci.BRCI()
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
+
+# Adding a newly created brick
+data.add_new_brick('my_brick', 'Switch_1sx1sx1s', {
+    'BrickColor': [120, 255, 212, 255],
+    'BrickPattern': 'C_Flecktarn',
+    'BrickMaterial': 'ChannelledAlu'
+}, [10, 0, 0], [0, 180, 0])
 ```
-# Supposing BRCI is already setup
 
-data.add_new_brick(['first_brick', 'second_brick'],
-                   ['MathBrick_1sx1sx1s', 'Switch_1x1x1s'],
-                   [{}, {'bReturnToZero: False', 'Position': [10, 0, 2.5]}])
-```
+### Modifying an already implemented brick
 
-`data.add_new_brick()` will return self.
+You may need to modify an already implemented brick. In this case, use `data.update_brick()` / `data.ub()` which returns self.
 
+It has 2 mandatory arguments :
 
-### `data.update_brick()`
+Mandatory :  
+`brick_name` (`str | list[str]`) define what brick you're editing (use its name, not its type)
+`new_brick` (`dict | list[dict]`) define what values are being set, instead of the old ones.
 
-Alias : `data.ub(n, b)`
+If the arguments are provided as a list, then all arguments must be in list form to affect multiple bricks concurrently.
+Additionally, all lists must be of the same length.
 
-If you have to modify an already added brick, you may use the function `data.update_brick(brick_name, new_brick)`.
-It takes 2 arguments:
-- `brick_name` (`str | list[str]`) (Mandatory) : The name of the brick you want to modify.
-You may use a list of strings in order to add multiple bricks simultaneously, if other inputs are also list of their respective types.
-- `new_brick` (`dict | list[dict]`) (Mandatory) : The new values for the properties of the brick.
-You may use a list of strings in order to create multiple bricks simultaneously, if other inputs are also list of their respective types.
+Here's an example on how to use `data.update_brick()` / `data.ub()`:
 
-It may look like this:
-```
-# Supposing BRCI is already setup
+```python
+# Initializing BRCI
+import BRCI as brci
+from os import getcwd
 
-my_brick = brci.create_brick('Switch_1sx1sx1s')
-data.add_brick('my_brick', my_brick)
+data = brci.BRCI()
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
 
-my_brick['bReturnToZero'] = False
+# Creating our new brick
+my_brick = brci.cb('Switch_1sx1sx1s', [10, 0, 0], [0, 180, 0], {'BrickPattern': 'C_Flecktarn'})
+
+# Adding our brick to the list of bricks that will be generated
+data.ab('my_brick', my_brick)
+
+# Modifying our brick & applying changes
+my_brick['BrickColor'] = [0, 127, 255, 255]
 data.update_brick('my_brick', my_brick)
 ```
 
-`data.update_brick()` will return self.
+### Deleting an already implemented brick
 
-### `data.remove_brick()`
+You may need to delete an already implemented brick. In this case, use `data.remove_brick()` / `data.rb()` which returns self.
 
-Alias : `data.rb(n)`
+It has 1 mandatory argument :
 
-If you want to remove an already added brick, you may use the function `data.remove_brick(brick_name)`.
-It takes 1 argument:
-- `brick_name` (`str | list[str]`) (Mandatory) : The name of the brick you want to remove.
-You may use a list of strings in order to remove multiple bricks simultaneously.
+Mandatory :  
+`brick_name` / `n` (`str | list[str]`) define what brick you're going to delete (use its name, not its type).
 
-It may look like this:
-```
-# Supposing BRCI is already setup
+If the argument is provided as a list, it'll delete multiple bricks simultaneously.
 
-my_brick = brci.create_brick('Switch_1sx1sx1s')
-data.add_brick('my_brick', my_brick)
+Here's an example on how to use `data.remove_brick()` / `data.rb()`:
 
+```python
+# Initializing BRCI
+import BRCI as brci
+from os import getcwd
+
+data = brci.BRCI()
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
+
+# Creating our new brick
+my_brick = brci.cb('Switch_1sx1sx1s', [10, 0, 0], [0, 180, 0], {'BrickPattern': 'C_Flecktarn'})
+
+# Adding our brick to the list of bricks that will be generated
+data.ab('my_brick', my_brick)
+
+# Deleting our brick
 data.remove_brick('my_brick')
 ```
 
-### Generating files
+## Generating files
 
 Note that if any file already exists with the same name, BRCI will crash. This will be resolved once
 we will implement file editing.
@@ -234,17 +304,20 @@ If the project is already in Brick Rigs' vehicle folder, it will replace the pre
 
 ### `data.debug()`
 
-`data.debug(summary_only, write, print_bricks)` has 3 arguments:
-- `summary_only` (`bool`) (`False`) (Optional) : If true, it will only get essential information on the build :
-Name, Amount of bricks, etc. Otherwise, it will also print all generated bricks and debug information to help troubleshooting.
-- `write` (`bool`) (`True`) (Optional) : If true, it will write everything in `debug_logs.txt`. Brick Rigs will ignore this file.
-- `print_bricks` (`bool`) (`False`) (Optional) : If true, it will print all generated bricks to the console.
+`data.debug(summary_only, write, print_bricks)` has 3 optional arguments:
+
+Optional :  
+`summary_only` (`bool`) (`False`), if true, will make it only get essential information on the build :
+Name, Amount of bricks, etc. Otherwise, it will also include all generated bricks and debug information to help troubleshooting.  
+`write` (`bool`) (`True`), if true, will make it write everything in `debug_logs.txt`. Brick Rigs will ignore this file.  
+`print_bricks` (`bool`) (`False`), if true, will make it print all generated bricks to the console.
 
 ### `data.get_missing_gbn_keys()`
 `data.get_missing_gbn_keys()` is a function that returns all missing 'gbn' keys. It is used to find a common error
 when adding bricks to the brick list : leaving argument `gbn` to false whilst using `append_multiple()`. This function
-has 1 argument:
-- `print_missing` (`bool`) (`False`) (Optional) : If true, it will not only return all missing `gbn` keys but
+has 1 argument:  
+
+`print_missing` (`bool`) (`False`) (Optional) : If true, it will not only return all missing `gbn` keys but
 also print them.
 
 If there is no issue, `['default_brick_data']` will be returned.
@@ -252,5 +325,10 @@ Note: `'default_brick_data'` is not a brick and using it will cause an error as 
 Even if it had one, which would no longer cause an error with BRCI, Brick Rigs would not be able to load this brick.
 
 
-### Brick Inputs
+## Brick Inputs
 
+`BrickInput()` is a custom class that is used to specify what inputs are given to a brick. Learn more in `BRICKS.md`.
+
+
+## Tips
+- You can use `\r\n` to create a new line. Only using `\n` will not work.
