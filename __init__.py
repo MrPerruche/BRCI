@@ -16,7 +16,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C40"  # String, This is equivalent to 3.__ fyi
+_version: str = "C41"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -77,7 +77,7 @@ class BRCI:
             logs = []
         if user_appendix is None:
             user_appendix = []
-        self.debug_logs = logs # List of logs to print
+        self.logs = logs # List of logs to print
         self.user_appendix = user_appendix # List (User appendix)
         self.seat_brick = seat_brick
 
@@ -188,18 +188,18 @@ class BRCI:
         match variable_name:
             case 'write_blank':
                 if not isinstance(self.write_blank, bool):
-                    FM.error_with_header("Invalid write_blank type.", f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a {type(self.write_blank).__name__}.\nIt is now set to False.")
+                    FM.warning_with_header("Invalid write_blank type.", f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a {type(self.write_blank).__name__}.\nIt is now set to False.")
                     self.write_blank = False
             case 'bricks_len':
                 if len(self.bricks) > 65535:
-                    FM.error_with_header("Too many bricks.",
+                    FM.warning_with_header("Too many bricks.",
                         f"Whilst {occured_when}, the length of the list of bricks was found to exceed 65,535.\n"
                         f"Therefore, the last {len(self.bricks)-65535 :,} brick(s) were removed. 65,535 bricks left.")
                     self.bricks = self.bricks[:65535]
             case 'logs':
                 logs_whitelist_list: list[str] = ['time', 'bricks']
                 invalid_logs_list: list[str] = []
-                for log_request_str in self.debug_logs:
+                for log_request_str in self.logs:
                     if not log_request_str in logs_whitelist_list:
                         invalid_logs_list.append(log_request_str)
                 if invalid_logs_list:
@@ -233,7 +233,7 @@ class BRCI:
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            FM.error_with_header("Image not found", "Whilst writing Preview.png, we were unable to find BRCI default image. Please retry.")
+            FM.warning_with_header("Image not found", "Whilst writing Preview.png, we were unable to find BRCI default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
@@ -303,7 +303,7 @@ class BRCI:
 
                 # Writing tags                                                                                          FIXME
                 write_tags_to_file() # TODO: Add a way to input tags. For now, they are all "Other"
-                
+
     # Writing the project folder to brick rigs # only works on windows
     def write_to_br(self) -> None:
         import shutil
@@ -377,7 +377,7 @@ class BRCI:
                             prop_mp_temp = property_value_mp.properties()
                             # If it's incorrect
                             if isinstance(prop_mp_temp, str) and prop_mp_temp == 'invalid_source_bricks':
-                                FM.error_with_header("Invalid type for brick list.",f"Whilst writing Vehicle.brv,"
+                                FM.warning_with_header("Invalid type for brick list.",f"Whilst writing Vehicle.brv,"
                                     f"we noticed {property_key_mp} (from brick {brick_mp[0]!r}) was not set to a list."
                                     f"\nIt was set to type {type(property_value_mp).__name__}. It is now set to None, corresponding to no inputs.")
                                 property_value_mp.brick_input = []
@@ -403,7 +403,7 @@ class BRCI:
                 # --------------------------------------------------
 
 
-                self.bricks_writing = self.bricks.copy()
+                self.bricks_writing = deepcopy(self.bricks)
 
                 # Writes Carriage Return char
                 brv_file.write(unsigned_int(13, 1))
@@ -415,9 +415,9 @@ class BRCI:
                 # --------------------------------------------------
 
                 # Add all missing properties, notably inputs.
-                add_missing_properties(self.bricks_writing, 'bricks' in self.debug_logs)
+                add_missing_properties(self.bricks_writing, 'bricks' in self.logs)
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Missing Properties.. : {perf_counter() - previous_time :.6f} seconds')
 
                 # --------------------------------------------------
@@ -425,12 +425,12 @@ class BRCI:
                 # --------------------------------------------------
 
                 # Get the different bricks present in the project
-                brick_types = brv_brick_types(self.bricks_writing, 'bricks' in self.debug_logs) # List
+                brick_types = brv_brick_types(self.bricks_writing, 'bricks' in self.logs) # List
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
-                if 'bricks' in self.debug_logs:
+                if 'bricks' in self.logs:
                     print(f'{FM.debug} Brick Types............... : {brick_types}')
 
 
@@ -487,10 +487,10 @@ class BRCI:
                                 property_table[p_del_current_key].append(p_del_current_value)
 
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: ID Assigning........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
-                if 'bricks' in self.debug_logs:
+                if 'bricks' in self.logs:
                     print(f'{FM.debug} Identical Excluded Brick L : {temp_iebl}')
                     print(f'{FM.debug} Property Table............ : {property_table}')
                     print(f'{FM.debug} String Name to ID Table... : {string_name_to_id_table}')
@@ -524,10 +524,10 @@ class BRCI:
                     w_current_property_id = 0
 
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Prop. ID Assigning.. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
-                if 'bricks' in self.debug_logs:
+                if 'bricks' in self.logs:
                     print(f'{FM.debug} ID Assigned Property Table : {self.id_assigned_property_table}')
                     print(f'{FM.debug} Property Key Table........ : {property_key_table}')
                     print(f'{FM.debug} Inverted Property Key Tbl. : {self.inverted_property_key_table}')
@@ -559,22 +559,22 @@ class BRCI:
                     # Giving Brick Type IDs
                     temp_bricks_writing[-1][1][0]['gbn'] = brick_types.index(temp_bricks_writing[-1][1][0]['gbn'])
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Temp Bricks Writing. : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
                 # Insert n-word here
 
                 # Bricks Writing is ready to be updated!
-                self.bricks_writing = temp_bricks_writing.copy()
+                self.bricks_writing = deepcopy(temp_bricks_writing)
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Bricks Writing...... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
 
                 # Debug
-                if 'bricks' in self.debug_logs:
+                if 'bricks' in self.logs:
                     print(f'{FM.debug} Brick Properties Writing.. : {self.bricks_writing}')
 
                 # Write how many properties there are
@@ -586,7 +586,7 @@ class BRCI:
                     brv_file.write(unsigned_int(len(brick_type), 1))
                     brv_file.write(small_bin_str(brick_type))
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Write Brick Types... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
@@ -681,7 +681,7 @@ class BRCI:
 
                     temp_spl: bytes = b''  # Reset
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Write Properties.... : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
@@ -719,7 +719,7 @@ class BRCI:
                     brv_file.write(unsigned_int(string_name_to_id_table[self.seat_brick], 2))
                 else: brv_file.write(b'\x00\x00')
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Write Bricks........ : {perf_counter() - previous_time :.6f} seconds')
                     previous_time = perf_counter()
 
@@ -750,7 +750,7 @@ class BRCI:
                     brv_file.write(unsigned_int(len(user_individual_appendix), 4))
                     brv_file.write(user_individual_appendix)
 
-                if 'time' in self.debug_logs:
+                if 'time' in self.logs:
                     print(f'{FM.debug} Time: Write Appendix...... : {perf_counter() - previous_time :.6f} seconds')
                     print(f'{FM.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds')
 
@@ -769,7 +769,7 @@ class BRCI:
         str_to_write += f"PROJECT FOLDER: {self.in_project_folder_directory}\n"
         str_to_write += f"PROJECT NAME: {self.project_display_name!r} [ID: {self.project_name}]\n"
         str_to_write += f"FILE DESCRIPTION: {self.file_description!r}\n"
-        str_to_write += f"DEBUG LOGS: {self.debug_logs}\n"
+        str_to_write += f"DEBUG LOGS: {self.logs}\n"
         str_to_write += named_spacer("CREATION INFORMATION") + '\n'
         str_to_write += f"BRICK COUNT: {self.brick_count}\n"
         str_to_write += f"VEHICLE SIZE [X,Y,Z] (CM): {self.vehicle_size}\n"

@@ -56,14 +56,11 @@ class FM:
     bg_light_cyan = '\x1b[106m'
     info = f'{reverse}{light_blue}[INFO]{remove_reverse}'
     success = f'{reverse}{light_green}[SUCCESS]{remove_reverse}'
-    error = f'{reverse}{light_red}[ERROR]'
-    warning = f'{reverse}{yellow}[WARNING]'
+    # error = f'{reverse}{light_red}[ERROR]'
+    warning = f'{reverse}{light_red}[WARNING]'
     debug = f'{reverse}{light_purple}[DEBUG]{remove_reverse}'
     test = f'{reverse}{light_cyan}[TEST]{remove_reverse}'
 
-    @staticmethod
-    def error_with_header(header, text):
-        print(f"{FM.error} {header}{FM.remove_reverse} \n{text}")
 
     @staticmethod
     def warning_with_header(header, text):

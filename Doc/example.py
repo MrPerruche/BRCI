@@ -7,7 +7,7 @@ if __name__ == "__main__" or True:
     data.project_name = 'no_name'
     data.project_display_name = 'no name'
     data.project_folder_directory = os.path.join(os.getcwd(), 'Projects')
-    data.debug_logs = ['time']
+    data.logs = ['time']
     data.file_description = 'no\r\ndescription'
     data.write_blank = False
 
