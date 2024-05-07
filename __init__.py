@@ -8,6 +8,7 @@ from .BRCI_RF import *
 
 # TODO Calculate vehicle_size, vehicle_weight and vehicle_worth
 # TODO Implement Brick Loading (IDEA : Exclusively load user appendix)?
+# TODO BRCI_Legacy class for legacy?
 
 # ------------------------------------------------------------
 # DEFAULT VARIABLES AND SETUP
@@ -16,7 +17,8 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C41"  # String, This is equivalent to 3.__ fyi
+_version: str = "C42"  # String, This is equivalent to 3.__ fyi
+
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -123,7 +125,7 @@ class BRCI:
         return self
 
 
-    def add_new_brick(self, brick_name: str | list[str], brick_type: str | list[str], brick: dict | list[dict], position: list[list[float]] | list[float] = None, rotation: list[list[float]] | list[float] = None):
+    def add_new_brick(self, brick_name: str | list[str], brick_type: str | list[str], brick: dict | list[dict] = None, position: list[list[float]] | list[float] = None, rotation: list[list[float]] | list[float] = None):
         if isinstance(brick_type, str):
             self.bricks.append([str(brick_name), create_brick(brick=brick_type, brick_properties=brick, position=position, rotation=rotation)])
         else:
@@ -162,6 +164,10 @@ class BRCI:
 
         return self
 
+    def clear_bricks(self):
+        self.bricks = []
+        return self
+
 
     # Add Brick Alias
     def ab(self, n: str | list[str], b: dict | list[dict]):
@@ -169,7 +175,7 @@ class BRCI:
 
 
     # Add New Brick Alias
-    def anb(self, n: str | list[str], t: str | list[str], b: dict | list[dict], pos: list[float] = None, rot: list[float] = None):
+    def anb(self, n: str | list[str], t: str | list[str], b: dict | list[dict] = None, pos: list[float] = None, rot: list[float] = None):
         return self.add_new_brick(n, t, b, pos, rot)
 
 
@@ -627,10 +633,10 @@ class BRCI:
 
                             # If it's a list of strings (=> generally list of bricks)
                             elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
-                                raise NotImplementedError('str support (utf-16) is not properly implemented yet.')
-                                # temp_pre_spl += unsigned_int(len(pt_c_val), 2) # TODO UNSURE: *2?
-                                # for pt_c_sub_val in pt_c_val:
-                                #     temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
+
+                                temp_pre_spl += unsigned_int(len(pt_c_val), 2)
+                                for pt_c_sub_val in pt_c_val:
+                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
 
 
                         else:
@@ -646,14 +652,20 @@ class BRCI:
                                     temp_pre_spl += unsigned_int(round(pt_c_val[1]), 2)
                                     temp_pre_spl += unsigned_int(round(pt_c_val[2]), 2)
                                 case '3xINT8_r':
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[0]), 1)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[1]), 1)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[2]), 1)
+                                    if isinstance(pt_c_val, int):
+                                        use_pt_c_val = [(pt_c_val >> i) & 0xFF for i in range(16, -1, -8)]
+                                    else: use_pt_c_val = pt_c_val.copy()
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[0]), 1)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[1]), 1)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[2]), 1)
                                 case '4xINT8_r':
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[0]), 1)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[1]), 1)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[2]), 1)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[3]), 1)
+                                    if isinstance(pt_c_val, int):
+                                        use_pt_c_val = [(pt_c_val >> i) & 0xFF for i in range(24, -1, -8)]
+                                    else: use_pt_c_val = pt_c_val.copy()
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[0]), 1)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[1]), 1)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[2]), 1)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[3]), 1)
                                 case '3xFLOAT32/None':
                                     temp_pre_spl += bin_float(pt_c_val[0], 4)
                                     temp_pre_spl += bin_float(pt_c_val[1], 4)

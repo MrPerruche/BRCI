@@ -5,7 +5,7 @@
 This is a list of properties all bricks (are supposed to) have.  
 NAME: `br_brick_list['default_brick_data']`
 
-- `BrickColor` (`[u8, u8, u8, u8]`) (`[0, 0, 127, 255]`)
+- `BrickColor` (`[u8, u8, u8, u8] | int`) (`[0, 0, 127, 255]`)
 - `BrickPattern` (`str`) (`Default`)
 - `BrickMaterial` (`str`) (`Plastic`)
 - `Position` (`[f32, f32, f32]`) (`[0, 0, 0]`)
@@ -86,6 +86,7 @@ It is a single boolean: `RESET (bool)`
 ### `BrickColor`
 This property correspond to the (main) color assigned to the brick. It is common to all bricks*.
 It is a list of 4 elements in the following order : `[HUE (u8), SATURATION (u8), VALUE (u8), ALPHA (u8)]`.
+It may also instead be an 8 bytes long integer : `0xHHSSVVAA`.
 
 ### `BrickMaterial`
 This property correspond to what material the brick is made of. It is common to all bricks*.
@@ -191,6 +192,7 @@ Static
 ### `DisplayColor`
 This property correspond to the display's digits color.
 It is a list of 3 unsigned 8-bit int values in the following order : `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
+It may also instead be a 6 bytes long integer : `0xHHSSVV`.
 
 ### `ExitLocation`
 This property correspond to custom exit location (if enabled).
@@ -284,6 +286,7 @@ Virus
 ### `ImageColor`
 This property correspond to what color the image is given.
 It is a list of 3 unsigned 8-bit int values in the following order : `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
+It may also instead be a 6 bytes long integer : `0xHHSSVV`.
 
 ### `InputScale`
 This property corresponds to what is technically referred as input scale. It is however counterintuitive,
@@ -396,6 +399,7 @@ This property correspond to actuators' speed. It is a single float 32 : `SPEED (
 ### `SmokeColor`
 This property correspond to the smoke color.
 It is a list of 3 elements in the following order: `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
+It may also instead be a 6 bytes long integer : `0xHHSSVV`.
 
 ### `SpawnRate`
 This property correspond to the spawn rate of particles. It is a single float 32 : `SPAWN RATE (f32)`.
@@ -452,6 +456,11 @@ This property correspond to the suspension's stiffness. It is a single float 32 
 
 ### `SwitchName`
 This property correspond to the switch's name. It is a single string (supports utf-16) : `TEXT (str)`
+
+### `TextColor`
+This property correspond to the text's color.
+It is a list of 3 elements in the following order: `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
+It may also instead be a 6 bytes long integer : `0xHHSSVV`.
 
 ### `TraceMask`
 This property correspond to what mask is applied to a sensor.
@@ -925,27 +934,27 @@ SteeringWheel_2x2x1s.. : B
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
 - `Image` (`str`) (`'Warning'`)
-- `ImageColor` (`list[int, int, int]`) (`[0, 0, 255]`)
+- `ImageColor` (`list[int, int, int] | int`) (`[0, 0, 255]`)
 
 #### Properties : D
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
 - `Text` (`str`) (`'Text'`)
-- `TextColor` (`list[int, int, int]`) (`[0, 0, 0]`)
+- `TextColor` (`list[int, int, int] | int`) (`[0, 0, 0]`)
 - `FontSize` (`int`) (`10`)
 
 #### Properties : E
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
 - `Text` (`str`) (`'Text'`)
-- `TextColor` (`list[int, int, int]`) (`[0, 0, 0]`)
+- `TextColor` (`list[int, int, int] | int`) (`[0, 0, 0]`)
 - `FontSize` (`int`) (`30`)
 
 #### Properties : F
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
 - `Text` (`str`) (`'Text'`)
-- `TextColor` (`list[int, int, int]`) (`[0, 0, 0]`)
+- `TextColor` (`list[int, int, int] | int`) (`[0, 0, 0]`)
 - `FontSize` (`int`) (`60`)
 
 ## Fire and Water
@@ -1024,7 +1033,7 @@ Switch_1x1x1s..... : D
 - `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 3, 0]`)
 - `InputChannel` (`BrickInput()`) (`BrickInput('Custom', None)`)
 - `NumFractionalDigits` (`u8`) (`1`)
-- `DisplayColor` (`[u8, u8, u8]`) (`[0, 204, 128]`)
+- `DisplayColor` (`[u8, u8, u8] | int`) (`[0, 204, 128]`)
 
 #### Properties : B
 - Default Brick Properties
@@ -1457,7 +1466,7 @@ Wheel_1x1x1...... : H
 #### Properties : C
 - Default Brick Properties
 - `InputChannel` (`BrickInput()`) (`BrickInput('Throttle', None)`)
-- `SmokeColor` (`[u8, u8, u8]`) (`[0, 0, 255]`)
+- `SmokeColor` (`[u8, u8, u8] | int`) (`[0, 0, 255]`)
 - `SpawnScale` (`f32`) (`1.0`)
 
 #### Properties : D

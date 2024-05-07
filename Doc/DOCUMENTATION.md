@@ -175,13 +175,14 @@ data.add_brick('my_brick', my_brick)
 You may do the two previous steps (`data.cb()` + `data.ab()`) in one line using `data.add_new_brick()` / `data.anb()`,
 which returns self.
 
-It has 3 mandatory arguments and 2 optional arguments :
+It has 2 mandatory arguments and 3 optional arguments :
 
 Mandatory :
-
 `brick_name` / `n` (`str | list[str]`) define what name you want to give your brick, in order to interact with it in various
 ways such as deleting / editing it, using it as an input for some bricks, etc.  
-`brick_type` / `t` (`str | list[str]`) define what type of brick you want to create.  
+`brick_type` / `t` (`str | list[str]`) define what type of brick you want to create. 
+
+Optional :
 `brick` / `b` (`dict[str: any] | list[dict[str: any]]`) define what properties are given to the brick.  
 `position` / `pos` (`list[float] | list[list[float]]`) define where the brick will be placed.  
 `rotation` / `rot` (`list[float] | list[list[float]]`) define how the brick will be rotated.
@@ -208,7 +209,7 @@ data.add_new_brick('my_brick', 'Switch_1sx1sx1s', {
 }, [10, 0, 0], [0, 180, 0])
 ```
 
-### Modifying an already implemented brick
+### Modifying an already added brick
 
 You may need to modify an already implemented brick. In this case, use `data.update_brick()` / `data.ub()` which returns self.
 
@@ -243,7 +244,7 @@ my_brick['BrickColor'] = [0, 127, 255, 255]
 data.update_brick('my_brick', my_brick)
 ```
 
-### Deleting an already implemented brick
+### Deleting an already added brick
 
 You may need to delete an already implemented brick. In this case, use `data.remove_brick()` / `data.rb()` which returns self.
 
@@ -274,6 +275,36 @@ data.ab('my_brick', my_brick)
 # Deleting our brick
 data.remove_brick('my_brick')
 ```
+
+### Deleting all already added bricks
+
+You may need to clear all implemented bricks. In this case, you may use `data.clear_bricks()`, which returns self.
+
+It takes no arguments.
+
+Here's an example on how to use `data.clear_bricks()` :
+```python
+# Initializing BRCI
+import BRCI as brci
+from os import getcwd
+
+data = brci.BRCI()
+data.project_name = 'my_first_project'
+data.project_folder_directory = getcwd()
+
+# Creating some bricks
+data.anb('first', 'Switch_1sx1sx1s')
+data.anb('second', 'DisplayBrick')
+data.anb('third', 'ScalableBrick')
+data.anb('last', 'Wing_4x8x1s_L')
+
+# Clearing all bricks
+data.clear_bricks()
+
+# No bricks left. Generating .brv will generate an empty creation.
+```
+
+
 
 ## Generating files
 
@@ -327,8 +358,48 @@ Even if it had one, which would no longer cause an error with BRCI, Brick Rigs w
 
 ## Brick Inputs
 
-`BrickInput()` is a custom class that is used to specify what inputs are given to a brick. Learn more in `BRICKS.md`.
+`BrickInput()` is a custom class that is used to specify what inputs are given to a brick. Learn more in `BRICKS.md`
+(check last property listed).
+
+
+## Implementing Modded/Missing bricks
+
+You may encounter some issues using BRCI regarding modded or newly added bricks.
+
+Note : If newly added bricks are missing, make sure to update BRCI to the latest version!
+
+In order to implement missing bricks, you must use `brci.append_multiple()`. Before explaining how to use it to
+implement missing bricks, let's check how it works:
+
+`var` (`dict`) defines is which dictionary will be modified  
+`keys` (`list`) defines which keys are going to be appended  
+`value` (`dict`) defines what is going to be appended to it  
+`gbn` (`bool`) defines if we're implementing missing bricks
+
+Now that we're familiar with this function, let's use it to create bricks:
+- `var` must be set to `brci.br_brick_list`.
+- `keys` must be a list of a brick names (names in the `.brv` file, not in-game). There may only be 1 element in this list.
+- `value` must be set to `brci.br_brick_list['default_brick_data'] | {...}`.
+Replace `...` with the list of properties, other than `Position`, `Rotation`, `BrickColor`, `BrickPattern`, `BrickMaterial`.
+`gbn` is defined with the last argument. Naturally, property names must also correspond to names in the `.brv` file, not in-game.
+If there are no other properties to add, you may remove `| {}`.
+- `gbn` must be set to `True` in order to add `gbn` keys for each. We recommend you doing it using this argument instead
+of `value`, not only to make the code harder to read but also because `gbn` must be unique to each key.
+
+Here's an example on how to use `brci.append_multiple()` to implement missing bricks:
+```python
+import BRCI as brci
+
+# Adding our new brick
+brci.append_multiple(brci.br_brick_list, ['NewFancyBrick', 'MyModdedBrick'],
+                     brci.br_brick_list['default_brick_data'] | {
+                         'ThisNewFancyProperty': 1.0,
+                         'YetAnotherNewProperty': brci.BrickInput('Custom', None)
+                     }, True)
+```
 
 
 ## Tips
 - You can use `\r\n` to create a new line. Only using `\n` will not work.
+- `brci.br_brick_list` is a dict containing all bricks and their properties. You may use it to get the list of (known)
+bricks. Keep in mind this dict also contains the element `'default_brick_data'`, which is not a brick.
