@@ -13,13 +13,33 @@ Here we will use `data = brci.BRCI()`.
 
 Last, we must edit some variables in order to use it.
 
-Mandatory :  
+Mandatory (Out of order) :  
 `data.project_name` (`str`) define what name is given to the file later generated.  
 `data.project_folder_directory` (`str`) define where the creation will be created.
 
-Optional :  
+Optional (Out of order) :  
 `data.project_display_name` (`str`) (`''`) define what name will be displayed in-game.  
 `data.file_description` (`str | None`) (`None`) define what description will be displayed in-game.  
+`data.visibility` (`int` 0-3) (`2`) define what visibility it is set to, 0 being the least restrictive (public) and 3 the
+most restrictive (private) in UI order.  
+`data.creation_timestamp` (`int | None`) (`None`) define what timestamp will be displayed in-game as creation time.
+None corresponds to timestamp at generation, int corresponds to 100-nanoseconds since 0001-01-01 00:00:00.  
+`data.update_timestamp` (`int | None`) (`None`) define what timestamp will be displayed in-game as last update time.
+None corresponds to timestamp at generation, int corresponds to 100-nanoseconds since 0001-01-01 00:00:00.  
+`data.tags` (`list[str, str, str] | None`) (`None`→`['None', 'None', 'None']`) define what tags will be displayed in-game.
+Tags :
+- 1st tag : `'None'` / `'Car'` / `'RaceCar'`
+// `'Truck'` / `'HeavyMachinery'` / `'Plane'`
+// `'Helicopter'` / `'Tank'` / `'Train'`
+// `'Trailer'` / `'Prop'` / `'Building'`
+// `'Ship'` / `'SpaceCraft'` / `'Bus'`
+// `'Motorcycle'`
+- 2nd tag : `'None'` / `'_1800s'` / `'_1900s'`
+// `'_2000s'` / `'Futuristic'` / `'Ancient'`
+// `'WW2'` / `'WW1'`
+- 3rd tag : `'None'`/ `'Civil'` / `'Military'`
+// `'Police'` / `'FireDepartment'`
+
 `data.logs` (`list[str] | None`) (`None`→`[]`) define what logs will be printed :
 - `'time'` will print how long each step takes to generate.
 - `'bricks'` will print debug information about bricks.
@@ -397,6 +417,12 @@ brci.append_multiple(brci.br_brick_list, ['NewFancyBrick', 'MyModdedBrick'],
                          'YetAnotherNewProperty': brci.BrickInput('Custom', None)
                      }, True)
 ```
+
+
+## Metadata.brm
+
+
+
 
 
 ## Tips

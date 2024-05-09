@@ -1,6 +1,7 @@
 import os
 # from warnings import warn as raise_warning
 from copy import deepcopy
+from datetime import datetime
 
 from .BRCI_RF import *
 
@@ -17,7 +18,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C42"  # String, This is equivalent to 3.__ fyi
+_version: str = "C43"  # String, This is equivalent to 3.__ fyi
 
 
 # Important variables
@@ -60,11 +61,14 @@ class BRCI:
                  project_name='',
                  write_blank=False,
                  project_display_name='',
-                 file_description='',
+                 file_description=None,
                  logs=None,
                  user_appendix: list[bytes] = None,
                  seat_brick=None,
-                 ):
+                 visibility=2,
+                 tags=None,
+                 creation_timestamp=None,
+                 update_timestamp=None):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -82,6 +86,13 @@ class BRCI:
         self.logs = logs # List of logs to print
         self.user_appendix = user_appendix # List (User appendix)
         self.seat_brick = seat_brick
+        self.visibility = visibility
+        if tags is None:
+            tags = ['None', 'None', 'None']
+        self.tags = tags
+        self.creation_timestamp = creation_timestamp
+        self.update_timestamp = update_timestamp
+
 
 
     # Creating more variables
@@ -152,18 +163,25 @@ class BRCI:
 
     # Removing bricks from the brick list
     def remove_brick(self, brick_name: str | list[str]):
-        self.bricks = [sublist for sublist in self.bricks if sublist[0] not in brick_name]
+        for sublist in self.bricks:
+            if sublist[0] == brick_name:
+                self.bricks.remove(sublist)
+                break
 
         return self
 
 
     # Updating a currently existing brick
     def update_brick(self, brick_name: str | list[str], new_brick: dict | list[dict]):
-        self.remove_brick(brick_name)
-        self.add_brick(brick_name, new_brick)
+        for sublist in self.bricks:
+            if sublist[0] == brick_name:
+                sublist[1] = new_brick
+                break
 
         return self
 
+
+    # Deleting all bricks
     def clear_bricks(self):
         self.bricks = []
         return self
@@ -276,10 +294,10 @@ class BRCI:
                 metadata_file.write(bin_str(self.project_display_name)[2:])
 
                 # Write all necessary information for the file description
-                watermarked_file_description = f"Created using BRCI (Version {_version}).\n" \
-                                               f"Join our discord for more information : sZXaESzDd9\n\n" # String
+                watermarked_file_description = f"Created using BRCI (Version {_version}).\r\n" \
+                                               f"Join our discord for more information : sZXaESzDd9" # String
                 if self.file_description is not None:
-                    watermarked_file_description += f'Description:\n{self.file_description}.'
+                    watermarked_file_description += f'\r\n\r\nDescription:\r\n{self.file_description}'
                 metadata_file.write(signed_int(-len(watermarked_file_description), 2))
                 metadata_file.write(bin_str(watermarked_file_description)[2:])
 
@@ -292,23 +310,29 @@ class BRCI:
                 metadata_file.write(bin_float(self.vehicle_worth, 4))
 
                 # Writes the author. We don't want it to be listed, so we write invalid data.
-                metadata_file.write(bytes.fromhex('FFFFFFFFFFFFFFFF')) # What if a steam ID someday reaches this limit? Never!
+                metadata_file.write(unsigned_int(16, 1))
+                metadata_file.write(b'\x00' * 8)
 
-                # I have no fucking clue of what I'm writing but hey it's something right?
-                metadata_file.write(bytes.fromhex("14686300000000B034B6C7382ADC08E079251F392ADC08")) # Peak programming. TODO Figure out what the fuck we're writing here
+                # Write time (100 nanosecond Gregorian bigint value)
+                # Creation Time
+                if self.creation_timestamp is None:
+                    metadata_file.write(unsigned_int(int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 1e7), 8))
+                else:
+                    metadata_file.write(unsigned_int(self.creation_timestamp, 8))
+                # Update Time
+                if self.update_timestamp is None:
+                    metadata_file.write(unsigned_int(int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 1e7), 8))
+                else:
+                    metadata_file.write(unsigned_int(self.update_timestamp, 8))
 
 
-                # Write a function for a very specific and stupid purpose
-                def write_tags_to_file(tag1: str = "Other", tag2: str = "Other", tag3: str = "Other"):
-                    metadata_file.write(unsigned_int(3, 1))
-                    for i in range(3):
-                        metadata_file.write(unsigned_int(5, 1))
-                        metadata_file.write(small_bin_str(locals()[f"tag{i+1}"])) # "locals()" returns the dict of all variables in the current scope
-                        # Trying to modify said dict will actually add a new variable or change an existing one. I don't know why, since it is returning the *current* variables.
+                # Write visibility mode
+                metadata_file.write(unsigned_int(self.visibility, 1))
 
+                for tag in self.tags:
+                    metadata_file.write(unsigned_int(len(tag), 1))
+                    metadata_file.write(small_bin_str(tag))
 
-                # Writing tags                                                                                          FIXME
-                write_tags_to_file() # TODO: Add a way to input tags. For now, they are all "Other"
 
     # Writing the project folder to brick rigs # only works on windows
     def write_to_br(self) -> None:
