@@ -1,4 +1,4 @@
-from .functions import append_multiple, BrickInput
+from .functions import append_multiple, BrickInput, FM
 
 br_brick_materials = {
     'Aluminium': {'price': 2.00, 'density': 2.70,  'strength': 7.50, 'friction': 0.57, 'restitution': 0.10},
@@ -592,6 +592,27 @@ append_multiple(br_brick_list, ['Winch_3x2x1'],
 
 
 # -------------------------------------------------
+# EXPERIMENTAL [LAST UPDATE: 1.6.3 MAIN]
+# -------------------------------------------------
+
+
+def enable_exp_features():
+
+    exp_branch_exist: bool = False
+
+    if not exp_branch_exist:
+        FM.warning_with_header('No experimental branch.',
+                               'It appears you attempted to enable experimental branch features.\n'
+                               'Please ensure you are using the latest BRCI update. Updating BRCI takes time!\n'
+                               'And the latest versions may not support new content yet.\n'
+                               'You may also mod new bricks. Read Doc\DOCUMENTATION.md, section "Implementing Modded/Missing bricks"')
+
+    else:
+
+        pass
+
+
+# -------------------------------------------------
 # PROPERTIES
 # --------------------------------------------------
 
@@ -602,6 +623,7 @@ Order for Connector Spacing in UI: [1.6.3]
     [5] [4]
 """
 
+"""
 br_special_property_instance_list = {
     'BrickColor': '4xINT8_r',
     'BrickSize': '3xINT16_r',
@@ -615,4 +637,71 @@ br_special_property_instance_list = {
     'ImageColor': '3xINT8_r',
     'Text': 'UTF-16',
     'TextColor': '3xINT8_r'
+}
+"""
+
+# TODO. WORK IN PROGRESS! SOME PROPERTIES MAY BE MISSING.
+br_property_types = {
+    'ActuatorMode': 'str8',
+    'AmmoType': 'str8',
+    'bAccumulated': 'bool',
+    'bAccumulateInput': 'bool',
+    'bCanDisableSteering': 'bool',
+    'bCanInvertSteering': 'bool',
+    'bDriven': 'bool',
+    'bGenerateLift': 'bool',
+    'bHasBrake': 'bool',
+    'bHasHandBrake': 'bool',
+    'bInvertDrive': 'bool',
+    'bInvertTankSteering': 'bool',
+    'BrakeStrength': 'float',
+    'bReturnToZero': 'bool',
+    'BrickColor': 'list[4*uint8]',
+    'BrickMaterial': 'str8',
+    'BrickPattern': 'str8',
+    'BrickSize': 'list[3*uint16]',
+    'Brightness': 'float',
+    'bTankDrive': 'bool',
+    'ConnectorSpacing': 'list[6*uint2]',
+    'CouplingMode': 'str8',
+    'DisplayColor': 'list[3*uint8]',
+    'ExitLocation': 'list[3*float]',
+    'FlashSequence': 'str8',
+    'FuelType': 'str8',
+    'FontSize': 'float',
+    'GearRatioScale': 'float',
+    'HornPitch': 'float',
+    'Image': 'str8',
+    'ImageColor': 'list[3*uint8]',
+    'InputScale': 'float',
+    'LightConeAngle': 'float',
+    'LightDirection': 'str8',
+    'MaxAngle': 'float',
+    'MaxLimit': 'float',
+    'MinAngle': 'float',
+    'MinLimit': 'float',
+    'NumFractionalDigits': 'uint8',
+    'Operation': 'str8',
+    'OutputChannel.MinIn': 'float',
+    'OutputChannel.MinOut': 'float',
+    'OutputChannel.MaxIn': 'float',
+    'OutputChannel.MaxOut': 'float',
+    'OwningSeat': 'brick_id',
+    'SensorType': 'str8',
+    'SirenType': 'str8',
+    'SmokeColor': 'list[3*uint8]',
+    'SpawnScale': 'float',
+    'SpeedFactor': 'float',
+    'SteeringAngle': 'float',
+    'SteeringSpeed': 'float',
+    'SuspensionDamping': 'float',
+    'SuspensionLength': 'float',
+    'SuspensionStiffness': 'float',
+    'SwitchName': 'str16',
+    'Text': 'str16',
+    'TextColor': 'list[3*uint8]',
+    'TirePressureRatio': 'float',
+    'TraceMask': 'str8',
+    'WinchSpeed': 'float'
+    # IDEA : Also make it support 'bin' type for manual operation for mods.
 }

@@ -414,18 +414,76 @@ import BRCI as brci
 brci.append_multiple(brci.br_brick_list, ['NewFancyBrick', 'MyModdedBrick'],
                      brci.br_brick_list['default_brick_data'] | {
                          'ThisNewFancyProperty': 1.0,
-                         'YetAnotherNewProperty': brci.BrickInput('Custom', None)
+                         'YetAnotherNewProperty': brci.BrickInput('Custom', None),
+                         'BinaryProperty': b'Abcd',
+                         'CustomProperty': ['say_hello', 'James']
+                     }, True)
+
+# Note that this will now work. Here's why : (See documentation below)
+```
+
+If your new brick(s) involve new properties, you must add to the `brci.br_property_types` dictionary every single new
+property and their type. It may be one of these :
+- `bin` (Later discussed)
+- `bool` : Boolean
+- `brick_id` : A single brick. (String)
+- `custom` : (Later discussed)
+- `float` : Single precision float.
+- `list[3*float]` : A list of 3 single precision float values.
+- `list[3*uint8]` : A list of 3 unsigned 8-bit integer values. Also accept a single unsigned 24-bit integer value (e.g. `0x7AD608`).
+- `list[4*uint8]` : A list of 4 unsigned 8-bit integer values. Also accept a single unsigned 32-bit integer value (e.g. `0x7AD608CF`).
+- `list[6*uint2]` : A list of 6 unsigned 2-bit integer values. Also accept a single unsigned 12-bit integer value (e.g. `0xAD6`).
+- `str8` : A utf-8 string.
+- `str16` : A utf-16 string.
+- `uint8` : Single unsigned 8-bit integer.
+
+Concerning `bin` :
+This type will directly write binary data to your `brv` file.
+It is only made available for mods, and is not used by default by BRCI.
+
+Concerning `custom` :
+This will take a lambda function that will be executed and is expected to return a bytes object.
+(e.g. `'CustomProperty': lambda: say_hello('world')`)
+
+Here's an example on how to use `brci.append_multiple()`, as-well as setup required info.
+```python
+import BRCI as brci
+
+brci.br_property_types += {'ThisNewFancyProperty': 'float'}
+# Since YetAnotherNewProperty is using the BrickInput() type, we do not add it to the dict.
+brci.br_property_types += {'BinaryProperty': 'bin'}
+brci.br_property_types += {'CustomProperty': 'custom'}
+
+def say_hello(name):
+    text = f'Hello, {name}!'
+    return brci.unsigned_int(len(text), 1) + brci.small_bin_str(text)
+
+# Adding our new brick
+brci.append_multiple(brci.br_brick_list, ['NewFancyBrick', 'MyModdedBrick'],
+                     brci.br_brick_list['default_brick_data'] | {
+                         'ThisNewFancyProperty': 1.0,
+                         'YetAnotherNewProperty': brci.BrickInput('Custom', ['MyFunction', 'MyArgument']),
+                         'BinaryProperty': b'Abcd',
+                         'CustomProperty': lambda: say_hello('world')
                      }, True)
 ```
 
-
-## Metadata.brm
-
-
-
+As you may have seen, you have a few functions to your disposition to convert to binary:
+- `brci.unsigned_int(integer, byte_len)` will convert to an unsigned little endian integer of the specified byte length.
+(e.g. `brci.unsigned_int(1234, 2)` will return the 16-bit unsigned integer `0x4D2`).
+- `brci.signed_int(integer, byte_len)` will convert to a signed little endian integer of the specified byte length.
+(e.g. `brci.signed_int(-1234, 2)` will return the 16-bit signed integer `0x2EFB`).
+- `brci.bin_float(float_number, byte_len)` will convert to a little endian float of the specified byte length.
+It only supports single precision (`byte_len=4`) and double precision (`byte_len=8`) floating point numbers.
+(e.g. `brci.bin_float(1234.5, 4)` will return the 32-bit little endian float `0x00509A44`).
+- `brci.bin_str(string)` will convert to an utf-16 string. It was only made for better readability.
+- `brci.small_bin_str(string)` will convert to an utf-8 string. It was only made for better readability.
+- All the previously mentioned functions in this will also have a duplicate with the `r_` prefix, standing for reverse.
+(e.g. `brci.r_bin_float(brci.bin_float(1234.5, 2))` will return float `1234.5`).
 
 
 ## Tips
 - You can use `\r\n` to create a new line. Only using `\n` will not work.
 - `brci.br_brick_list` is a dict containing all bricks and their properties. You may use it to get the list of (known)
 bricks. Keep in mind this dict also contains the element `'default_brick_data'`, which is not a brick.
+

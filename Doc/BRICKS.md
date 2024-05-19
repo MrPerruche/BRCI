@@ -44,7 +44,7 @@ TargetSeeking
 Guided
 ```
 
-### `bAcumulated`
+### `bAccumulated`
 This property correspond to if the brick accumulate its input
 (e.g. for flaps if they conserve their current position upon no longer receiving an input)
 It is a single boolean : `ACCUMULATED (bool)`.
@@ -75,6 +75,9 @@ This property correspond to if the axle can hand brake. It is a single boolean :
 
 ### `bInvertDrive`
 It is a single boolean : `INVERT DRIVE (bool)`.
+
+### `bInvertTankSteering`
+It is a single boolean : `INVERT TANK STEER (bool)`.
 
 ### `BrakeStrength`
 This property correspond to the brake's strength. It is a single float 32 : `BRAKE STRENGTH (f32)`.
@@ -174,6 +177,10 @@ It is a list of 3 elements in the following order :
 ### `Brightness`
 This property correspond to how light a light is (Ratio, not in percents). It is a single float 32 : `BRIGHTNESS (f32)`
 
+### `bTankDrive`
+This property correspond to how the engine will interact with the wheels (Regular / Tank drive).
+It is a single boolean : `TANK DRIVE (bool)`
+
 ### `ConnectorSpacing`
 This property correspond to the brick's connector spacing. It is NOT common to all bricks.
 It is a list of 6 elements in the following order: `[UR (u2), UL (u2), MR (u2), ML (u2), BR (u2), BL (u2)]`.
@@ -223,6 +230,9 @@ RunningLight_04_Sequence
 Strobe_Sequence
 ```
 
+### `FontSize`
+This property correspond to the font's size. It is a single float 32: `FONT SIZE (f32)`.
+
 ### `FuelType`
 This property correspond to what fuel is inside the fuel tank. It is a single string : `FUEL TYPE (str)`. Input list:
 ###### In Brick Rigs 1.6.3 UI order
@@ -244,6 +254,12 @@ BRCI failing to generate the creation; Brick Rigs failing to load the creation, 
 Defined values not corresponding to what's expected.
 Modifying this "property" will not in any way update this brick's property list. To change what brick type your variable
 is defined to, use `create_brick(brick_type)` again. Be aware this command will clear any previously edited properties
+
+### `GearRatioScale`
+This property correspond to the engine's gear ratio. It is a single float 32 : `GEAR RATIO (f32)`
+
+### `HornPitch`
+This property correspond to the pitch of the horn. It is a single float 32 : `HORN PITCH (f32)`.
 
 ### `Image`
 This property corresponds to what image is being displayed. It is a single string `IMAGE (str)`. Input list:
@@ -393,17 +409,6 @@ Although rotation is defined as a property in BRCI, it is not a property in Bric
 It is a list of 3 elements corresponding to the brick's rotation relative to the origin in degrees,
 in the following order: `[ROT_Y (deg) (f32), ROT_Z (deg) (f32), ROT_X (deg) (f32)]`.
 
-### `SpeedFactor`
-This property correspond to actuators' speed. It is a single float 32 : `SPEED (f32)`.
-
-### `SmokeColor`
-This property correspond to the smoke color.
-It is a list of 3 elements in the following order: `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
-It may also instead be a 6 bytes long integer : `0xHHSSVV`.
-
-### `SpawnRate`
-This property correspond to the spawn rate of particles. It is a single float 32 : `SPAWN RATE (f32)`.
-
 ### `SensorType`
 This property correspond to the sensor's type. It is a single string : `SENSOR TYPE (str)`. Input list:
 ```
@@ -437,6 +442,17 @@ PoliceGerman
 TruckHorn
 ```
 
+### `SmokeColor`
+This property correspond to the smoke color.
+It is a list of 3 elements in the following order: `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
+It may also instead be a 6 bytes long integer : `0xHHSSVV`.
+
+### `SpawnScale`
+This property correspond to the spawn rate of particles. It is a single float 32 : `SPAWN RATE (f32)`.
+
+### `SpeedFactor`
+This property correspond to actuators' speed. It is a single float 32 : `SPEED (f32)`.
+
 ### `SteeringAngle`
 This property correspond to the maximum angle at which the axle will rotate the wheel.
 It is a single float 32 : `STEERING ANGLE (deg) (f32)`.
@@ -457,10 +473,16 @@ This property correspond to the suspension's stiffness. It is a single float 32 
 ### `SwitchName`
 This property correspond to the switch's name. It is a single string (supports utf-16) : `TEXT (str)`
 
+### `Text`
+This property correspond to the text. It is a single string (supports utf-16) : `TEXT (str)`
+
 ### `TextColor`
 This property correspond to the text's color.
 It is a list of 3 elements in the following order: `[HUE (u8), SATURATION (u8), VALUE (u8)]`.
 It may also instead be a 6 bytes long integer : `0xHHSSVV`.
+
+### `TirePressureRatio`
+This property correspond to how much pressure is in the tire. It is a single float 32 : `PRESSURE (f32)`
 
 ### `TraceMask`
 This property correspond to what mask is applied to a sensor.

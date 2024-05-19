@@ -77,56 +77,22 @@ def unsigned_int(integer, byte_len):
 
     return (integer & ((1 << (8 * byte_len)) - 1)).to_bytes(byte_len, byteorder='little', signed=False)
 
+def r_unsigned_int(bin_value):
+    return int.from_bytes(bin_value, byteorder='little', signed=False)
+
 
 # Function to write signed negative integers of any byte length. Used for utf-16 encoding
 def signed_int(integer, byte_len):
     return integer.to_bytes(byte_len, byteorder='little', signed=True)
 
+def r_signed_int(bin_value):
+    return int.from_bytes(bin_value, byteorder='little', signed=True)
+
 
 # Function to write half, single and double precision float number
 def bin_float(float_number, byte_len):
 
-    if byte_len == 2:
-        # Convert the float to a  32-bit integer representation
-        float_bits = struct.unpack('<I', struct.pack('<f', float_number))[0]
-
-        # Extract the sign, exponent, and mantissa from the float bits
-        sign = (float_bits >> 16) & 0x8000
-        exponent = (float_bits >> 23) & 0xFF
-        mantissa = float_bits & 0x7FFFFF
-
-        # Handle special cases
-        if exponent == 255:
-            # Infinity or NaN
-            if mantissa:
-                # NaN, return a half-precision NaN
-                return struct.pack('<H', 0x7C00 | (mantissa >> 13))
-            else:
-                # Infinity, return a half-precision infinity
-                return struct.pack('<H', sign | 0x7C00)
-
-        # Subtract the bias from the exponent
-        exponent -= 127
-
-        # Check for overflow or underflow
-        if exponent < -24:
-            # Underflow, return zero
-            return struct.pack('<H', sign)
-        elif exponent > 15:
-            # Overflow, return infinity
-            return struct.pack('<H', sign | 0x7C00)
-
-        # Normalize the mantissa and adjust the exponent
-        mantissa >>= 13
-        exponent += 15
-
-        # Combine the sign, exponent, and mantissa into a half-precision float
-        half_float_bits = (sign << 15) | (exponent << 10) | mantissa
-
-        # Pack the half-precision float bits into a  16-bit binary string
-        return struct.pack('<H', half_float_bits)
-
-    elif byte_len == 4:  # Single-precision float
+    if byte_len == 4:  # Single-precision float
         float_bytes = struct.pack('<f', float_number)
     elif byte_len == 8:  # Double-precision float
         float_bytes = struct.pack('<d', float_number)
@@ -137,15 +103,31 @@ def bin_float(float_number, byte_len):
 
     return padded_bytes
 
+def r_bin_float(bin_value):
+
+    if len(bin_value) == 4:  # Single-precision float
+        return struct.unpack('<f', bin_value)[0]
+    elif len(bin_value) == 8:  # Double-precision float
+        return struct.unpack('<d', bin_value)[0]
+    else:
+        raise ValueError("Invalid byte length for float")
+
 
 # Function to write with utf-16 encoding (Neg. length excluded)
 def bin_str(string):
     return string.encode('utf-16')
 
 
+def r_bin_str(bin_value):
+    return bin_value.decode('utf-16')
+
+
 # Function to write with utf-8 encoding (Length excluded)
 def small_bin_str(string):
     return string.encode('utf-8')
+
+def r_small_bin_str(bin_value):
+    return bin_value.decode('utf-8')
 
 
 # Function to copy existing files into new directories
@@ -169,7 +151,12 @@ def append_multiple(var, keys, value, gbn=False):
             var[key]['gbn'] = key
 
 
+# Function to remove & return bytes like .pop()
+def b_pop(byte_array, len):
+    removed_bytes = byte_array[:len]
+    del byte_array[:len]
 
+    return removed_bytes
 
 
 @dataclass
