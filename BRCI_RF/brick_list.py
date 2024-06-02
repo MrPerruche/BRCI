@@ -605,7 +605,7 @@ def enable_exp_features():
                                'It appears you attempted to enable experimental branch features.\n'
                                'Please ensure you are using the latest BRCI update. Updating BRCI takes time!\n'
                                'And the latest versions may not support new content yet.\n'
-                               'You may also mod new bricks. Read Doc\DOCUMENTATION.md, section "Implementing Modded/Missing bricks"')
+                               'You may also mod new bricks. Read Doc\\DOCUMENTATION.md, section "Implementing Modded/Missing bricks"')
 
     else:
 

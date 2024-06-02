@@ -2,7 +2,8 @@ import os
 # from warnings import warn as raise_warning
 from copy import deepcopy
 from datetime import datetime
-from types import LambdaType
+from time import perf_counter
+from math import isclose
 
 from .BRCI_RF import *
 
@@ -19,18 +20,18 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C44"  # String, This is equivalent to 3.__ fyi
+_version: str = "C45"  # String, This is equivalent to 3.__ fyi
 
 """
 Changelog :
-- Fixed various mistakes in Doc\\DOCUMENTATION.md and Doc\\BRICKS.md.
-- New enable_exp_features() (Do nothing)
-- New .wip_features (Enable some functions)
-- New .load_brv() (Work in progress)
-- Functions to convert to bytes such as brci.bin_float() are now officially part of BRCI as a tool to implement modded bricks.
-- New reverse functions to convert from bytes, with the same names as the previously established + r_ prefix.
-- New br_property_types dictionary replacing br_special_property_instance_list.
-- Revamped the way properties and handled in order to improve modularity. This also include new `bin` / `custom` types for modded bricks.
+- Implemented Brick Loading
+- New function get_all_bricks(output_as_dict) to retrieve all bricks
+- New function get_brick(name) to retrieve bricks with a specified name
+- New function search_brick(...) to retrieve bricks depending on a large range of filters.
+- Added warning when exceeding 50,000 bricks
+- Fixed warning when loading brick_list.py 
+- Fixed major buh with 2 different properties having different values
+- Integer IDs are now specifically allowed
 """
 
 
@@ -166,7 +167,7 @@ class BRCI:
         for sublist in self.bricks:
             if sublist[0] == brick_name:
                 self.bricks.remove(sublist)
-                break
+                if isinstance(brick_name, str): break
 
         return self
 
@@ -176,9 +177,131 @@ class BRCI:
         for sublist in self.bricks:
             if sublist[0] == brick_name:
                 sublist[1] = new_brick
-                break
+                if isinstance(brick_name, str) : break
 
         return self
+
+
+    # Retrieving bricks from self.bricks
+    def get_brick(self, brick_name: str | list[str]) -> list[dict[str, any]]:
+        if isinstance(brick_name, str):
+            brick_names: list[dict[str, any]] = [sublist for sublist in self.bricks if sublist[0] == brick_name]
+        else:
+            brick_names: list[dict[str, any]] = [sublist for sublist in self.bricks if sublist[0] in brick_name]
+        return brick_names
+
+
+    def search_brick(self,
+                     names: list[str | int] = None,
+                     has_property: list[str] = None,
+                     has_value: any = None,
+                     has_value_in_range: tuple[int | float] = None,
+                     has_item: dict[str, any] = None,
+                     has_item_in_range: dict[str, tuple[int | float]] = None,
+                     is_brick: list[str] = None,
+                     criteria: str = 'and',
+                     output_as_dict: bool = False,
+                     tolerance_factor: float = 1e-6):
+        
+        met_criteria = {key: False for key, value in {
+            'names': names,
+            'has_property': has_property,
+            'has_value': has_value,
+            'has_value_in_range': has_value_in_range,
+            'has_item': has_item,
+            'has_item_in_range': has_item_in_range,
+            'is_brick': is_brick
+        }.items() if value is not None}
+
+        output_bricks: list[list[dict[str, any]]] = []
+
+        tolerance = 1 + tolerance_factor
+
+        for brick in self.bricks:
+
+            brick_met_criteria = met_criteria.copy()
+
+            # If brick match with a name
+            if names is not None and brick[0] in names:
+
+                brick_met_criteria['names'] = True
+
+            # If it is a brick
+            if is_brick is not None and brick[1]['gbn'] in is_brick:
+
+                brick_met_criteria['is_brick'] = True
+
+            has_item_mc: int = 0
+            has_item_mcir: int = 0
+
+            type_has_value = type(has_value)
+
+            # Checking properties
+            for brick_property, brick_value in brick[1].items():
+
+                type_brick_value = type(brick_value)
+
+                # If it has the correct property
+                if has_property is not None and brick_property in has_property:
+
+                    brick_met_criteria['has_property'] = True
+
+                # If it has the correct value
+                if has_value is not None:
+                    if type_has_value in (int, float) and type_brick_value in (int, float):
+                        if abs(brick_value - has_value) <= tolerance_factor*has_value:
+                            brick_met_criteria['has_value'] = True
+                    else:
+                        if has_value == brick_value:
+                            brick_met_criteria['has_value'] = True
+
+                # If it has a value within a certain range (numbers only)
+                if has_value_in_range is not None:
+                    if has_value_in_range[0] / tolerance <= brick_value <= has_value_in_range[1] * tolerance:
+                        brick_met_criteria['has_value_in_range'] = True
+
+                # If it has the property with the value
+                if has_item is not None:
+
+                    if brick_property in has_item.keys():
+                        if type(has_item[brick_property]) in (int, float) and type_brick_value in (int, float):
+                            has_item_mc += abs(brick_value - has_item[brick_property]) <= tolerance_factor*has_item[brick_property]
+                        else:
+                            has_item_mc += brick_value == has_item[brick_property]
+
+                # If it has the property with the value being a number in a certain range
+                if has_item_in_range is not None:
+
+                    if brick_property in has_item.keys():
+                        has_item_mcir += has_item[brick_property][0] / tolerance <= brick_value <= has_item[brick_property][0] * tolerance
+
+            # Check if 'has_item' matched
+            if has_item is not None and has_item_mc == len(has_item):
+                brick_met_criteria['has_item'] = True
+            if has_item_in_range is not None and has_item_mcir == len(has_item_in_range):
+                brick_met_criteria['has_item_in_range'] = True
+
+            # Outputting our brick if it's correct
+            if criteria == 'and' and all(brick_met_criteria.values()):
+                output_bricks.append(brick)
+            elif criteria == 'or' and any(brick_met_criteria.values()):
+                output_bricks.append(brick)
+            elif criteria == 'not and' and (not all(brick_met_criteria.values())):
+                output_bricks.append(brick)
+            elif criteria == 'not or' and (not any(brick_met_criteria.values())):
+                output_bricks.append(brick)
+
+        if output_as_dict:
+            return {brick[0]: brick[1] for brick in output_bricks}
+
+        return output_bricks
+
+
+    def get_all_bricks(self, output_as_dict: bool = False):
+        if output_as_dict:
+            return {brick[0]: brick[1] for brick in self.bricks}
+
+        return self.bricks
 
 
     # Deleting all bricks
@@ -207,6 +330,11 @@ class BRCI:
         return self.update_brick(n, b)
 
 
+    # Get brick Alias
+    def gb(self, n: str | list[str]) -> list[dict[str, any]]:
+        return self.get_brick(n)
+
+
 
     def ensure_valid_variable_type(self, variable_name: str, occured_when: str) -> None:
         match variable_name:
@@ -216,10 +344,14 @@ class BRCI:
                     self.write_blank = False
             case 'bricks_len':
                 if len(self.bricks) > 65535:
-                    FM.warning_with_header("Too many bricks.",
+                    FM.warning_with_header("Too many bricks for BRCI.",
                         f"Whilst {occured_when}, the length of the list of bricks was found to exceed 65,535.\n"
                         f"Therefore, the last {len(self.bricks)-65535 :,} brick(s) were removed. 65,535 bricks left.")
                     self.bricks = self.bricks[:65535]
+                if len(self.bricks) > 50000:
+                    FM.warning_with_header("Too many bricks for Brick Rigs.",
+                        f"Whilst {occured_when}, the length of the list of bricks was found to exceed 50,000.\n"
+                        f"Although BRCI can generate up to 65,535 bricks; Brick Rigs will only load 50,000 of them.")
             case 'logs':
                 logs_whitelist_list: list[str] = ['time', 'bricks']
                 invalid_logs_list: list[str] = []
@@ -247,7 +379,7 @@ class BRCI:
 
 
     # Writing preview.png
-    def write_preview(self) -> None:
+    def write_preview(self, file_name: str = 'Preview.png') -> None:
 
         _write_preview_regular_image_path = os.path.join(_cwd, 'Resources', 'BRCI_Preview_Default.png') # Path
 
@@ -257,34 +389,34 @@ class BRCI:
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            FM.warning_with_header("Image not found", "Whilst writing Preview.png, we were unable to find BRCI default image. Please retry.")
+            FM.warning_with_header("Image not found", f"Whilst writing preview ({file_name}) we were unable to find BRCI default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
-            if os.path.exists(os.path.join(self.in_project_folder_directory, "Preview.png")):
-                FM.warning_with_header("Preview.png already created", "Whilst writing Preview.png, we noticed it was already added.\nThe old Preview.png was therefore replaced.")
-                os.remove(os.path.join(self.in_project_folder_directory, "Preview.png"))
+            if os.path.exists(os.path.join(self.in_project_folder_directory, file_name)):
+                FM.warning_with_header("Preview.png already created", f"Whilst writing preview ({file_name}), we noticed it was already added.\nThe old Preview.png was therefore replaced.")
+                os.remove(os.path.join(self.in_project_folder_directory, file_name))
 
             copy_file(os.path.join(_write_preview_regular_image_path),
-                os.path.join(self.in_project_folder_directory, "Preview.png"))
+                os.path.join(self.in_project_folder_directory, file_name))
 
     # Writing metadata.brm file
-    def write_metadata(self) -> None:
+    def write_metadata(self, file_name: str = 'MetaData.brm') -> None:
 
         # Create folder if missing
         self.ensure_project_directory_exists()
-        self.ensure_valid_variable_type('write_blank', 'writing MetaData.brm')
-        self.ensure_valid_variable_type('bricks_len', 'writing MetaData.brm')
+        self.ensure_valid_variable_type('write_blank', f'writing {file_name}')
+        self.ensure_valid_variable_type('bricks_len', f'writing {file_name}')
 
         # Write blank file for metadata (if desired)
         if self.write_blank:
 
-            with open(os.path.join(self.in_project_folder_directory, "MetaData.brm"), "x"):
+            with open(os.path.join(self.in_project_folder_directory, file_name), "x"):
                 pass
 
         # Otherwise write working metadata file
         else:
-            with open(os.path.join(self.in_project_folder_directory, "MetaData.brm"), 'wb') as metadata_file:
+            with open(os.path.join(self.in_project_folder_directory, file_name), 'wb') as metadata_file:
 
                 # Writes Carriage Return char
                 metadata_file.write(unsigned_int(13, 1))
@@ -345,15 +477,14 @@ class BRCI:
         full_path = os.path.join(user_home, relative_path, self.project_name)
 
         try:
-                # Remove the destination folder if it exists
+            # Remove the destination folder if it exists
             if os.path.exists(full_path):
                 shutil.rmtree(full_path)
             # Copy the folder
             shutil.copytree(self.in_project_folder_directory, full_path)
-            print(f"Folder cloned successfully from '{self.in_project_folder_directory}' to '{full_path}'.")
         except OSError as e:
             # Failed for some reason -_-
-            print(f"Failed to clone folder: {e}")
+            FM.warning_with_header(f"Failed to clone folder: {e}", f"This may be because .write_to_br() function was made for Windows.")
 
     # Sharing some variables from writing vehicle.brv to the rest of the class
     bricks_writing = []
@@ -364,23 +495,22 @@ class BRCI:
 
 
     # Writing Vehicle.brv
-    def write_brv(self) -> None:
+    def write_brv(self, file_name: str = 'Vehicle.brv') -> None:
 
         self.ensure_project_directory_exists()
 
         # Verify self.write_blank is valid.
-        self.ensure_valid_variable_type('write_blank', 'writing Vehicle.brv')
+        self.ensure_valid_variable_type('write_blank', f'writing {file_name}')
 
         # Write blank file for vehicle (if desired)
         if self.write_blank:
-            blank_brv = open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), "x")
+            blank_brv = open(os.path.join(self.in_project_folder_directory, file_name), "x")
             blank_brv.close()
 
         # Otherwise write working vehicle file
         else:
 
             # Show generation time if debug logs
-            from time import perf_counter
             previous_time = perf_counter()
             begin_time = perf_counter()
 
@@ -407,7 +537,7 @@ class BRCI:
                             prop_mp_temp = property_value_mp.properties()
                             # If it's incorrect
                             if isinstance(prop_mp_temp, str) and prop_mp_temp == 'invalid_source_bricks':
-                                FM.warning_with_header("Invalid type for brick list.",f"Whilst writing Vehicle.brv,"
+                                FM.warning_with_header("Invalid type for brick list.",f"Whilst writing vehicle ({file_name}),"
                                     f"we noticed {property_key_mp} (from brick {brick_mp[0]!r}) was not set to a list."
                                     f"\nIt was set to type {type(property_value_mp).__name__}. It is now set to None, corresponding to no inputs.")
                                 property_value_mp.brick_input = []
@@ -423,10 +553,10 @@ class BRCI:
 
 
             # Verify if there are too many bricks
-            self.ensure_valid_variable_type('bricks_len', 'writing Vehicle.brv')
-            self.ensure_valid_variable_type('logs', 'writing Vehicle.brv')
+            self.ensure_valid_variable_type('bricks_len', f'writing {file_name}')
+            self.ensure_valid_variable_type('logs', f'writing f{file_name}')
 
-            with (open(os.path.join(self.in_project_folder_directory, "Vehicle.brv"), 'wb') as brv_file):
+            with (open(os.path.join(self.in_project_folder_directory, file_name), 'wb') as brv_file):
 
                 # --------------------------------------------------
                 # SETUP
@@ -678,6 +808,17 @@ class BRCI:
                                     temp_pre_spl += unsigned_int(round(use_pt_c_val[1]), 1)
                                     temp_pre_spl += unsigned_int(round(use_pt_c_val[2]), 1)
 
+                                case 'list[3*uint16]':
+
+                                    if isinstance(pt_c_val, int):
+                                        use_pt_c_val = [(pt_c_val >> i) & 0xFFFF for i in range(32, -1, -16)]
+                                    else:
+                                        use_pt_c_val = pt_c_val.copy()
+
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[0]), 2)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[1]), 2)
+                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[2]), 2)
+
                                 case 'list[4*uint8]':
 
                                     if isinstance(pt_c_val, int):
@@ -717,7 +858,7 @@ class BRCI:
                                     temp_pre_spl += unsigned_int(int(pt_c_val), 1)
 
 
-                        elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
+                        elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str): # OR if it doesn't end with .InputAxis
 
                             temp_pre_spl += unsigned_int(len(pt_c_val), 2)
 
@@ -725,103 +866,20 @@ class BRCI:
                                 temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val] + 1, 2)
 
 
-                        elif isinstance(pt_c_val, str):
+                        elif isinstance(pt_c_val, str): # OR if it ends with .InputAxis
 
                             temp_pre_spl += unsigned_int(len(pt_c_val), 1)
 
                             temp_pre_spl += small_bin_str(pt_c_val)
 
-
                         else:
 
                             raise ValueError(f'Unsupported property type: {pt_c_val}.\n'
-
                                              f'Consider using bin to implement this property, as explained in Doc\\DOCUMENTATION.md')
 
 
-
-
                         property_length_list.append(len(temp_pre_spl))
                         temp_spl += temp_pre_spl
-
-
-
-
-
-
-                    """
-                    # Summing values
-                    for pt_c_val in property_type_value:  # property_table_current_value
-
-                        temp_pre_spl: bytes = b''
-
-                        if property_type_key not in br_special_property_instance_list:
-
-                            # If it's an integer (uint 16 bit by default)
-                            if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
-                                pt_c_val = float(pt_c_val)
-
-                            # If it's a float (float 32 bit by default)
-                            if isinstance(pt_c_val, float):
-                                temp_pre_spl += bin_float(pt_c_val, 4)
-
-                            # If it's a bool
-                            elif isinstance(pt_c_val, bool):
-                                temp_pre_spl += unsigned_int(int(pt_c_val), 1)
-
-                            # If it's a string (converting to utf-8)
-                            elif isinstance(pt_c_val, str):
-                                temp_pre_spl += signed_int(len(pt_c_val), 1)
-                                temp_pre_spl += small_bin_str(pt_c_val)
-
-                            # If it's a list of strings (=> generally list of bricks)
-                            elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
-
-                                temp_pre_spl += unsigned_int(len(pt_c_val), 2)
-                                for pt_c_sub_val in pt_c_val:
-                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
-
-
-                        else:
-                            match br_special_property_instance_list[property_type_key]:
-                                case 'INT8':
-                                    temp_pre_spl += unsigned_int(pt_c_val, 1)
-                                case '6xINT2':
-                                    temp_w_spl_connector = pt_c_val[0] + (pt_c_val[1] << 2) + (pt_c_val[2] << 4) + (
-                                                pt_c_val[3] << 6) + (pt_c_val[4] << 8) + (pt_c_val[5] << 10)
-                                    temp_pre_spl += unsigned_int(temp_w_spl_connector, 2)
-                                case '3xINT16_r':
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[0]), 2)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[1]), 2)
-                                    temp_pre_spl += unsigned_int(round(pt_c_val[2]), 2)
-                                case '3xINT8_r':
-                                    if isinstance(pt_c_val, int):
-                                        use_pt_c_val = [(pt_c_val >> i) & 0xFF for i in range(16, -1, -8)]
-                                    else: use_pt_c_val = pt_c_val.copy()
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[0]), 1)
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[1]), 1)
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[2]), 1)
-                                case '4xINT8_r':
-                                    if isinstance(pt_c_val, int):
-                                        use_pt_c_val = [(pt_c_val >> i) & 0xFF for i in range(24, -1, -8)]
-                                    else: use_pt_c_val = pt_c_val.copy()
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[0]), 1)
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[1]), 1)
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[2]), 1)
-                                    temp_pre_spl += unsigned_int(round(use_pt_c_val[3]), 1)
-                                case '3xFLOAT32/None':
-                                    temp_pre_spl += bin_float(pt_c_val[0], 4)
-                                    temp_pre_spl += bin_float(pt_c_val[1], 4)
-                                    temp_pre_spl += bin_float(pt_c_val[2], 4)
-                                case 'UTF-16':
-                                    temp_pre_spl += signed_int(-len(pt_c_val), 2)
-                                    temp_pre_spl += pt_c_val.encode('utf-16')[2:]
-                                case '1BrickID':
-                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_val], 2)
-
-                        property_length_list.append(len(temp_pre_spl))
-                        temp_spl += temp_pre_spl
-                    """
 
 
                     brv_file.write(unsigned_int(len(temp_spl), 4))
@@ -832,7 +890,7 @@ class BRCI:
                         property_length_set: set = set(property_length_list)
                         if len(property_length_set) > 1:
                             brv_file.write(unsigned_int(0, 2))
-                        for property_length in property_length_set:
+                        for property_length in property_length_list:
                             brv_file.write(unsigned_int(property_length, 2))
 
                     temp_spl: bytes = b''  # Reset
@@ -882,15 +940,12 @@ class BRCI:
 
                 #  BRCI & USER APPENDIX
 
+                # BRCI Appendix
 
+                # Contents
                 brv_watermark = f'File written with BRCI. Join our discord to learn more: sZXaESzDd9. Version:'
                 self.brci_appendix.append(small_bin_str(brv_watermark))
                 self.brci_appendix.append(small_bin_str(_version))
-
-
-                # BRCI Appendix
-                # Length
-                brv_file.write(unsigned_int(len(self.brci_appendix), 4))
 
                 brick_names_bina: bytes = b''
 
@@ -898,11 +953,14 @@ class BRCI:
                 for brick in self.bricks:
                     name: str = str(brick[0]) # brick[0] = brick name
                     brick_names_bina += unsigned_int(len(name), 2)
-                    brick_names_bina += bin_str(name)
+                    brick_names_bina += bin_str(name)[2:]
 
                 self.brci_appendix.append(brick_names_bina)
 
-                # Data
+                # Length
+                brv_file.write(unsigned_int(len(self.brci_appendix), 4))
+
+                # Writing data
                 for brci_individual_appendix in self.brci_appendix:
                     brv_file.write(unsigned_int(len(brci_individual_appendix), 4))
                     brv_file.write(brci_individual_appendix)
@@ -987,20 +1045,15 @@ class BRCI:
         if print_bricks: print(str_to_write)
 
 
-    def load_brv(self, load_vehicle: bool = True, load_brci_data: bool = True, load_appendix: bool = True):
+    def load_brv(self, load_vehicle: bool = True, load_brci_data: bool = True, load_appendix: bool = True, file_name: str = 'Vehicle.brv'):
 
-        if not self.wip_features:
-
-            FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_brv().\n'
-                                                                'This feature is still WIP. Set .wip_features to True\n'
-                                                                'In order to access WIP features.')
-
-            return None
+        previous_time = perf_counter()
+        begin_time = perf_counter()
 
         self.ensure_project_directory_exists()
-        self.ensure_valid_variable_type('logs', 'loading Vehicle.brv')
+        self.ensure_valid_variable_type('logs', f'loading {file_name}')
 
-        with (open(os.path.join(self.in_project_folder_directory, 'Vehicle.brv'), 'rb') as brv_file_reader):
+        with (open(os.path.join(self.in_project_folder_directory, file_name), 'rb') as brv_file_reader):
 
             brv_file = bytearray(brv_file_reader.read())
 
@@ -1014,6 +1067,10 @@ class BRCI:
 
         property_type_count = r_unsigned_int(b_pop(brv_file, 2))
 
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Setup & loading..... : {perf_counter() - previous_time :.6f} seconds")
+            previous_time = perf_counter()
+
         # ---------------------------------------------------
         # PART I : BRICK TYPES
         # ---------------------------------------------------
@@ -1025,70 +1082,404 @@ class BRCI:
 
             brick_type_len = r_unsigned_int(b_pop(brv_file, 1))
 
-            brick_types += r_small_bin_str(b_pop(brv_file, brick_type_len))
+            brick_types += [r_small_bin_str(b_pop(brv_file, brick_type_len))]
+
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Brick Types......... : {perf_counter() - previous_time :.6f} seconds")
+            # LENGTH OF TEXT : Time: ....................
+            previous_time = perf_counter()
+
+        if 'bricks' in self.logs:
+            print(f"{FM.debug} Brick Types............... : {brick_types}")
+            # LENGTH OF TEXT : ..........................
 
         # ---------------------------------------------------
         # PART II : PRE-LOAD BRICK PROPERTIES
         # ---------------------------------------------------
 
-        """
-        If you don't want to bother with all that:
-        [DEBUG] Modified Brick List. : [['brick_1', {'BrickColor': 1972455471, 'BrickPattern': 'Default', 'BrickMaterial': 'Plastic', 'Position': [0, 0, 0], 'Rotation': [0, 0, 0], 'gbn': 'RemoteController_2x1x1s'}], ['brick_2', {'BrickColor': [16, 89, 231, 95], 'BrickPattern': 'Default', 'BrickMaterial': 'Rubber', 'Position': [0, 0, 0], 'Rotation': [0, 0, 0], 'gbn': 'RemoteController_2x1x1s'}]]
-        ------- Brick Types......... : ['RemoteController_2x1x1s']
-        ------- Brick Types............... : ['RemoteController_2x1x1s']
-        [DEBUG] Identical Excluded Brick L : [[0, [{'Position': [0, 0, 0], 'Rotation': [0, 0, 0], 'gbn': 'RemoteController_2x1x1s'}, {'BrickColor': 1972455471}]], [1, [{'Position': [0, 0, 0], 'Rotation': [0, 0, 0], 'gbn': 'RemoteController_2x1x1s'}, {'BrickColor': [16, 89, 231, 95], 'BrickMaterial': 'Rubber'}]]]
-        [DEBUG] Property Table............ : {'BrickColor': [1972455471, [16, 89, 231, 95]], 'BrickMaterial': ['Rubber']}
-        [DEBUG] String Name to ID Table... : {'brick_1': 0, 'brick_2': 1}
-        [DEBUG] ID Assigned Property Table : {'BrickColor': {0: 1972455471, 1: [16, 89, 231, 95]}, 'BrickMaterial': {0: 'Rubber'}}
-        [DEBUG] Property Key Table........ : {'BrickColor': 0, 'BrickMaterial': 1}
-        [DEBUG] Inverted Property Key Tbl. : {0: 'BrickColor', 1: 'BrickMaterial'}
-        [DEBUG] Brick Properties Writing.. : [[0, [{'Position': [0, 0, 0], 'Rotation': [0, 0, 0], 'gbn': 0}, [[0, 0]]]], [1, [{'Position': [0, 0, 0], 'Rotation': [0, 0, 0], 'gbn': 0}, [[0, 1], [1, 0]]]]]
-        """
-
-        """
-                                    if type(pt_c_val) == int:  # This is because it fucks around when its bool as bool is a subtype of int
-                                pt_c_val = float(pt_c_val)
-
-                            # If it's a float (float 32 bit by default)
-                            if isinstance(pt_c_val, float):
-                                temp_pre_spl += bin_float(pt_c_val, 4)
-
-                            # If it's a bool
-                            elif isinstance(pt_c_val, bool):
-                                temp_pre_spl += unsigned_int(int(pt_c_val), 1)
-
-                            # If it's a string (converting to utf-8)
-                            elif isinstance(pt_c_val, str):
-                                temp_pre_spl += signed_int(len(pt_c_val), 1)
-                                temp_pre_spl += small_bin_str(pt_c_val)
-
-                            # If it's a list of strings (=> generally list of bricks)
-                            elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0], str):
-
-                                temp_pre_spl += unsigned_int(len(pt_c_val), 2)
-                                for pt_c_sub_val in pt_c_val:
-                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val]+1, 2)
-        """
-
         # Get property types
+        # bin_properties: dict[str, list[int, int, bytes, list[int]]] = {}
+
+        p_id_to_p: dict[int: str] = {}
+        p_val_id_to_val: dict[int: dict[int: any]] = {}
 
         for r_property in range(property_type_count):
 
+            # Getting property name len
             property_type_icon_len = r_unsigned_int(b_pop(brv_file, 1))
 
+            # Getting property & its data
             property_name = r_small_bin_str(b_pop(brv_file, property_type_icon_len))
+            property_count = r_unsigned_int(b_pop(brv_file, 2))
+            property_byte_len = r_unsigned_int(b_pop(brv_file, 4))
 
-            if property_name in br_special_property_instance_list:
+            # Assigning property name id and more
+            p_id_to_p |= {r_property: property_name}
+            p_val_id_to_val |= {property_name: {}}
 
-                pass
+            property_content : bytes = b_pop(brv_file, property_byte_len)
 
+            # Getting all properties length
+            if property_count > 1:
+                properties_len: list[int] | int = r_unsigned_int(b_pop(brv_file, 2))
+                if properties_len == 0:
+
+                    properties_len: list[int] = []
+
+                    for _ in range(property_count):
+                        properties_len.append(r_unsigned_int(b_pop(brv_file, 2)))
             else:
+                properties_len: list[int] = [property_byte_len]
 
-                if True: # TODO
+            # Get all different properties in a list
+            if load_vehicle:
 
-                    pass
+                properties_byte : list[bytes] = []  # REMINDER AS I GET CONFUSED: THIS IS ALL VALUES FOR THE PROPERTY
+
+                # If length is variable
+                if isinstance(properties_len, list):
+
+                    for i in properties_len:
+                        properties_byte.append(b_pop(property_content, i))
+
+                # If length is constant
+                else:
+
+                    for _ in range(len(property_content) // properties_len):
+                        properties_byte.append(b_pop(property_content, properties_len))
 
 
+                # Convert bytes data
+
+                if property_name in br_property_types:
+
+                    for i, property_bin in enumerate(properties_byte):
+
+                        # Binary was already extracted in properties_byte
+                        match br_property_types[property_name]:
+
+                            case 'bin' | 'custom':
+
+                                p_val_id_to_val[property_name] |= {i: property_bin}
+
+                            case 'bool':
+
+                                p_val_id_to_val[property_name] |= {i: bool(r_unsigned_int(property_bin))}
+
+                            case 'brick_id':
+
+                                # SIEVE THOUGH ALL PROPERTIES AGAIN TO CONVERT IDS ONCE BRICKS ARE LOADED
+                                p_val_id_to_val[property_name] |= {i: r_unsigned_int(property_bin)}
+
+                            case 'float':
+
+                                p_val_id_to_val[property_name] |= {i: r_bin_float(property_bin)}
+
+                            case 'list[3*float]':
+
+                                p_val_id_to_val[property_name] |= {i:
+                                    [r_bin_float(unsigned_int(property_bin[j:j+4], 4)) for j in range(0, len(property_bin), 4)]
+                                }
+
+                            case 'list[3*uint8]':
+
+                                p_val_id_to_val[property_name] |= {i:
+                                    [property_bin[j] for j in range(len(property_bin))]
+                                }
+
+                            case 'list[3*uint16]':
+
+                                p_val_id_to_val[property_name] |= {i:
+                                    [r_unsigned_int(property_bin[j:j+2]) for j in range(0, len(property_bin), 2)]
+                                }
+
+                            case 'list[4*uint8]':
+
+                                p_val_id_to_val[property_name] |= {i:
+                                    [property_bin[j] for j in range(len(property_bin))] # For some reason this outputs little endian?
+                                }
+
+                            case 'list[6*uint2]':
+
+                                p_val_id_to_val[property_name] |= {i: [(r_unsigned_int(property_bin) >> j) & 0x3 for j in range(12, -1, -2)]}
+
+                            case 'str8':
+
+                                p_val_id_to_val[property_name] |= {i: r_small_bin_str(property_bin[1:])}
+
+                            case 'str16':
+
+                                p_val_id_to_val[property_name] |= {i: r_small_bin_str(b'\xFF\xFE' + property_bin[2:])}
+
+                            case 'uint8':
+
+                                p_val_id_to_val[property_name] |= {i: r_unsigned_int(property_bin)}
+
+                elif property_name.endswith('.InputAxis'): # Presuming it's an input channel's type
+
+                    for i, property_bin in enumerate(properties_byte):
+
+                        p_val_id_to_val[property_name] |= {i: r_small_bin_str(property_bin[1:])}
+
+                elif property_name.endswith('.Value'): # Presuming it's an input channel's value
+
+                    for i, property_bin in enumerate(properties_byte):
+
+                        p_val_id_to_val[property_name] |= {i: r_bin_float(property_bin)}
+
+                elif property_name.endswith('.SourceBricks'): # Presuming it's a list of brick inputs
+
+                    for i, property_bin in enumerate(properties_byte):
+
+                        # SIEVE THROUGH ALL PROPERTIES AGAIN TO CONVERT THEM
+                        p_val_id_to_val[property_name] |= {i: property_bin}
+
+                else:
+
+                    FM.warning_with_header("Unknown property type", f"The vehicle file you're attempting to load contains the property {property_name}.\n"
+                                                                    f"This property is unknown, and was ignored by BRCI. It's contents weren't loaded.")
+
+        # Debug Logs
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Properties (1)...... : {perf_counter() - previous_time :.6f} seconds")
+            # LENGTH OF TEXT : Time: ....................
+            previous_time = perf_counter()
+
+        if 'bricks' in self.logs:
+            print(f'{FM.debug} Property ID to Property... : {p_id_to_p}')
+            print(f"{FM.debug} P. Value ID to Value (1).. : {p_val_id_to_val}")
+
+
+        # Reading all bricks
+        for r_brick in range(brick_count):
+
+            # Retrieving the brick type
+            brick_type: str = brick_types[r_unsigned_int(b_pop(brv_file, 2))]
+
+            # Reading properties
+            # Length of the property list in bytes (unneeded so just get rids of it)
+            b_pop(brv_file, 4)
+            # Reading the number of properties
+            properties_num: int = r_unsigned_int(b_pop(brv_file, 1))
+            # Saving each property
+            properties_id: list[tuple[int, int]] = []
+            for _ in range(properties_num):
+                property_type_id: int = r_unsigned_int(b_pop(brv_file, 2))
+                property_value_id: int = r_unsigned_int(b_pop(brv_file, 2))
+                properties_id += [(property_type_id, property_value_id)]
+
+            # Reading position and rotation
+            brick_px: float = r_bin_float(b_pop(brv_file, 4))
+            brick_py: float = r_bin_float(b_pop(brv_file, 4))
+            brick_pz: float = r_bin_float(b_pop(brv_file, 4))
+            brick_ry: float = r_bin_float(b_pop(brv_file, 4))
+            brick_rz: float = r_bin_float(b_pop(brv_file, 4))
+            brick_rx: float = r_bin_float(b_pop(brv_file, 4))
+
+            # Converting properties to dictionary
+            if load_vehicle:
+                properties: dict = {
+                    'gbn': brick_type,
+                    'Position': [brick_px, brick_py, brick_pz],
+                    'Rotation': [brick_rx, brick_ry, brick_rz]
+                }
+                for property_id in properties_id:
+                    property_type = p_id_to_p[property_id[0]]
+                    property_value = p_val_id_to_val[property_type][property_id[1]]
+                    properties[property_type] = property_value
+
+                self.bricks.append([r_brick, properties])
+
+        # Seats
+        seat = r_unsigned_int(b_pop(brv_file, 2))
+        if load_vehicle:
+            if seat == 0:
+                self.seat_brick = None
+            else:
+                self.seat_brick = seat
+
+
+        # Debug Logs
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Bricks (1).......... : {perf_counter() - previous_time :.6f} seconds")
+            # LENGTH OF TEXT : Time: ....................
+            previous_time = perf_counter()
+
+        if 'bricks' in self.logs:
+            print(f'{FM.debug} Bricks (1)................ : {self.bricks}')
+
+        # Is used later to convert. Don't worry about it not being filled ;)
+        brick_id_to_name_table: dict[int: str] = {}
+
+        # Loading additional data (names)
+        if load_brci_data and brv_file != '':
+
+            brci_data_elements = r_unsigned_int(b_pop(brv_file, 4))
+
+            # Get rid of the description
+            b_pop(brv_file, r_unsigned_int(b_pop(brv_file, 4)))
+            brci_data_elements -= 1
+
+            file_version: str = r_small_bin_str(b_pop(brv_file, r_unsigned_int(b_pop(brv_file, 4))))
+            brci_data_elements -= 1
+
+            f_maj_vers, f_min_vers = file_version[0], file_version[1:]
+            f_maj_vers = ord(f_maj_vers) - ord('A') + 1
+            c_maj_vers, c_min_vers = _version[0], _version[1:]
+            c_maj_vers = ord(c_maj_vers) - ord('A') + 1
+
+            # Too old version of BRCI warning
+            if c_maj_vers < f_maj_vers or (c_maj_vers == f_maj_vers and c_min_vers < f_min_vers):
+
+                FM.warning_with_header("BRCI is outdated.",
+                                       "It appears the file you're attempting to load was made in a later version\n"
+                                       f"than this version of BRCI (BRCI: {_version}. File: {file_version}).\n"
+                                       f"Expect unexpected results.")
+
+            if int(f_min_vers) <= 44 and f_maj_vers <= c_maj_vers:
+
+                raise NotImplementedError(f"BRCI {_version} no longer support BRCI data of files generated before C45.")
+
+            elif int(f_min_vers) <= int(c_min_vers) and f_maj_vers <= c_maj_vers:
+
+                # BRCI C45 BRCI DATA VERSION:
+
+                b_pop(brv_file, 4)
+
+                for i in range(brick_count):
+
+                    brick_name = r_bin_str(b'\xFF\xFE' + b_pop(brv_file, r_unsigned_int(b_pop(brv_file, 2))*2))
+                    if load_vehicle:
+                        self.bricks[i][0] = brick_name
+                    brick_id_to_name_table |= {i: brick_name}
+
+                brci_data_elements -= 1
+
+
+            # Clear any remaining data
+            while brci_data_elements > 0:
+
+                b_pop(brv_file, r_unsigned_int(b_pop(brv_file, 4)))
+                brci_data_elements -= 1
+
+
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Load BRCI Data...... : {perf_counter() - previous_time :.6f} seconds")
+            # LENGTH OF TEXT : Time: ....................
+            previous_time = perf_counter()
+
+        if 'bricks' in self.logs:
+            print(f'{FM.debug} BRCI Data / Id to Name.... : {brick_id_to_name_table}')
+
+
+        if load_appendix and brv_file != '':
+
+            # Getting rid of brci data if required
+            if not load_brci_data:
+                brci_data_elements: int = r_unsigned_int(b_pop(brv_file, 4))
+
+                while brci_data_elements > 0:
+
+                    b_pop(brv_file, r_unsigned_int(b_pop(brv_file, 4)))
+                    brci_data_elements -= 1
+
+            self.user_appendix = []
+
+            user_appendix_len: int = r_unsigned_int(b_pop(brv_file, 4))
+
+            for _ in range(user_appendix_len):
+
+                self.user_appendix.append(b_pop(brv_file, r_unsigned_int(b_pop(brv_file, 4))))
+
+
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Load User Appendix.. : {perf_counter() - previous_time :.6f} seconds")
+            # LENGTH OF TEXT : Time: ....................
+            previous_time = perf_counter()
+
+        if 'bricks' in self.logs:
+            print(f'{FM.debug} User Appendix............. : {self.user_appendix}')
+
+
+        # Fixing brick ids now that we have all bricks & their name (I want to sleep)
+        if load_vehicle:
+
+            for brick in self.bricks:
+
+                brick[1] = create_brick(brick[1]['gbn']) | brick[1]  # We don't do the |= thing since order matters
+
+                # brick[1] = brick properties
+
+                properties_to_update: dict[str, any] = {}
+                properties_to_create: dict[str, any] = {}
+                properties_to_delete: set[str] = set()
+
+                for b_prop_k, b_prop_v in brick[1].items():
+
+                    if b_prop_k in br_property_types:  # I don't know why sometimes when I do ands in these cases it still throws an error so just in case:
+                        if br_property_types[b_prop_k] == 'brick_id' and len(brick_id_to_name_table) > 0:
+
+                            properties_to_update |= {b_prop_k: brick_id_to_name_table[b_prop_v]}
+
+                    elif (b_prop_k.endswith('.InputAxis')
+                          or b_prop_k.endswith('.SourceBricks')
+                          or b_prop_k.endswith('.Value')):
+
+                        pre_dot_name, post_dot_name = b_prop_k.split('.')[:2]
+
+                        if pre_dot_name not in properties_to_create.keys():
+
+                            properties_to_create[pre_dot_name] = BrickInput('None', None)
+
+                        if post_dot_name == 'InputAxis':
+
+                            properties_to_create[pre_dot_name].brick_input_type = b_prop_v
+
+                        elif post_dot_name == 'Value':
+
+                            properties_to_create[pre_dot_name].brick_input = b_prop_v
+
+                        else: # Assuming its .SourceBricks
+
+                            brick_input_list: list[int | str] = [r_unsigned_int(b_prop_v[i:i+2]) for i in range(0, len(b_prop_v), 2)]
+
+                            if len(brick_id_to_name_table) > 0:
+                                brick_input_list = [brick_id_to_name_table[j-1] for j in brick_input_list]
+
+                            properties_to_create[pre_dot_name].brick_input = brick_input_list
+
+
+                        properties_to_delete.add(b_prop_k)
+
+                brick[1].update(properties_to_update)
+
+                for property_to_delete in properties_to_delete:
+                    del brick[1][property_to_delete]
+
+                brick[1] |= properties_to_create
+
+
+        if 'time' in self.logs:
+            print(f"{FM.debug} Time: Bricks (2).......... : {perf_counter() - previous_time :.6f} seconds")
+            print(f"{FM.debug} Time: Total............... : {perf_counter() - begin_time :.6f} seconds")
+            # LENGTH OF TEXT : Time: ....................
+
+        if 'bricks' in self.logs:
+            print(f'{FM.debug} Bricks (2)................ : {self.bricks}')
+
+        return self
+
+
+    # Load metadata
+    def load_metadata(self):
+
+        if not self.wip_features:
+
+            FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_metadata().\n'
+                                                                'This feature is still WIP. Set .wip_features to True\n'
+                                                                'In order to access WIP features.')
+
+            return None
 
 
 

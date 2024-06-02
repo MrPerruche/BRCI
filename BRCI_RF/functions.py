@@ -90,7 +90,7 @@ def r_signed_int(bin_value):
 
 
 # Function to write half, single and double precision float number
-def bin_float(float_number, byte_len):
+def bin_float(float_number, byte_len) -> bytes:
 
     if byte_len == 4:  # Single-precision float
         float_bytes = struct.pack('<f', float_number)
@@ -103,7 +103,7 @@ def bin_float(float_number, byte_len):
 
     return padded_bytes
 
-def r_bin_float(bin_value):
+def r_bin_float(bin_value) -> float:
 
     if len(bin_value) == 4:  # Single-precision float
         return struct.unpack('<f', bin_value)[0]
