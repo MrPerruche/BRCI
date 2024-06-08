@@ -17,7 +17,7 @@ This section includes various data about various bricks' properties which we fin
 
 ### `ActuatorMode`
 This defines which mode the actuator is being set to. List :
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Accumulated
 Seeking
@@ -31,12 +31,14 @@ Static
 ### `AmmoType`
 This property correspond to the ammo type. It is a single string : `AMMO TYPE (str)`. Input list:
 ##### Guns:
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Standard
 Incendiary
 HighExplosive
 ```
-##### Launchers (aka. Missles):
+##### Launchers (aka. Missiles):
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Incendiary
 HighExplosive
@@ -94,7 +96,7 @@ It may also instead be an 8 bytes long integer : `0xHHSSVVAA`.
 ### `BrickMaterial`
 This property correspond to what material the brick is made of. It is common to all bricks*.
 It is a single string : `MATERIAL (str)`. Input list:
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Aluminium
 BrushedAlu
@@ -110,23 +112,24 @@ Glass
 
 Glow
 Gold
-Oak
+LEDMatrix
 
+Oak
 Pine
 Plastic
-RoughWood
 
+RoughWood
 Rubber
 RustedSteel
-Steel
 
+Steel
 Tungsten
 ```
 
 ### `BrickPattern`
 This property correspond to what pattern is applied to the brick, and/or if none is being applied.
 It is common to all bricks*. It is a single string : `PATTERN (str)`. Input list:
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Default
 C_Army
@@ -183,14 +186,14 @@ It is a single boolean : `TANK DRIVE (bool)`
 
 ### `ConnectorSpacing`
 This property correspond to the brick's connector spacing. It is NOT common to all bricks.
-It is a list of 6 elements in the following order: `[UR (u2), UL (u2), MR (u2), ML (u2), BR (u2), BL (u2)]`.
+It is a list of 6 elements in the following order: `[UM (u2), BM (u2), UL (u2), BL (u2), UR (u2), BR (u2)]`.
 These names correspond to their position in Brick Rigs' UI.
-`U` stands for Upper, `M` stands for Middle, `B` stands for Bottom. `L` stands for Left, `R` stands for Right.
-`0` corresponds to None. `1` corresponds to Default. `2` corresponds for Half. `3` corresponds to Thirds.
+`U` stands for Upper, `B` stands for Bottom. `L` stands for Left, `C` stands for Center, `R` stands for Right.
+`0` corresponds to None. `1` corresponds to Default. `2` corresponds for Halves. `3` corresponds to Thirds.
 
 ### `CouplingMode`
 This property correspond to the coupling mode. It is a single string : `COUPLING MODE (str)`. Input list:
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Default
 Static
@@ -208,7 +211,7 @@ or a list of 3 float 32 values in the following order : `[X (cm) (f32), Y (cm) (
 
 ### `FlashSequence`
 This property correspond to the light's flash sequence. It is a single string : `FLASH SEQUENCE (str)`. Input list:
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 None
 Blinker_Sequence
@@ -230,12 +233,26 @@ RunningLight_04_Sequence
 Strobe_Sequence
 ```
 
+### `Font`
+This property correspond to what font is applied to the text brick. It is a single string : `FONT (str)`. Input list:
+```
+BigShouldersStencil
+NotoEmoji
+Orbitron
+
+PermanentMarker
+Roboto
+RobotoSerif
+
+Silkscreen
+```
+
 ### `FontSize`
 This property correspond to the font's size. It is a single float 32: `FONT SIZE (f32)`.
 
 ### `FuelType`
 This property correspond to what fuel is inside the fuel tank. It is a single string : `FUEL TYPE (str)`. Input list:
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 C4
 Nitro
@@ -261,8 +278,12 @@ This property correspond to the engine's gear ratio. It is a single float 32 : `
 ### `HornPitch`
 This property correspond to the pitch of the horn. It is a single float 32 : `HORN PITCH (f32)`.
 
+### `IdlerWheels`
+This corresponds to what wheels the sprocket will use. It is a list of IDs (Strings or integers) : `WHEELS (int|str)`
+
 ### `Image`
 This property corresponds to what image is being displayed. It is a single string `IMAGE (str)`. Input list:
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Arrow
 Biohazard
@@ -349,6 +370,7 @@ This property correspond to the number of fractional digits. It is a single floa
 
 ### `Operation`
 This property correspond to the actuator's operation. It is a single string : `OPERATION (str)`. Input list:
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Add
 Subtract
@@ -389,6 +411,9 @@ AtanDeg
 Atan
 ```
 
+###  `OutlineThickness`
+This property correspond to how thick the text's outline is. It is a single float : `OUTLINE (f32)`
+
 ### `OutputChannel.MinIn`, `OutputChannel.MaxIn`, `OutputChannel.MinOut`, `OutputChannel.MaxOut` 
 These properties correspond to the brick's output channel scaling values.
 Each are a single float 32 value : `VALUE (f32)`
@@ -411,6 +436,7 @@ in the following order: `[ROT_Y (deg) (f32), ROT_Z (deg) (f32), ROT_X (deg) (f32
 
 ### `SensorType`
 This property correspond to the sensor's type. It is a single string : `SENSOR TYPE (str)`. Input list:
+###### In Brick Rigs 1.7.0b UI order
 ```
 Speed
 NormalSpeed
@@ -430,6 +456,9 @@ Pitch
 
 Yaw
 Roll
+NumSeekingProjectiles
+
+SeekingProjectilesDistance
 ```
 
 ### `SirenType`
@@ -498,6 +527,16 @@ Pawn
 Water
 ```
 
+### `TrackColor`
+This property correspond to what color is assigned to your tracks. It is a list of 4 unsigned 8-bit integers:
+`[HUE (u8), SATURATION (u8), VALUE (u8), ALPHA (u8)]`.
+
+### `WheelDiameter`
+This property correspond to the wheel's diameter. It is a single float : `DIAMETER (f32)`
+
+### `WheelWidth`
+This property corresponds to the wheel's width. It is a single float : `WIDTH (f32)`
+
 ### `WinchSpeed`
 This property correspond to the winch's speed. 100 corresponds to 1 meter per second (3.6 km/h).
 It is a single float 32 : `SPEED (f32)`
@@ -517,7 +556,7 @@ It has 3 arguments :
 `brick_input`: may be the input value, or source bricks, or anything else.
 `prefix`: this is automatically set by BRCI. You may ignore it or set it to anything.
 Input list:
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b UI order
 ```
 BrickInput('None', brick_input, prefix)........... : None (can be anything), prefix
 BrickInput('AlwaysOn', brick_input, prefix)....... : Value (f32), prefix
@@ -568,7 +607,7 @@ BrickInput('Action8', brick_input, prefix)........ : List of all str brick names
 
 ## Actuators
 
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 ```
 Actuator_1sx1sx1s_02_Top...... : A
 Actuator_1sx1sx1s_Bottom...... : B
@@ -639,7 +678,7 @@ Actuator_20x2x1s_Top.......... : A
 
 ## Aviation
 
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b* UI order
 
 ```
 BladeHolder_2x1..... : A
@@ -847,7 +886,7 @@ Brick_24x12x1............ : A
 
 ## Cameras
 
-###### In Brick Rigs 1.6.3 UI Order
+###### In Brick Rigs 1.7.0b UI Order
 
 ```
 Camera_1sx1sx1s.. : A
@@ -862,7 +901,7 @@ TargetMaker_1x1x1 : A
 
 ## Couplings
 
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b UI order
 ```
 Coupling_1sx1sx1s_Front_Female : A
 Coupling_1sx1sx1s_Front_Male.. : B
@@ -893,91 +932,65 @@ Coupling_6x2x1s_Male.......... : B
 
 ###### In Brick Rigs 1.6.3 UI order
 ```
-Antenna_1x1x8......... : A
-Antenna_2x1x1s........ : A
-Bumper_4sx6x2......... : B
+ImageBrick............ : A
+ImageCylinder......... : A
+Flag_3x1x2............ : B
 
-Bumper_4sx8x7s........ : B
-Door_L_3x1x1.......... : B
-Door_R_3x1x1.......... : B
+TextBrick............. : C
+TextCylinder.......... : C
+Antenna_1x1x8......... : D
 
-Door_L_3x1x2.......... : B
-Door_R_3x1x2.......... : B
-WindowedDoor_L_3x1x4.. : B
+Antenna_2x1x1s........ : D
+Bumper_4sx6x2......... : E
+Bumper_4sx8x7s........ : E
 
-WindowedDoor_R_3x1x4.. : B
-Grid_2x1x1s_02........ : B
-Grid_2x1x1s........... : B
+Door_L_3x1x1.......... : E
+Door_R_3x1x1.......... : E
+Door_L_3x1x2.......... : E
 
-GridZylinder_2x2x1s... : B
-Handle_1x2x4s......... : B
-Handle_4x1x1.......... : B
+Door_R_3x1x2.......... : E
+WindowedDoor_L_3x1x4.. : E
+WindowedDoor_R_3x1x4.. : E
 
-Imageplate_1x1x0...... : C
-Imageplate_1x1x1s..... : C
-ImageZylinder_1x1x1s.. : C
+Grid_2x1x1s_02........ : E
+Grid_2x1x1s........... : E
+GridZylinder_2x2x1s... : E
 
-Imageplate_2x2x1s..... : C
-ImageZylinder_2x2x1s.. : C
-Flag_3x1x2............ : C
+Handle_1x2x4s......... : D
+Handle_4x1x1.......... : D
+SteeringWheel_5sx5sx1s : E
 
-Imageplate_4x4x1s..... : C
-Nameplate_1sx1sx1s.... : D
-Nameplate_1x1sx1s..... : D
-
-Nameplate_1x1x1s...... : E
-NameZylinder_1x1x1s... : E
-Nameplate_2x1sx1s..... : D
-
-Nameplate_2x1x1s...... : E
-Nameplate_2x2x1s...... : F
-NameZylinder_2x2x1s... : F
-
-Nameplate_4x1x1s...... : E
-Nameplate_4x2x1s...... : F
-Nameplate_6x1x1s...... : E
-
-Nameplate_6x2x1s...... : F
-Nameplate_8x1x1s...... : E
-Nameplate_8x2x1s...... : F
-
-SteeringWheel_5sx5sx1s : B
-SteeringWheel_2x2x1s.. : B
+SteeringWheel_2x2x1s.. : E
 ```
 
 #### Properties : A
 - Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+- `BrickSize` (`list[float, float, float]`) (`[6.0, 6.0, 1.0]`)
+- `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 0, 3]`)
+- `Image` (`str`) (`'Arrow'`)
+- `ImageColor` (`list[int, int, int]`) (`[0, 0, 255]`)
 
 #### Properties : B
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
+- `BrickSize` (`list[float, float, float]`) (`[6.0, 1.0, 6.0]`)
+- `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 0, 3]`)
+- `Image` (`str`) (`'Arrow'`)
+- `ImageColor` (`list[int, int, int]`) (`[0, 0, 255]`)
 
 #### Properties : C
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
-- `Image` (`str`) (`'Warning'`)
-- `ImageColor` (`list[int, int, int] | int`) (`[0, 0, 255]`)
+- `BrickSize` (`list[float, float, float]`) (`[6.0, 6.0, 1.0]`)
+- `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 0, 3]`)
 
 #### Properties : D
 - Default Brick Properties
-- `bGenerateLift` (`bool`) (`False`)
-- `Text` (`str`) (`'Text'`)
-- `TextColor` (`list[int, int, int] | int`) (`[0, 0, 0]`)
-- `FontSize` (`int`) (`10`)
 
 #### Properties : E
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
-- `Text` (`str`) (`'Text'`)
-- `TextColor` (`list[int, int, int] | int`) (`[0, 0, 0]`)
-- `FontSize` (`int`) (`30`)
-
-#### Properties : F
-- Default Brick Properties
-- `bGenerateLift` (`bool`) (`False`)
-- `Text` (`str`) (`'Text'`)
-- `TextColor` (`list[int, int, int] | int`) (`[0, 0, 0]`)
-- `FontSize` (`int`) (`60`)
 
 ## Fire and Water
 
@@ -1088,31 +1101,27 @@ Switch_1x1x1s..... : D
 
 ###### In Brick Rigs 1.6.3 UI order
 ```
-Light_1x1x1s............. : A
-Light_1x1x0.............. : A
-Light_1x1x1s............. : A
+LightBrick....... : A
+LightCone........ : A
+LightConeFlat.... : A
 
-Light_1x1x1s_Flat........ : A
-LightZylinder_1x1x1s..... : A
-LightZylinder_1x1x1s_Flat : A
+LightCylinder.... : A
+LightHemisphere.. : A
+LightRamp........ : A
 
-LightCone_1x1x1.......... : A
-LightHalfSphere_1x1...... : A
-LightRamp_1x1x1.......... : A
-
-LightRampRounded_1x1x1... : A
-LightZylinder_1x1x1...... : A
-Light_2x1x1s............. : A
-
-LightZylinder_2x2x1s_Flat : A
+LightRampRounded. : A
+LightRampRoundedN : A
 ```
 
 #### Properties : A
 - Default Brick Properties
+- `bGenerateLift` (`bool`) (`False`)
+- `BrickSize` (`[f32, f32, f32]`) (`[3.0, 3.0, 3.0]`)
+- `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 3, 3]`)
 - `InputChannel` (`BrickInput()`) (`BrickInput('Headlight', None)`)
 - `Brightness` (`f32`) (`0.5`)
-- `FlashSequence` (`str`) (`None`)
-- `LightDirection` (`str`) (`Off`)
+- `FlashSequence` (`str`) (`'None'`)
+- `LightDirection` (`str`) (`'Off'`)
 - `LightConeAngle` (`f32`) (`45.0`)
 
 ## Player
@@ -1334,6 +1343,7 @@ ScalableBrick............... : A
 ScalableCone................ : A
 ScalableConeRounded......... : A
 
+ScalableConeFlat............ : A
 ScalableCorner.............. : B
 ScalableCornerN............. : B
 ScalableCornerRounded....... : B
@@ -1366,13 +1376,13 @@ ScalableWedgeCorner......... : A
 #### Properties : A
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`)
-- `BrickSize` (`[u16, u16, u16]`) (`[3, 3, 3]`)
+- `BrickSize` (`[f32, f32, f32]`) (`[3.0, 3.0, 3.0]`)
 - `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 3, 3]`)
 
 #### Properties : B
 - Default Brick Properties
 - `bGenerateLift` (`bool`) (`False`) Note: Cannot always be enabled.
-- `BrickSize` (`[u16, u16, u16]`) (`[3, 3, 3]`)
+- `BrickSize` (`[f32, f32, f32]`) (`[3.0, 3.0, 3.0]`)
 - `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 3, 3]`)
 
 ## Thrusters
@@ -1403,115 +1413,199 @@ Tank_2x2x4....... : B
 
 ## Vehicle
 
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b UI order
 
 ```
-Axle_1sx1sx1s.... : A
-Axle_1x1x1s_02... : A
-Axle_1x1x1s...... : A
+ExhaustBrick..... : A
+ExhaustCylinder.. : A
+Axle_1sx1sx1s.... : B
 
-Axle_1x2x1s...... : A
-Axle_2x2x1s...... : A
-Axle_2x2x1....... : A
+Axle_1x1x1s_02... : B
+Axle_1x1x1s...... : B
+Axle_1x2x1s...... : B
 
-LandingGear_2x2x2 : A
-Axle_2x4x1s...... : A
-Axle_2x6x1s...... : A
+Axle_2x2x1s...... : B
+Axle_2x2x1....... : B
+LandingGear_2x2x2 : B
 
-Compressor_4x1x4s : B
-Exhaust_1x1x1.... : C
+Axle_2x4x1s...... : B
+Axle_2x6x1s...... : B
+Compressor_4x1x4s : C
+
 Motor_1x2x5s..... : D
-
 EMotor_2x2x2..... : D
 Motor_3x2x5s..... : D
-AircraftR4....... : D
 
+AircraftR4....... : D
 Motor_4x2x5s..... : D
 DragV8........... : D
+
 DieselV12........ : D
+Mudguard_2x1sx3.. : C
+Mudguard_2x1x1s.. : C
 
-Mudguard_2x1sx3.. : B
-Mudguard_2x1x1s.. : B
-Mudguard_2x2x2s.. : B
+Mudguard_2x2x2s.. : C
+Mudguard_4x2x5s.. : C
+Tank_1x1x1....... : F
 
-Mudguard_4x2x5s.. : B
-Tank_1x1x1....... : E
-Tank_2x2x1....... : E
+Tank_2x2x1....... : F
+Tank_2x2x4....... : F
+Wheel_2x2s....... : G
 
-Tank_2x2x4....... : E
-Wheel_2x2s....... : F
-RacingWheel_4x2s. : F
+RacingWheel_4x2s. : H
+Wheel_7sx1....... : I
+Wheel_10sx1...... : J
 
-Wheel_10sx1...... : F
-OffroadWheel_3x4s : F
-RacingWheel_3x4s. : F
+OffroadWheel_3x4s : K
+RacingWheel_3x4s. : K
+Wheel_3x4s....... : K
 
-Wheel_3x4s....... : F
-Wheel_7sx2....... : F
-DragWheel_4x2.... : F
+DragWheel_4x2.... : L
+Wheel_4x2........ : L
+OffroadWheel_5x2. : M
 
-Wheel_4x2........ : F
-OffroadWheel_5x2. : F
-Wheel_10x4....... : F
+Wheel_10x4....... : N
+IdlerWheel....... : O
+SprocketWheel.... : P
 
-TrainWheel_2x2s.. : G
-TrainWheel_3x2s.. : G
-TrainWheel_4x2s.. : G
+TrainWheel_2x2s.. : Q
+TrainWheel_3x2s.. : R
+TrainWheel_4x2s.. : S
 
-Wheel_1sx1sx1s... : H
-Wheel_1x1x1...... : H
+Wheel_1sx1sx1s... : E
+Wheel_1x1x1...... : E
 ```
 
 #### Properties : A
-
 - Default Brick Properties
-- `SteeringAngle` (`f32`) (`0.0`)
-- `SteeringSpeed` (`f32`) (`1.0`)
-- `SuspensionLength` (`f32`) (`0.0`)
-- `SuspensionStiffness` (`f32`) (`2.0`)
-- `SuspensionDamping` (`f32`) (`1.0`)
+- `bGenerateLift` (`bool`) (`False`)
+- `BrickSize` (`[f32, f32, f32]`) (`[3.0, 3.0, 3.0]`)
+- `ConnectorSpacing` (`[u2, u2, u2, u2, u2, u2]`) (`[3, 3, 3, 3, 3, 3]`)
+- `InputChannel` (`BrickInput()`) (`BrickInput('None', None)`)
+- `SmokeColor` (`[u8, u8, u8]`) (`[0, 0, 0]`)
+- `SpawnScale` (`f32`) (`1.0`) 
+
+#### Properties : B
+- Default Brick Properties
+- `SteeringAngle` (`float`) (`0.0`)
+- `SteeringSpeed` (`float`) (`1.0`)
+- `SuspensionLength` (`float`) (`0.0`)
+- `SuspensionStiffness` (`float`) (`2.0`)
+- `SuspensionDamping` (`float`) (`1.0`)
 - `bDriven` (`bool`) (`True`)
 - `bInvertDrive` (`bool`) (`False`)
-- `bHasBrake` (`bool`) (`True`),
+- `bHasBrake` (`bool`) (`True`)
 - `bHasHandBrake` (`bool`) (`True`)
-- `BrakeStrength` (`f32`) (`1.0`)
+- `BrakeStrength` (`float`) (`1.0`)
 - `SteeringInputChannel` (`BrickInput()`) (`BrickInput('Steering', None)`)
 - `BrakeInputChannel` (`BrickInput()`) (`BrickInput('Brake', None)`)
 - `bCanDisableSteering` (`bool`) (`False`)
 - `bCanInvertSteering` (`bool`) (`False`)
 
-#### Properties : B
-
-- Default Brick Properties
-- `bGenerateLift` (`bool`) (`False`
-
 #### Properties : C
 - Default Brick Properties
-- `InputChannel` (`BrickInput()`) (`BrickInput('Throttle', None)`)
-- `SmokeColor` (`[u8, u8, u8] | int`) (`[0, 0, 255]`)
-- `SpawnScale` (`f32`) (`1.0`)
+- `bGenerateLift` (`bool`) (`False`)
 
 #### Properties : D
 - Default Brick Properties
 - `ThrottleInputChannel` (`BrickInput()`) (`BrickInput('Throttle', None)`)
-- `GearRatioScale` (`f32`) (`1.0`)
+- `GearRatioScale` (`float`) (`1.0`)
 - `bTankDrive` (`bool`) (`False`)
 
 #### Properties : E
 - Default Brick Properties
-- `FuelType` (`str`) (`'Petrol'`)
 
 #### Properties : F
 - Default Brick Properties
-- `bInvertTankSteering` (`bool`) (`False`)
-- `TirePressureRatio` (`f32`) (`0.8`)
+- `FuelType` (`str`) (`'Petrol'`)
 
 #### Properties : G
 - Default Brick Properties
 - `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`6.0`)
+- `WheelWidth` (`float`) (`2.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : H
 - Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`9.0`)
+- `WheelWidth` (`float`) (`2.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : I
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`7.0`)
+- `WheelWidth` (`float`) (`3.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : J
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`10.0`)
+- `WheelWidth` (`float`) (`3.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : K
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`9.0`)
+- `WheelWidth` (`float`) (`4.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : L
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`12.0`)
+- `WheelWidth` (`float`) (`6.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : M
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`15.0`)
+- `WheelWidth` (`float`) (`6.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : N
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`30.0`)
+- `WheelWidth` (`float`) (`12.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : O
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`9.0`)
+- `WheelWidth` (`float`) (`3.0`)
+
+#### Properties : P
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`9.0`)
+- `WheelWidth` (`float`) (`3.0`)
+- `IdlerWheels` (`list[int]`) (`[]`)
+- `TrackColor` (`[u8, u8, u8, u8]`) (`[0, 0, 26, 255]`)
+
+#### Properties : Q
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`6.0`)
+- `WheelWidth` (`float`) (`2.0`)
+
+#### Properties : R
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`9.0`)
+- `WheelWidth` (`float`) (`2.0`)
+- 
+#### Properties : S
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`12.0`)
+- `WheelWidth` (`float`) (`2.0`)
 
 ## Windows
 
@@ -1536,7 +1630,7 @@ Windscreen_4x6x3.. : A
 
 ## Uncategorized
 
-###### In Brick Rigs 1.6.3 UI order
+###### In Brick Rigs 1.7.0b UI order
 
 ```
 Arch_2x1x2......... : A
@@ -1544,15 +1638,17 @@ Arch_4x1x4......... : A
 Arch_6x1x1......... : A
 
 Arch_8x1x8......... : A
+FlareGun_1x1x1..... : D
 CornerLedge_1x1x1.. : A
-Ledge_1x1x1........ : A
 
+Ledge_1x1x1........ : A
 Ledge_1x2x1........ : A
 Ledge_1x4x1........ : A
-DoubleSiren_1x2x1s. : B
 
+DoubleSiren_1x2x1s. : B
 PlaneTail_10x10x16. : A
 CraneSupport_6x6x20 : A
+
 Winch_3x2x1s....... : C
 ```
 
@@ -1570,3 +1666,7 @@ Winch_3x2x1s....... : C
 - Default Brick Properties
 - `InputChannel` (`BrickInput()`) (`BrickInput('Auxiliary', None)`)
 - `WinchSpeed` (`f32`) (`100.0`)
+
+#### Properties : D
+- Default Brick Properties
+- `InputChannel` (`BrickInput()`) (`BrickInput('Action1', None)`)

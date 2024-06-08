@@ -1,4 +1,4 @@
-# Brick Rigs Creation Interface (Update C45)
+# Brick Rigs Creation Interface (Update C46)
 
 BRCI is a library written in python that allows you to create and edit your creations though code.
 

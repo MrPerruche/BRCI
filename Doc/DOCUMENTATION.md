@@ -593,6 +593,7 @@ property and their type. It may be one of these :
 - `brick_id` : A single brick. (String)
 - `custom` : (Later discussed)
 - `float` : Single precision float.
+- `list[brick_id]` : A list of bricks.
 - `list[3*float]` : A list of 3 single precision float values.
 - `list[3*uint8]` : A list of 3 unsigned 8-bit integer values. Also accept a single unsigned 24-bit integer value (e.g. `0x7AD608`).
 - `list[3*uint16]` : A list of 3 unsigned 16-bit integer values. Also accept a single unsigned 48-bit integer value (e.g. `0x7AD608CF0072`).
@@ -608,8 +609,8 @@ It is only made available for mods, and is not used by default by BRCI.
 
 Concerning `custom` :
 This will take a lambda function that will be executed and is expected to return a bytes object.
-When attempting to load a custom property, it'll load it as if it was a binary property.
 (e.g. `'CustomProperty': lambda: say_hello('world')`)
+When attempting to load a custom property, it'll load it as if it was a binary property.
 
 Here's an example on how to use `brci.append_multiple()`, as-well as setup required info.
 ```python

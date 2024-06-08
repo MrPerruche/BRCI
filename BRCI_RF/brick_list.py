@@ -12,6 +12,7 @@ br_brick_materials = {
     'Glass': {'price': 1.50, 'density': 1.00,  'strength': 0.50, 'friction': 0.70, 'restitution': 0.10},
     'Glow': {'price': 1.50, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
     'Gold': {'price': 11.0, 'density': 19.3,  'strength': 7.50, 'friction': 0.50, 'restitution': 0.10},
+    'LEDMatrix': {'price': 1.50, 'density': 1.00, 'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
     'Oak': {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
     'Pine': {'price': 1.00, 'density': 0.60,  'strength': 5.00, 'friction': 0.60, 'restitution': 0.10},
     'Plastic': {'price': 1.00, 'density': 1.00,  'strength': 3.00, 'friction': 0.60, 'restitution': 0.10},
@@ -46,7 +47,7 @@ br_brick_list = {
 
 
 # --------------------------------------------------
-# ACTUATORS [LAST UPDATE: 1.6.3]
+# ACTUATORS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -78,7 +79,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# AVIATION [LAST UPDATE: 1.6.3]
+# AVIATION [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -125,7 +126,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# BRICKS [LAST UPDATE: 1.6.3]
+# BRICKS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -155,7 +156,7 @@ append_multiple(br_brick_list, ['Brick_1x1x1s', 'Brick_1x1x1s_Flat', 'Brick_1x1x
 
 
 # --------------------------------------------------
-# CAMERAS [LAST UPDATE: 1.6.3]
+# CAMERAS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -167,7 +168,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# COUPLINGS [LAST UPDATE: 1.6.3]
+# COUPLINGS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 # Female
@@ -186,68 +187,62 @@ append_multiple(br_brick_list,
                 }, True)
 
 # --------------------------------------------------
-# DECORATION [LAST UPDATE: 1.6.3]
+# DECORATION [LAST UPDATE: 1.7.0b]
 # --------------------------------------------------
 
 
 append_multiple(br_brick_list,
-                ['Antenna_1x1x8', 'Antenna_2x1x1s', 'Handle_1x2x4s', 'Handle_4x1x1'],
-                br_brick_list['default_brick_data'], True)
-
-
-append_multiple(br_brick_list,
-                ['Bumper_4sx6x2', 'Bumper_4sx8x7s', 'Door_L_3x1x1', 'Door_R_3x1x1', 'Door_L_3x1x2',
-                 'Door_R_3x1x2', 'WindowedDoor_3x1x2', 'WindowedDoor_R_3x1x4', 'Grid_2x1x1s_02', 'Grid_2x1x1s',
-                 'GridZylinder_2x2x1s', 'SteeringWheel_5sx5sx1s', 'SteeringWheel_2x2x1s'],
-                br_brick_list['default_brick_data'], True)
-
-append_multiple(br_brick_list,
-                ['Imageplate_1x1x0', 'Imageplate_1x1x1s', 'ImageZylinder_1x1x1s', 'Imageplate_2x2x1s',
-                 'ImageZylinder_2x2x1s', 'Flag_3x1x2', 'Imageplate_4x4x1s'],
+                ['ImageBrick', 'ImageCylinder'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False,
-                    'Image': 'Caution',
+                    'BrickSize': [6.0, 6.0, 1.0],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
+                    'Image': 'Arrow',
+                    'ImageColor': [0, 0, 255]
+                }, True)
+
+append_multiple(br_brick_list, ['Flag_3x1x2'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'BrickSize': [6.0, 1.0, 6.0],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 3],
+                    'Image': 'Arrow',
                     'ImageColor': [0, 0, 255]
                 }, True)
 
 
-append_multiple(br_brick_list,
-                ['Nameplate_1sx1sx1s', 'Nameplate_1x1sx1s', 'Nameplate_2x1sx1s'],
+append_multiple(br_brick_list, ['TextBrick', 'TextCylinder'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False,
+                    'BrickSize': [6.0, 6.0, 1.0],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
                     'Text': 'Text',
+                    'Font': 'Roboto',
+                    'FontSize': 60.0,
                     'TextColor': [0, 0, 0],
-                    'FontSize': 10
+                    'OutlineThickness': 0.0
                 }, True)
 
-append_multiple(br_brick_list,
-                ['Nameplate_1x1x1s', 'NameZylinder_1x1x1s', 'Nameplate_2x1x1s', 'Nameplate_4x1x1s',
-                 'Nameplate_6x1x1s', 'Nameplate_8x1x1s'],
-                br_brick_list['default_brick_data'] | {
-                    'bGenerateLift': False,
-                    'Text': 'Text',
-                    'TextColor': [0, 0, 0],
-                    'FontSize': 30
-                }, True)
 
-append_multiple(br_brick_list,
-                ['Nameplate_2x2x1s', 'NameZylinder_2x2x1s', 'Nameplate_4x2x1s', 'Nameplate_6x2x1s',
-                 'Nameplate_8x2x1s'],
+append_multiple(br_brick_list, ['Antenna_1x1x8', 'Antenna_2x1x1s', 'Handle_1x2x4s', 'Handle_4x1x1'],
+                br_brick_list['default_brick_data'],True)
+
+
+append_multiple(br_brick_list, ['Bumper_4sx6x2', 'Bumper_4sx8x7s', 'Door_L_3x1x1', 'Door_R_3x1x1', 'Door_L_3x1x2',
+                                'Door_R_3x1x2', 'WindowedDoor_L_3x1x4', 'WindowedDoor_R_3x1x4', 'Grid_2x1x1s_02',
+                                'Grid_2x1x1s', 'GridZylinder_2x2x1s', 'SteeringWheel_5sx5sx1s', 'SteeringWheel_2x2x1s'],
                 br_brick_list['default_brick_data'] | {
-                    'bGenerateLift': False,
-                    'Text': 'Text',
-                    'TextColor': [0, 0, 0],
-                    'FontSize': 60
+                    'bGenerateLift': False
                 }, True)
 
 
 # --------------------------------------------------
-# FIRE AND WATER [LAST UPDATE: 1.6.3]
+# FIRE AND WATER [LAST UPDATE: 1.7.0b]
 # --------------------------------------------------
 
 # Float
 append_multiple(br_brick_list, ['Float'], br_brick_list['default_brick_data'] | {
-    'BrickSize': [3, 3, 3],
+    'BrickSize': [3.0, 3.0, 3.0],
     'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
 }, True)
 
@@ -264,7 +259,7 @@ append_multiple(br_brick_list, ['PumpZylinder_2x2x2'], br_brick_list['default_br
 # FUEL TANKS IN VEHICLE CATEGORY
 
 # --------------------------------------------------
-# GUNS [LAST UPDATE: 1.6.3]
+# GUNS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 # Barrels
@@ -294,7 +289,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# INPUT AND OUTPUT [LAST UPDATE: 1.6.3]
+# INPUT AND OUTPUT [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -311,7 +306,7 @@ append_multiple(br_brick_list, ['Switch_1sx1sx1s', 'Switch_1x1x1s'],
 append_multiple(br_brick_list, ['DisplayBrick'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False,
-                    'BrickSize': [6, 3, 1],
+                    'BrickSize': [6.0, 3.0, 1.0],
                     'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
                     'InputChannel': BrickInput('Custom', None),
                     'NumFractionalDigits': 1,
@@ -339,15 +334,17 @@ append_multiple(br_brick_list, ['MathBrick_1sx1sx1s'],
 
 
 # --------------------------------------------------
-# LIGHTS [LAST UPDATE: 1.6.3]
+# LIGHTS [LAST UPDATE: 1.7.0b]
 # --------------------------------------------------
 
 
 append_multiple(br_brick_list,
-                ['Light_1sx1sx1s', 'Light_1x1x0', 'Light_1x1x1s', 'Light_1x1x1s_Flat', 'LightZylinder_1x1x1s',
-                 'LightZylinder_1x1x1s_Flat', 'LightCone_1x1x1', 'LightHalfSphere_1x1', 'LightRamp_1x1x1',
-                 'LightRampRounded_1x1x1', 'LightZylinder_1x1x1', 'Light_2x1x1s', 'LightZylinder_2x2x1s_Flat'],
+                ['LightBrick', 'LightCone', 'LightConeFlat', 'LightCylinder', 'LightHemisphere', 'LightRamp',
+                 'LightRampRounded', 'LightRampRoundedN'],
                 br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'BrickSize': [3.0, 3.0, 3.0],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 3],
                     'InputChannel': BrickInput('Headlight', None),
                     'Brightness': 0.5,
                     'FlashSequence': 'None',
@@ -357,7 +354,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# PLAYER [LAST UPDATE: 1.6.3]
+# PLAYER [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 # RC Receiver
@@ -369,13 +366,14 @@ append_multiple(br_brick_list, ['Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'],
                     'ExitLocation': None
                 }, True)
 
-append_multiple(br_brick_list, ['SteeringWheel_5sx5sx1s', 'SteeringWheel_5x5x1s'],
+# Already initialized earlier! Also, there was a mistake here haha...
+"""append_multiple(br_brick_list, ['SteeringWheel_5sx5sx1s', 'SteeringWheel_5x5x1s'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False
-                }, True)
+                }, True)"""
 
 # --------------------------------------------------
-# RAMPS [LAST UPDATE: 1.6.3]
+# RAMPS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 # NO Fluid Dynamics
@@ -401,7 +399,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# REDIRECTORS [LAST UPDATE:  1.6.3]
+# REDIRECTORS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -417,7 +415,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# RODS [LAST UPDATE: 1.6.3]
+# RODS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -428,7 +426,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# ROUND STUFF [LAST UPDATE: 1.6.3]
+# ROUND STUFF [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -440,19 +438,19 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# SCALABLES [LAST UPDATE: 1.6.3]
+# SCALABLES [LAST UPDATE: 1.7.0b]
 # --------------------------------------------------
 
 
 # Scalables w/ aerodynamics
 append_multiple(br_brick_list,
-                ['ScalableBrick', 'ScalableCone', 'ScalableConeRounded', 'ScalableZylinder', 'ScalableCylinder90R0',
+                ['ScalableBrick', 'ScalableCone', 'ScalableConeRounded', 'ScalableConeFlat','ScalableZylinder', 'ScalableCylinder90R0',
                  'ScalableCylinder90R1', 'ScalableHalfCone', 'ScalableHalfCylinder', 'ScalableHemisphere',
                  'ScalablePyramid', 'ScalableQuarterSphere', 'ScalableRamp', 'ScalableRampRounded', 'ScalableRampRoundedN',
                  'ScalableWedge', 'ScalableWedgeCorner'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False,
-                    'BrickSize': [3, 3, 3],
+                    'BrickSize': [3.0, 3.0, 3.0],
                     'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
                 }, True)
 # Scalables w/out aerodynamics
@@ -460,13 +458,13 @@ append_multiple(br_brick_list,
                 ['ScalableCorner', 'ScalableCornerN', 'ScalableCornerRounded', 'ScalableCornerRoundedN',
                  'ScalableQuarterCone', 'ScalablePyramidCorner', 'ScalablePyramidCornerRounded'],
                 br_brick_list['default_brick_data'] | {
-                    'BrickSize': [3, 3, 3],
+                    'BrickSize': [3.0, 3.0, 3.0],
                     'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
                 }, True)
 
 
 # --------------------------------------------------
-# THRUSTERS [LAST UPDATE: 1.6.3]
+# THRUSTERS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 append_multiple(br_brick_list,
@@ -481,13 +479,23 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# VEHICLES [LAST UPDATE: 1.6.3]
+# VEHICLES [LAST UPDATE: 1.7.0b]
 # --------------------------------------------------
 
-# Axles
-append_multiple(br_brick_list,
-                ['Axle_1sx1sx1s', 'Axle_1x1x1s_02', 'Axle_1x1x1s', 'Axle_1x2x1s',
-                 'Axle_2x2x1s', 'Axle_2x2x1', 'LandingGear_2x2x2', 'Axle_2x4x1s', 'Axle_2x6x1s'],
+# Exhausts
+append_multiple(br_brick_list, ['ExhaustBrick', 'ExhaustCylinder'],
+                br_brick_list['default_brick_data'] | {
+                    'bGenerateLift': False,
+                    'BrickSize': [3.0, 3.0, 3.0],
+                    'ConnectorSpacing': [3, 3, 3, 3, 3, 3],
+                    'InputChannel': BrickInput('None', None),
+                    'SmokeColor': [0, 0, 255],
+                    'SpawnScale': 1.0
+                }, True)
+
+
+append_multiple(br_brick_list, ['Axle_1sx1sx1s', 'Axle_1x1x1s_02', 'Axle_1x1x1s', 'Axle_1x2x1s', 'Axle_2x2x1s',
+                                'Axle_2x2x1', 'LandingGear_2x2x2', 'Axle_2x4x1s', 'Axle_2x6x1s'],
                 br_brick_list['default_brick_data'] | {
                     'SteeringAngle': 0.0,
                     'SteeringSpeed': 1.0,
@@ -505,56 +513,150 @@ append_multiple(br_brick_list,
                     'bCanInvertSteering': False
                 }, True)
 
-# Compressor and exhaust
-append_multiple(br_brick_list,
-                ['Compressor_4x1x4s', 'Mudguard_2x1sx3', 'Mudguard_2x1x1s', 'Mudguard_2x2x2s', 'Mudguard_4x2x5s'],
+
+append_multiple(br_brick_list, ['Compressor_4x1x4s', 'Mudguard_2x1sx3', 'Mudguard_2x1x1s', 'Mudguard_2x2x2s',
+                                'Mudguard_4x2x5s'],
                 br_brick_list['default_brick_data'] | {
                     'bGenerateLift': False
                 }, True)
 
-append_multiple(br_brick_list, ['Exhaust_1x1x1'],
-                br_brick_list['default_brick_data'] | {
-                    'InputChannel': BrickInput('None', None),
-                    'SmokeColor': [0, 0, 255],
-                    'SpawnScale': 1.0
-                }, True)
 
-# Engines
-append_multiple(br_brick_list,
-                ['Motor_1x2x5s', 'EMotor_2x2x2', 'Motor_3x2x5s', 'AircraftR4',
-                 'Motor_4x2x5s', 'DragV8', 'DieselV12'],
+append_multiple(br_brick_list, ['Motor_1x2x5s', 'EMotor_2x2x2', 'Motor_3x2x5s', 'AircraftR4', 'Motor_4x2x5s',
+                                'DragV8', 'DieselV12'],
                 br_brick_list['default_brick_data'] | {
                     'ThrottleInputChannel': BrickInput('Throttle', None),
                     'GearRatioScale': 1.0,
                     'bTankDrive': False
                 }, True)
 
-# Fuel
-append_multiple(br_brick_list,
-                ['Tank_1x1x1', 'Tank_2x2x1', 'Tank_2x2x4'],
+
+append_multiple(br_brick_list, ['Tank_1x1x1', 'Tank_2x2x1', 'Tank_2x2x4'],
                 br_brick_list['default_brick_data'] | {
                     'FuelType': 'Petrol'
                 }, True)
 
-# Wheels
-append_multiple(br_brick_list,
-                ['Wheel_2x2s', 'RacingWheel_4x2s', 'Wheel_10sx1', 'OffroadWheel_3x4s', 'RacingWheel_3x4s',
-                 'Wheel_3x4s', 'Wheel_7sx2', 'DragWheel_4x2', 'Wheel_4x2', 'OffroadWheel_5x2', 'Wheel_10x4'],
+
+# The trillion wheels
+append_multiple(br_brick_list, ['Wheel_2x2s'],
                 br_brick_list['default_brick_data'] | {
                     'bInvertTankSteering': False,
+                    'WheelDiameter': 6.0,
+                    'WheelWidth': 2.0,
                     'TirePressureRatio': 0.8
                 }, True)
 
-append_multiple(br_brick_list,['TrainWheel_2x2s', 'TrainWheel_3x2s', 'TrainWheel_4x2s'],
+
+append_multiple(br_brick_list, ['RacingWheel_4x2s'],
                 br_brick_list['default_brick_data'] | {
-                    'bInvertTankSteering': True
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 9.0,
+                    'WheelWidth': 2.0,
+                    'TirePressureRatio': 0.8
                 }, True)
 
-append_multiple(br_brick_list, ['Wheel_1sx1sx1s', 'Wheel_1x1x1'], br_brick_list['default_brick_data'], True)
+
+append_multiple(br_brick_list, ['Wheel_7sx1'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 7.0,
+                    'WheelWidth': 3.0,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+append_multiple(br_brick_list, ['Wheel_10sx1'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 10.0,
+                    'WheelWidth': 3.0,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+append_multiple(br_brick_list, ['OffroadWheel_3x4s', 'RacingWheel_3x4s', 'Wheel_3x4s'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 9.0,
+                    'WheelWidth': 4.0,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+append_multiple(br_brick_list, ['DragWheel_4x2', 'Wheel_4x2'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 12.0,
+                    'WheelWidth': 6.0,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+append_multiple(br_brick_list, ['OffroadWheel_5x2'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 15.0,
+                    'WheelWidth': 6.0,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+append_multiple(br_brick_list, ['Wheel_10x4'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 30.0,
+                    'WheelWidth': 12.0,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+append_multiple(br_brick_list, ['IdlerWheel'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 9.0,
+                    'WheelWidth': 3.0,
+                }, True)
+
+
+append_multiple(br_brick_list, ['SprocketWheel'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 9.0,
+                    'WheelWidth': 3.0,
+                    'IdlerWheels': [],
+                    'TrackColor': [0, 0, 26, 255]
+                }, True)
+
+
+append_multiple(br_brick_list, ['TrainWheel_2x2s'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 6.0,
+                    'WheelWidth': 2.0
+                }, True)
+
+
+append_multiple(br_brick_list, ['TrainWheel_3x2s'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 9.0,
+                    'WheelWidth': 2.0
+                }, True)
+
+
+append_multiple(br_brick_list, ['TrainWheel_4x2s'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 12.0,
+                    'WheelWidth': 2.0
+                }, True)
+
+
+append_multiple(br_brick_list, ['Wheel_1sx1sx1s', 'Wheel_1x1x1s'],
+                br_brick_list['default_brick_data'], True)
 
 
 # --------------------------------------------------
-# WINDOWS [LAST UPDATE: 1.6.3]
+# WINDOWS [LAST UPDATE: 1.7.0b*]
 # --------------------------------------------------
 
 
@@ -565,7 +667,7 @@ append_multiple(br_brick_list,
 
 
 # --------------------------------------------------
-# UNCATEGORIZED [LAST UPDATE: 1.6.3]
+# UNCATEGORIZED [LAST UPDATE: 1.7.0b]
 # --------------------------------------------------
 
 # Arch, Ledges and more
@@ -591,56 +693,16 @@ append_multiple(br_brick_list, ['Winch_3x2x1'],
                 }, True)
 
 
-# -------------------------------------------------
-# EXPERIMENTAL [LAST UPDATE: 1.6.3 MAIN]
-# -------------------------------------------------
-
-
-def enable_exp_features():
-
-    exp_branch_exist: bool = False
-
-    if not exp_branch_exist:
-        FM.warning_with_header('No experimental branch.',
-                               'It appears you attempted to enable experimental branch features.\n'
-                               'Please ensure you are using the latest BRCI update. Updating BRCI takes time!\n'
-                               'And the latest versions may not support new content yet.\n'
-                               'You may also mod new bricks. Read Doc\\DOCUMENTATION.md, section "Implementing Modded/Missing bricks"')
-
-    else:
-
-        pass
+append_multiple(br_brick_list, ['FlareGun_1x1x1'],
+                br_brick_list['default_brick_data'] | {
+                    'InputChannel': BrickInput('Action1', None)
+                }, True)
 
 
 # -------------------------------------------------
 # PROPERTIES
 # --------------------------------------------------
 
-"""
-Order for Connector Spacing in UI: [1.6.3]
-    [1] [0]
-    [3] [2]
-    [5] [4]
-"""
-
-"""
-br_special_property_instance_list = {
-    'BrickColor': '4xINT8_r',
-    'BrickSize': '3xINT16_r',
-    'ConnectorSpacing': '6xINT2',
-    'DisplayColor': '3xINT8_r',
-    'SmokeColor': '3xINT8_r',
-    'SwitchName': 'UTF-16',
-    'NumFractionalDigits': 'INT8',
-    'ExitLocation': '3xFLOAT32/None',
-    'OwningSeat': '1BrickID',
-    'ImageColor': '3xINT8_r',
-    'Text': 'UTF-16',
-    'TextColor': '3xINT8_r'
-}
-"""
-
-# TODO. WORK IN PROGRESS! SOME PROPERTIES MAY BE MISSING.
 br_property_types = {
     'ActuatorMode': 'str8',
     'AmmoType': 'str8',
@@ -659,7 +721,7 @@ br_property_types = {
     'BrickColor': 'list[4*uint8]',
     'BrickMaterial': 'str8',
     'BrickPattern': 'str8',
-    'BrickSize': 'list[3*uint16]',
+    'BrickSize': 'list[3*float]',
     'Brightness': 'float',
     'bTankDrive': 'bool',
     'ConnectorSpacing': 'list[6*uint2]',
@@ -667,10 +729,12 @@ br_property_types = {
     'DisplayColor': 'list[3*uint8]',
     'ExitLocation': 'list[3*float]',
     'FlashSequence': 'str8',
-    'FuelType': 'str8',
+    'Font': 'str',
     'FontSize': 'float',
+    'FuelType': 'str8',
     'GearRatioScale': 'float',
     'HornPitch': 'float',
+    'IdlerWheels': 'list[brick_id]',
     'Image': 'str8',
     'ImageColor': 'list[3*uint8]',
     'InputScale': 'float',
@@ -682,6 +746,7 @@ br_property_types = {
     'MinLimit': 'float',
     'NumFractionalDigits': 'uint8',
     'Operation': 'str8',
+    'OutlineThickness': 'float',
     'OutputChannel.MinIn': 'float',
     'OutputChannel.MinOut': 'float',
     'OutputChannel.MaxIn': 'float',
@@ -702,6 +767,8 @@ br_property_types = {
     'TextColor': 'list[3*uint8]',
     'TirePressureRatio': 'float',
     'TraceMask': 'str8',
+    'TrackColor': 'list[4*uint8]',
+    'WheelDiameter': 'float',
+    'WheelWidth': 'float',
     'WinchSpeed': 'float'
-    # IDEA : Also make it support 'bin' type for manual operation for mods.
 }
