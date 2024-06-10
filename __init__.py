@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from datetime import datetime
 from time import perf_counter
-from math import isclose
+from math import ceil
 
 from .BRCI_RF import *
 
@@ -19,13 +19,12 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C46"  # String, This is equivalent to 3.__ fyi
+_version: str = "C47"  # String, This is equivalent to 3.__ fyi
 
 """
 Changelog :
-- 1.7.0b support
-- No longer supports 1.6.3.
-- Warning : There may be some leftovers from 1.6.3.
+- Bugfixes
+- New load_metadata() (experimental)
 """
 
 # Important variables
@@ -79,7 +78,8 @@ class BRCI:
                  tags: list[str, str, str] | None = None,
                  creation_timestamp: int | None = None,
                  update_timestamp: int | None = None,
-                 wip_features: bool = False):
+                 wip_features: bool = False,
+                 custom_description_watermark: str | None = None):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -104,6 +104,7 @@ class BRCI:
         self.creation_timestamp = creation_timestamp
         self.update_timestamp = update_timestamp
         self.wip_features = wip_features
+        self.custom_description_watermark = custom_description_watermark
 
     # Creating more variables
     # In project path
@@ -405,7 +406,7 @@ class BRCI:
             with open(os.path.join(self.in_project_folder_directory, file_name), 'wb') as metadata_file:
 
                 # Writes Carriage Return char
-                metadata_file.write(unsigned_int(13, 1))
+                metadata_file.write(unsigned_int(14, 1))
 
                 # Write all necessary information for the file name
                 metadata_file.write(signed_int(-len(self.project_display_name), 2))
@@ -414,6 +415,8 @@ class BRCI:
                 # Write all necessary information for the file description
                 watermarked_file_description = f"Created using BRCI (Version {_version}).\r\n" \
                                                f"Join our discord for more information : sZXaESzDd9"  # String
+                if self.custom_description_watermark is not None:
+                    watermarked_file_description += f'\r\n\r\n{self.custom_description_watermark}'
                 if self.file_description is not None:
                     watermarked_file_description += f'\r\n\r\nDescription:\r\n{self.file_description}'
                 metadata_file.write(signed_int(-len(watermarked_file_description), 2))
@@ -549,7 +552,7 @@ class BRCI:
                 self.bricks_writing = deepcopy(self.bricks)
 
                 # Writes Carriage Return char
-                brv_file.write(unsigned_int(13, 1))
+                brv_file.write(unsigned_int(14, 1))
                 # Write brick count
                 brv_file.write(unsigned_int(len(self.bricks_writing), 2))
 
@@ -872,8 +875,10 @@ class BRCI:
                         property_length_set: set = set(property_length_list)
                         if len(property_length_set) > 1:
                             brv_file.write(unsigned_int(0, 2))
-                        for property_length in property_length_list:
-                            brv_file.write(unsigned_int(property_length, 2))
+                            for property_length in property_length_list:
+                                brv_file.write(unsigned_int(property_length, 2))
+                        else:
+                            brv_file.write(unsigned_int(property_length_list[0], 2))
 
                     temp_spl: bytes = b''  # Reset
 
@@ -1456,14 +1461,65 @@ class BRCI:
         return self
 
     # Load metadata
-    def load_metadata(self):
+    def load_metadata(self, load_creation_time: bool = True, load_update_time: bool = False,
+                      load_visibility: bool = True, load_tags: bool = True, file_name: str = "MetaData.brm"):
 
         if not self.wip_features:
             FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_metadata().\n'
                                                                 'This feature is still WIP. Set .wip_features to True\n'
                                                                 'In order to access WIP features.')
 
-            return None
+            with open(os.path.join(self.in_project_folder_directory, file_name), 'wb') as metadata_file_reader:
+
+                metadata_file = bytearray(metadata_file_reader.read())
+
+            del metadata_file[:1]
+
+            name_len: int = r_signed_int(b_pop(metadata_file, 2))
+            if name_len >= 0:
+                # UTF-8
+                name: str = r_small_bin_str(b_pop(metadata_file, name_len))
+            else:
+                # UTF-16
+                name: str = r_bin_str(b_pop(metadata_file, -name_len*2))
+
+            description_len: int = r_signed_int(b_pop(metadata_file, 2))
+            if description_len >= 0:
+                # UTF-8
+                description: str = r_small_bin_str(b_pop(metadata_file, description_len))
+            else:
+                # UTF-16
+                description: str = r_bin_str(b_pop(metadata_file, -description_len*2))
+
+            # Get rid of brick count, vehicle size, weight & worth (we don't need that)
+            b_pop(metadata_file, 22)
+
+            # Get rid of the author
+            author_len = r_unsigned_int(b_pop(metadata_file, 1))
+            b_pop(metadata_file, ceil(author_len / 2))
+
+            # Creation time
+            creation_timestamp = r_unsigned_int(b_pop(metadata_file, 8))
+            last_update_timestamp = r_unsigned_int(b_pop(metadata_file, 8))
+            if load_creation_time:
+                self.creation_timestamp = creation_timestamp
+            if load_update_time:
+                self.update_timestamp = last_update_timestamp
+
+            visibility: int = r_unsigned_int(b_pop(metadata_file, 1))
+
+            if load_visibility:
+                self.visibility = visibility
+
+            tags: list[str] = []
+            for _ in range(3):
+                if metadata_file: # If there's still something to take
+                    tag_len = r_unsigned_int(b_pop(metadata_file, 1))
+                    tag = r_small_bin_str(b_pop(metadata_file, tag_len))
+                    tags.append(tag)
+            if load_tags:
+                self.tags = tags.copy()
+
 
     @staticmethod
     def get_missing_gbn_keys(print_missing: bool = False) -> list:
@@ -1474,6 +1530,7 @@ class BRCI:
         if print_missing:
             print(missing_values)
         return missing_values
+
 
     @staticmethod
     def get_missing_properties(print_missing: bool = False):
@@ -1487,5 +1544,6 @@ class BRCI:
         if print_missing:
             print(missing_values)
         return missing_values
+
 
 # --------------------------------------------------

@@ -20,8 +20,7 @@ Mandatory (Out of order) :
 Optional (Out of order) :  
 `data.project_display_name` (`str`) (`''`) define what name will be displayed in-game.  
 `data.file_description` (`str | None`) (`None`) define what description will be displayed in-game.  
-`data.visibility` (`int` 0-3) (`2`) define what visibility it is set to, 0 being the least restrictive (public) and 3 the
-most restrictive (private) in UI order.  
+`data.visibility` (`int` 0-3) (`2`) define what visibility it is set to; `0` → `Public`, `1` → `Friends Only`, `2` → `Private`, `3` → `Unlisted`.
 `data.creation_timestamp` (`int | None`) (`None`) define what timestamp will be displayed in-game as creation time.
 None corresponds to timestamp at generation, int corresponds to 100-nanoseconds since 0001-01-01 00:00:00.  
 `data.update_timestamp` (`int | None`) (`None`) define what timestamp will be displayed in-game as last update time.

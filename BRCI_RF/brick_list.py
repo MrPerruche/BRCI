@@ -729,7 +729,7 @@ br_property_types = {
     'DisplayColor': 'list[3*uint8]',
     'ExitLocation': 'list[3*float]',
     'FlashSequence': 'str8',
-    'Font': 'str',
+    'Font': 'str8',
     'FontSize': 'float',
     'FuelType': 'str8',
     'GearRatioScale': 'float',
