@@ -19,13 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C47"  # String, This is equivalent to 3.__ fyi
-
-"""
-Changelog :
-- Bugfixes
-- New load_metadata() (experimental)
-"""
+_version: str = "C48"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -1461,8 +1455,9 @@ class BRCI:
         return self
 
     # Load metadata
-    def load_metadata(self, load_creation_time: bool = True, load_update_time: bool = False,
-                      load_visibility: bool = True, load_tags: bool = True, file_name: str = "MetaData.brm"):
+    def load_metadata(self, load_display_name: bool = True, load_description: bool = True, load_creation_time: bool = True,
+                      load_update_time: bool = False, load_visibility: bool = True, load_tags: bool = True,
+                      file_name: str = "MetaData.brm"):
 
         if not self.wip_features:
             FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_metadata().\n'
@@ -1482,6 +1477,8 @@ class BRCI:
             else:
                 # UTF-16
                 name: str = r_bin_str(b_pop(metadata_file, -name_len*2))
+            if load_display_name:
+                self.project_display_name = name
 
             description_len: int = r_signed_int(b_pop(metadata_file, 2))
             if description_len >= 0:
@@ -1490,6 +1487,8 @@ class BRCI:
             else:
                 # UTF-16
                 description: str = r_bin_str(b_pop(metadata_file, -description_len*2))
+            if load_description:
+                self.file_description = description
 
             # Get rid of brick count, vehicle size, weight & worth (we don't need that)
             b_pop(metadata_file, 22)
