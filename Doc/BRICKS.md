@@ -513,6 +513,9 @@ It may also instead be a 6 bytes long integer : `0xHHSSVV`.
 ### `TirePressureRatio`
 This property correspond to how much pressure is in the tire. It is a single float 32 : `PRESSURE (f32)`
 
+### `TireThickness`
+This property correspond to how thick the wheel's tire is. It is a single float 32 : `THICKNESS (f32)`
+
 ### `TraceMask`
 This property correspond to what mask is applied to a sensor.
 It can only be applied to sensors set on the 'Proximity' setting.
@@ -1453,15 +1456,15 @@ Tank_2x2x4....... : F
 Wheel_2x2s....... : G
 
 RacingWheel_4x2s. : H
-Wheel_7sx1....... : I
+Wheel_7sx2....... : I
 Wheel_10sx1...... : J
 
 OffroadWheel_3x4s : K
-RacingWheel_3x4s. : K
-Wheel_3x4s....... : K
+RacingWheel_3x4s. : T
+Wheel_3x4s....... : U
 
 DragWheel_4x2.... : L
-Wheel_4x2........ : L
+Wheel_4x2........ : V
 OffroadWheel_5x2. : M
 
 Wheel_10x4....... : N
@@ -1524,6 +1527,7 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`6.0`)
 - `WheelWidth` (`float`) (`2.0`)
+- `TireThickness` (`float`) (`1.2`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : H
@@ -1531,6 +1535,7 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`9.0`)
 - `WheelWidth` (`float`) (`2.0`)
+- `TireThickness` (`float`) (`1.0`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : I
@@ -1538,6 +1543,7 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`7.0`)
 - `WheelWidth` (`float`) (`3.0`)
+- `TireThickness` (`float`) (`1.25`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : J
@@ -1545,13 +1551,15 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`10.0`)
 - `WheelWidth` (`float`) (`3.0`)
+- `TireThickness` (`float`) (`2.2`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : K
 - Default Brick Properties
 - `bInvertTankSteering` (`bool`) (`False`)
-- `WheelDiameter` (`float`) (`9.0`)
+- `WheelDiameter` (`float`) (`8.2`)
 - `WheelWidth` (`float`) (`4.0`)
+- `TireThickness` (`float`) (`1.85`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : L
@@ -1566,6 +1574,7 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`15.0`)
 - `WheelWidth` (`float`) (`6.0`)
+- `TireThickness` (`float`) (`4.5`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : N
@@ -1573,6 +1582,7 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`30.0`)
 - `WheelWidth` (`float`) (`12.0`)
+- `TireThickness ` (`float`) (`9.0`)
 - `TirePressureRatio` (`float`) (`0.8`)
 
 #### Properties : O
@@ -1600,12 +1610,36 @@ Wheel_1x1x1...... : E
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`9.0`)
 - `WheelWidth` (`float`) (`2.0`)
-- 
+
 #### Properties : S
 - Default Brick Properties
 - `bInvertTankSteering` (`bool`) (`False`)
 - `WheelDiameter` (`float`) (`12.0`)
 - `WheelWidth` (`float`) (`2.0`)
+
+#### Properties : T
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`9.0`)
+- `WheelWidth` (`float`) (`4.0`)
+- `TireThickness` (`float`) (`1.0`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : U
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`8.1`)
+- `WheelWidth` (`float`) (`4.0`)
+- `TireThickness` (`float`) (`1.8`)
+- `TirePressureRatio` (`float`) (`0.8`)
+
+#### Properties : V
+- Default Brick Properties
+- `bInvertTankSteering` (`bool`) (`False`)
+- `WheelDiameter` (`float`) (`12.0`)
+- `WheelWidth` (`float`) (`6.0`)
+- `TireThickness` (`float`) (`2.65`)
+- `TirePressureRatio` (`float`) (`0.8`)
 
 ## Windows
 

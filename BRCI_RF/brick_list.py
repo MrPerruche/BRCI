@@ -542,6 +542,7 @@ append_multiple(br_brick_list, ['Wheel_2x2s'],
                     'bInvertTankSteering': False,
                     'WheelDiameter': 6.0,
                     'WheelWidth': 2.0,
+                    'TireThickness': 1.2,
                     'TirePressureRatio': 0.8
                 }, True)
 
@@ -551,15 +552,17 @@ append_multiple(br_brick_list, ['RacingWheel_4x2s'],
                     'bInvertTankSteering': False,
                     'WheelDiameter': 9.0,
                     'WheelWidth': 2.0,
+                    'TireThickness': 1.0,
                     'TirePressureRatio': 0.8
                 }, True)
 
 
-append_multiple(br_brick_list, ['Wheel_7sx1'],
+append_multiple(br_brick_list, ['Wheel_7sx2'],
                 br_brick_list['default_brick_data'] | {
                     'bInvertTankSteering': False,
                     'WheelDiameter': 7.0,
                     'WheelWidth': 3.0,
+                    'TireThickness': 1.25,
                     'TirePressureRatio': 0.8
                 }, True)
 
@@ -569,26 +572,64 @@ append_multiple(br_brick_list, ['Wheel_10sx1'],
                     'bInvertTankSteering': False,
                     'WheelDiameter': 10.0,
                     'WheelWidth': 3.0,
+                    'TireThickness': 2.2,
                     'TirePressureRatio': 0.8
                 }, True)
 
 
-append_multiple(br_brick_list, ['OffroadWheel_3x4s', 'RacingWheel_3x4s', 'Wheel_3x4s'],
+# K
+append_multiple(br_brick_list, ['OffroadWheel_3x4s'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 8.2,
+                    'WheelWidth': 4.0,
+                    'TireThickness': 1.85,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+# T
+append_multiple(br_brick_list, ['RacingWheel_3x4s'],
                 br_brick_list['default_brick_data'] | {
                     'bInvertTankSteering': False,
                     'WheelDiameter': 9.0,
                     'WheelWidth': 4.0,
+                    'TireThickness': 1.0,
                     'TirePressureRatio': 0.8
                 }, True)
 
 
-append_multiple(br_brick_list, ['DragWheel_4x2', 'Wheel_4x2'],
+# U
+append_multiple(br_brick_list, ['Wheel_3x4s'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 8.1,
+                    'WheelWidth': 4.0,
+                    'TireThickness': 1.8,
+                    'TirePressureRatio': 0.8
+                }, True)
+
+
+# L
+append_multiple(br_brick_list, ['DragWheel_4x2'],
                 br_brick_list['default_brick_data'] | {
                     'bInvertTankSteering': False,
                     'WheelDiameter': 12.0,
                     'WheelWidth': 6.0,
+                    'TireThickness': 3.0,
                     'TirePressureRatio': 0.8
                 }, True)
+
+
+# V
+append_multiple(br_brick_list, ['Wheel_4x2'],
+                br_brick_list['default_brick_data'] | {
+                    'bInvertTankSteering': False,
+                    'WheelDiameter': 12.0,
+                    'WheelWidth': 6.0,
+                    'TireThickness': 2.65,
+                    'TirePressureRatio': 0.8
+                })
 
 
 append_multiple(br_brick_list, ['OffroadWheel_5x2'],
@@ -596,6 +637,7 @@ append_multiple(br_brick_list, ['OffroadWheel_5x2'],
                     'bInvertTankSteering': False,
                     'WheelDiameter': 15.0,
                     'WheelWidth': 6.0,
+                    'TireThickness': 4.5,
                     'TirePressureRatio': 0.8
                 }, True)
 
@@ -605,6 +647,7 @@ append_multiple(br_brick_list, ['Wheel_10x4'],
                     'bInvertTankSteering': False,
                     'WheelDiameter': 30.0,
                     'WheelWidth': 12.0,
+                    'TireThickness': 9.0,
                     'TirePressureRatio': 0.8
                 }, True)
 
@@ -762,10 +805,11 @@ br_property_types = {
     'SuspensionDamping': 'float',
     'SuspensionLength': 'float',
     'SuspensionStiffness': 'float',
-    'SwitchName': 'str16',
-    'Text': 'str16',
+    'SwitchName': 'strany',
+    'Text': 'strany',
     'TextColor': 'list[3*uint8]',
     'TirePressureRatio': 'float',
+    'TireThickness': 'float',
     'TraceMask': 'str8',
     'TrackColor': 'list[4*uint8]',
     'WheelDiameter': 'float',

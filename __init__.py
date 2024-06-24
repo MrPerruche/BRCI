@@ -19,7 +19,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C48"  # String, This is equivalent to 3.__ fyi
+_version: str = "C49"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -833,6 +833,18 @@ class BRCI:
                                     temp_pre_spl += signed_int(-len(pt_c_val), 2)
                                     temp_pre_spl += pt_c_val.encode('utf-16')[2:]
 
+                                case 'strany':
+
+                                    try:
+                                        # Assume it can be a long str8
+                                        temp_pre_spl += signed_int(len(pt_c_val), 2)
+                                        temp_pre_spl += small_bin_str(pt_c_val)
+
+                                    except UnicodeEncodeError:
+                                        # Assume since it's not a long str8 it must be a long str16
+                                        temp_pre_spl += signed_int(-len(pt_c_val), 2)
+                                        temp_pre_spl += pt_c_val.encode('utf-16')[2:]
+
                                 case 'uint8':
 
                                     temp_pre_spl += unsigned_int(int(pt_c_val), 1)
@@ -1201,6 +1213,17 @@ class BRCI:
                             case 'str16':
 
                                 p_val_id_to_val[property_name] |= {i: r_small_bin_str(b'\xFF\xFE' + property_bin[2:])}
+
+                            case 'strany':
+
+                                if r_signed_int(property_bin[:2]) < 0:
+                                    # It's UTF-16
+                                    # It looks like some 2IQ move is going on here but no we're getting rid of
+                                    # the property length
+                                    p_val_id_to_val[property_name] |= {i: r_bin_str(b'\xFF\xFE') + property_bin[2:]}
+                                else:
+                                    # It's UTF-8
+                                    p_val_id_to_val[property_name] |= {i: r_small_bin_str(property_bin)}
 
                             case 'uint8':
 

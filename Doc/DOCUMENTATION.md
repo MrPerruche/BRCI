@@ -587,10 +587,10 @@ brci.append_multiple(brci.br_brick_list, ['NewFancyBrick', 'MyModdedBrick'],
 
 If your new brick(s) involve new properties, you must add to the `brci.br_property_types` dictionary every single new
 property and their type. It may be one of these :
-- `bin` (Later discussed)
-- `bool` : Boolean
-- `brick_id` : A single brick. (String)
-- `custom` : (Later discussed)
+- `bin` (Later discussed).
+- `bool` : Boolean.
+- `brick_id` : A single brick (string).
+- `custom` : (Later discussed).
 - `float` : Single precision float.
 - `list[brick_id]` : A list of bricks.
 - `list[3*float]` : A list of 3 single precision float values.
@@ -598,8 +598,9 @@ property and their type. It may be one of these :
 - `list[3*uint16]` : A list of 3 unsigned 16-bit integer values. Also accept a single unsigned 48-bit integer value (e.g. `0x7AD608CF0072`).
 - `list[4*uint8]` : A list of 4 unsigned 8-bit integer values. Also accept a single unsigned 32-bit integer value (e.g. `0x7AD608CF`).
 - `list[6*uint2]` : A list of 6 unsigned 2-bit integer values. Also accept a single unsigned 12-bit integer value (e.g. `0xAD6`).
-- `str8` : A utf-8 string.
-- `str16` : A utf-16 string.
+- `str8` : A utf-8 string (maximum length: 255).
+- `str16` : A utf-16 string (maximum length: 32767).
+- `strany`: A string that may either be utf-8 (maximum length: 32767) or utf-16 (maximum length: 32767).
 - `uint8` : Single unsigned 8-bit integer.
 
 Concerning `bin` :
