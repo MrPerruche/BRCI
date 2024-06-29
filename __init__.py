@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import datetime
 from time import perf_counter
 from math import ceil
+import re
 
 from .BRCI_RF import *
 
@@ -19,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C49"  # String, This is equivalent to 3.__ fyi
+_version: str = "C50"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -73,7 +74,8 @@ class BRCI:
                  creation_timestamp: int | None = None,
                  update_timestamp: int | None = None,
                  wip_features: bool = False,
-                 custom_description_watermark: str | None = None):
+                 custom_description_watermark: str | None = None,
+                 backup_directory: str = os.path.join(_cwd, 'Backup')):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -99,6 +101,7 @@ class BRCI:
         self.update_timestamp = update_timestamp
         self.wip_features = wip_features
         self.custom_description_watermark = custom_description_watermark
+        self.backup_directory = backup_directory
 
     # Creating more variables
     # In project path
@@ -469,6 +472,23 @@ class BRCI:
             # Failed for some reason -_-
             FM.warning_with_header(f"Failed to clone folder: {e}",
                                    f"This may be because .write_to_br() function was made for Windows.")
+
+    def backup(self, folder_name: str | None = None) -> None:
+        import shutil
+        use_folder_name = str(int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 1e7)) if folder_name is None else folder_name
+        # Define the relative path to append to the user's home directory
+        relative_path = os.path.join(os.getenv('LOCALAPPDATA'), 'BrickRigs', 'SavedRemastered', 'Vehicles')
+        # Chars known to be safe
+        pattern = re.compile(r'^[a-zA-Z0-9_\-]+$')
+
+        try:
+            # Remove the destination folder if it exists
+            if os.path.exists(relative_path) and os.path.exists(self.backup_directory) and pattern.match(folder_name):
+                shutil.copytree(relative_path, os.path.join(self.backup_directory, use_folder_name))
+        except OSError as e:
+            # Failed for some reason -_-
+            FM.warning_with_header(f"Failed to clone folder: {e}",
+                                   f"This may be because .backup() function was made for Windows.")
 
     # Sharing some variables from writing vehicle.brv to the rest of the class
     bricks_writing = []
