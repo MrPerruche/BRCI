@@ -563,49 +563,49 @@ Input list:
 ```
 BrickInput('None', brick_input, prefix)........... : None (can be anything), prefix
 BrickInput('AlwaysOn', brick_input, prefix)....... : Value (f32), prefix
-BrickInput('Custom', brick_input, prefix)......... : List of all str brick names (list[str]), prefix
+BrickInput('Custom', brick_input, prefix)......... : List of all source brick names (list[str]), prefix
 
-BrickInput('Steering', brick_input, prefix)....... : List of all str brick names (list[str]), prefix
-BrickInput('SteeringAlt', brick_input, prefix).... : List of all str brick names (list[str]), prefix
-BrickInput('Throttle', brick_input, prefix)....... : List of all str brick names (list[str]), prefix
+BrickInput('Steering', brick_input, prefix)....... : List of all source seat brick names (list[str]), prefix
+BrickInput('SteeringAlt', brick_input, prefix).... : List of all source seat brick names (list[str]), prefix
+BrickInput('Throttle', brick_input, prefix)....... : List of all source seat brick names (list[str]), prefix
 
-BrickInput('ThrottleAlt', brick_input, prefix).... : List of all str brick names (list[str]), prefix
-BrickInput('Brake', brick_input, prefix).......... : List of all str brick names (list[str]), prefix
-BrickInput('BrakeAlt', brick_input, prefix)....... : List of all str brick names (list[str]), prefix
+BrickInput('ThrottleAlt', brick_input, prefix).... : List of all source seat brick names (list[str]), prefix
+BrickInput('Brake', brick_input, prefix).......... : List of all source seat brick names (list[str]), prefix
+BrickInput('BrakeAlt', brick_input, prefix)....... : List of all source seat brick names (list[str]), prefix
 
-BrickInput('Auxiliary', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
-BrickInput('AuxiliaryAlt', brick_input, prefix)... : List of all str brick names (list[str]), prefix
-BrickInput('ViewPitch', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+BrickInput('Auxiliary', brick_input, prefix)...... : List of all source seat brick names (list[str]), prefix
+BrickInput('AuxiliaryAlt', brick_input, prefix)... : List of all source seat brick names (list[str]), prefix
+BrickInput('ViewPitch', brick_input, prefix)...... : List of all source seat brick names (list[str]), prefix
 
-BrickInput('ViewPitchAlt', brick_input, prefix)... : List of all str brick names (list[str]), prefix
-BrickInput('ViewYaw', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
-BrickInput('ViewYawAlt', brick_input, prefix)..... : List of all str brick names (list[str]), prefix
+BrickInput('ViewPitchAlt', brick_input, prefix)... : List of all source seat brick names (list[str]), prefix
+BrickInput('ViewYaw', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
+BrickInput('ViewYawAlt', brick_input, prefix)..... : List of all source seat brick names (list[str]), prefix
 
-BrickInput('Horn', brick_input, prefix)........... : List of all str brick names (list[str]), prefix
-BrickInput('DisableSteering', brick_input, prefix) : List of all str brick names (list[str]), prefix
-BrickInput('InvertSteering', brick_input, prefix). : List of all str brick names (list[str]), prefix
+BrickInput('Horn', brick_input, prefix)........... : List of all source seat brick names (list[str]), prefix
+BrickInput('DisableSteering', brick_input, prefix) : List of all source seat brick names (list[str]), prefix
+BrickInput('InvertSteering', brick_input, prefix). : List of all source seat brick names (list[str]), prefix
 
-BrickInput('HandBrake', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
-BrickInput('OperationMode', brick_input, prefix).. : List of all str brick names (list[str]), prefix
-BrickInput('Headlight', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+BrickInput('HandBrake', brick_input, prefix)...... : List of all source seat brick names (list[str]), prefix
+BrickInput('OperationMode', brick_input, prefix).. : List of all source seat brick names (list[str]), prefix
+BrickInput('Headlight', brick_input, prefix)...... : List of all source seat brick names (list[str]), prefix
 
-BrickInput('Beacon', brick_input, prefix)......... : List of all str brick names (list[str]), prefix
-BrickInput('WarningLight', brick_input, prefix)... : List of all str brick names (list[str]), prefix
-BrickInput('Taillight', brick_input, prefix)...... : List of all str brick names (list[str]), prefix
+BrickInput('Beacon', brick_input, prefix)......... : List of all source seat brick names (list[str]), prefix
+BrickInput('WarningLight', brick_input, prefix)... : List of all source seat brick names (list[str]), prefix
+BrickInput('Taillight', brick_input, prefix)...... : List of all source seat brick names (list[str]), prefix
 
-BrickInput('BrakeLight', brick_input, prefix)..... : List of all str brick names (list[str]), prefix
-BrickInput('ReversingLight', brick_input, prefix). : List of all str brick names (list[str]), prefix
-BrickInput('Action1', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('BrakeLight', brick_input, prefix)..... : List of all source seat brick names (list[str]), prefix
+BrickInput('ReversingLight', brick_input, prefix). : List of all source seat brick names (list[str]), prefix
+BrickInput('Action1', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
 
-BrickInput('Action2', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
-BrickInput('Action3', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
-BrickInput('Action4', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action2', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
+BrickInput('Action3', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
+BrickInput('Action4', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
 
-BrickInput('Action5', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
-BrickInput('Action6', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
-BrickInput('Action7', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action5', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
+BrickInput('Action6', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
+BrickInput('Action7', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
 
-BrickInput('Action8', brick_input, prefix)........ : List of all str brick names (list[str]), prefix
+BrickInput('Action8', brick_input, prefix)........ : List of all source seat brick names (list[str]), prefix
 ```
 
 ## Actuators

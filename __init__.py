@@ -20,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C50"  # String, This is equivalent to 3.__ fyi
+_version: str = "C51"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -482,12 +482,23 @@ class BRCI:
         pattern = re.compile(r'^[a-zA-Z0-9_\-]+$')
 
         try:
-            # Remove the destination folder if it exists
-            if os.path.exists(relative_path) and os.path.exists(self.backup_directory) and pattern.match(folder_name):
+            if not os.path.exists(self.backup_directory):
+
+                # This file is part of BRCI but not installed by default. Warning would cause confusing; so we don't.
+                if self.backup_directory != os.path.join(_cwd, 'Backup') :
+                    FM.warning_with_header("Cannot find specified backup folder",
+                                           "Unable to find specified backup folder. The folder has been made for you.")
+
+                os.makedirs(self.backup_directory)
+
+            if os.path.exists(relative_path) and pattern.match(use_folder_name):
                 shutil.copytree(relative_path, os.path.join(self.backup_directory, use_folder_name))
+            else:
+                FM.warning_with_header("Cannot create backup",
+                                       "Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.") 
         except OSError as e:
             # Failed for some reason -_-
-            FM.warning_with_header(f"Failed to clone folder: {e}",
+            FM.warning_with_header(f"Failed to clone folder: {type(e).__name__}: {e}",
                                    f"This may be because .backup() function was made for Windows.")
 
     # Sharing some variables from writing vehicle.brv to the rest of the class
@@ -885,10 +896,13 @@ class BRCI:
 
                             temp_pre_spl += small_bin_str(pt_c_val)
 
+                        elif isinstance(pt_c_val, float) or isinstance(pt_c_val, int):
+                            temp_pre_spl += bin_float(pt_c_val, 4)
+
                         else:
 
                             raise ValueError(f'Unsupported property type: {pt_c_val}.\n'
-                                             f'Consider using bin to implement this property, as explained in Doc\\DOCUMENTATION.md')
+                                             f'Consider using bin to implement this property, as explained in Doc/DOCUMENTATION.md')
 
                         property_length_list.append(len(temp_pre_spl))
                         temp_spl += temp_pre_spl
@@ -977,11 +991,15 @@ class BRCI:
                     brv_file.write(brci_individual_appendix)
 
                 # USER Appendix
+                if not isinstance(self.user_appendix, list): user_a_use = [self.user_appendix]
+                else: user_a_use = self.user_appendix
+                
                 # Length
                 brv_file.write(unsigned_int(len(self.user_appendix), 4))
 
                 # Data
-                for user_individual_appendix in self.user_appendix:
+                for user_individual_appendix in user_a_use:
+                    #uia_use: bytearray = bytearray(user_individual_appendix)
                     brv_file.write(unsigned_int(len(user_individual_appendix), 4))
                     brv_file.write(user_individual_appendix)
 
