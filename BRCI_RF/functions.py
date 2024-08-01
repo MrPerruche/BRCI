@@ -1,5 +1,6 @@
 import struct
 from dataclasses import dataclass
+from datetime import datetime
 
 # whoops, someone forgot to move this over here.
 from builtins import print as print_ins
@@ -66,6 +67,8 @@ class FM:
     def warning_with_header(header, text):
         print(f"{FM.warning} {header}{FM.remove_reverse} \n{text}")
 
+def get_64_time_100ns() -> int:
+    return int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 1e7)
 
 def unsigned_int(integer, byte_len):
 

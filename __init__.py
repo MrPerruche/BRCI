@@ -20,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C50"  # String, This is equivalent to 3.__ fyi
+_version: str = "C52"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -475,19 +475,32 @@ class BRCI:
 
     def backup(self, folder_name: str | None = None) -> None:
         import shutil
-        use_folder_name = str(int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 1e7)) if folder_name is None else folder_name
+        use_folder_name = get_64_time_100ns() if folder_name is None else folder_name
         # Define the relative path to append to the user's home directory
         relative_path = os.path.join(os.getenv('LOCALAPPDATA'), 'BrickRigs', 'SavedRemastered', 'Vehicles')
         # Chars known to be safe
         pattern = re.compile(r'^[a-zA-Z0-9_\-]+$')
 
         try:
-            # Remove the destination folder if it exists
-            if os.path.exists(relative_path) and os.path.exists(self.backup_directory) and pattern.match(folder_name):
-                shutil.copytree(relative_path, os.path.join(self.backup_directory, use_folder_name))
+            if not os.path.exists(self.backup_directory):
+
+                # This file is part of BRCI but not installed by default. Warning would cause confusing; so we don't.
+                if self.backup_directory != os.path.join(_cwd, 'Backup') :
+                    FM.warning_with_header("Cannot find specified backup folder",
+                                           "Unable to find specified backup folder. The folder has been made for you.")
+
+                os.makedirs(self.backup_directory)
+
+            if os.path.exists(relative_path) and pattern.match(use_folder_name):
+                    if os.path.exists(os.path.join(self.backup_directory, use_folder_name)):
+                        shutil.rmtree(os.path.join(self.backup_directory, use_folder_name))
+                    shutil.copytree(relative_path, os.path.join(self.backup_directory, use_folder_name))
+            else:
+                FM.warning_with_header("Cannot create backup",
+                                       "Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.") 
         except OSError as e:
             # Failed for some reason -_-
-            FM.warning_with_header(f"Failed to clone folder: {e}",
+            FM.warning_with_header(f"Failed to clone folder: {type(e).__name__}: {e}",
                                    f"This may be because .backup() function was made for Windows.")
 
     # Sharing some variables from writing vehicle.brv to the rest of the class
@@ -870,13 +883,13 @@ class BRCI:
                                     temp_pre_spl += unsigned_int(int(pt_c_val), 1)
 
 
-                        elif isinstance(pt_c_val, list) and isinstance(pt_c_val[0],
-                                                                       str):  # OR if it doesn't end with .InputAxis
+                        elif isinstance(pt_c_val, list) and (isinstance(pt_c_val[0],
+                                                                       str) or isinstance(pt_c_val[0], int)):  # OR if it doesn't end with .InputAxis
 
                             temp_pre_spl += unsigned_int(len(pt_c_val), 2)
-
                             for pt_c_sub_val in pt_c_val:
-                                temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val] + 1, 2)
+                                #print(f"pt_c_sub_val: {pt_c_sub_val}\npt_c_sub_val type: {type(pt_c_sub_val)}\npt_c_val: {pt_c_val}")
+                                temp_pre_spl += unsigned_int(string_name_to_id_table[str(pt_c_sub_val)] + 1, 2)
 
 
                         elif isinstance(pt_c_val, str):  # OR if it ends with .InputAxis
@@ -885,10 +898,14 @@ class BRCI:
 
                             temp_pre_spl += small_bin_str(pt_c_val)
 
+                        elif isinstance(pt_c_val, float) or isinstance(pt_c_val, int):
+                            temp_pre_spl += bin_float(pt_c_val, 4)
+
                         else:
 
                             raise ValueError(f'Unsupported property type: {pt_c_val}.\n'
-                                             f'Consider using bin to implement this property, as explained in Doc\\DOCUMENTATION.md')
+                                             f'Consider using bin to implement this property, as explained in Doc/DOCUMENTATION.md\n'
+                                             f'DEBUG INFORMATION: {pt_c_val}, ')
 
                         property_length_list.append(len(temp_pre_spl))
                         temp_spl += temp_pre_spl
@@ -977,11 +994,15 @@ class BRCI:
                     brv_file.write(brci_individual_appendix)
 
                 # USER Appendix
+                if not isinstance(self.user_appendix, list): user_a_use = [self.user_appendix]
+                else: user_a_use = self.user_appendix
+                
                 # Length
                 brv_file.write(unsigned_int(len(self.user_appendix), 4))
 
                 # Data
-                for user_individual_appendix in self.user_appendix:
+                for user_individual_appendix in user_a_use:
+                    #uia_use: bytearray = bytearray(user_individual_appendix)
                     brv_file.write(unsigned_int(len(user_individual_appendix), 4))
                     brv_file.write(user_individual_appendix)
 
@@ -1243,6 +1264,9 @@ class BRCI:
                                     p_val_id_to_val[property_name] |= {i: r_bin_str(b'\xFF\xFE') + property_bin[2:]}
                                 else:
                                     # It's UTF-8
+                                    print(f"pray this works: {property_bin}")
+                                    # pray THIS works
+                                    property_bin = property_bin[2:]
                                     p_val_id_to_val[property_name] |= {i: r_small_bin_str(property_bin)}
 
                             case 'uint8':
@@ -1506,21 +1530,28 @@ class BRCI:
             FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_metadata().\n'
                                                                 'This feature is still WIP. Set .wip_features to True\n'
                                                                 'In order to access WIP features.')
-
-            with open(os.path.join(self.in_project_folder_directory, file_name), 'wb') as metadata_file_reader:
-
+        else:
+            #print("opening metadata file")
+            with open(os.path.join(self.in_project_folder_directory, file_name), 'rb') as metadata_file_reader:
+                #print(f"opening {file_name}")
                 metadata_file = bytearray(metadata_file_reader.read())
 
             del metadata_file[:1]
 
             name_len: int = r_signed_int(b_pop(metadata_file, 2))
+            #print(f"name len: {name_len}")
             if name_len >= 0:
+                #print("UTF-8")
                 # UTF-8
                 name: str = r_small_bin_str(b_pop(metadata_file, name_len))
+                #print(f"name: {name}")
             else:
+                #print("UTF-16")
                 # UTF-16
                 name: str = r_bin_str(b_pop(metadata_file, -name_len*2))
+                #print(f"name: {name}")
             if load_display_name:
+                #print(f"project display name set to {name}")
                 self.project_display_name = name
 
             description_len: int = r_signed_int(b_pop(metadata_file, 2))
@@ -1557,6 +1588,7 @@ class BRCI:
             for _ in range(3):
                 if metadata_file: # If there's still something to take
                     tag_len = r_unsigned_int(b_pop(metadata_file, 1))
+                    print(f"if i dont print this, the entire read-metadata function breaks. welcome to brci: {b_pop(metadata_file, tag_len)}")
                     tag = r_small_bin_str(b_pop(metadata_file, tag_len))
                     tags.append(tag)
             if load_tags:
