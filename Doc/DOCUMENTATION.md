@@ -538,6 +538,30 @@ If there is no issue, `['default_brick_data']` will be returned.
 Note: `'default_brick_data'` is not a brick and using it will cause an error as no `gbn` key is given to it.
 Even if it had one, which would no longer cause an error with BRCI, Brick Rigs would not be able to load this brick.
 
+### `brci.rotate_point_3d()`
+
+This function will calculate the new position of a brick after rotation
+
+`brci.rotate_point_3d(point, center, rotation)` takes 3 arguments:
+
+Mandatory:
+`point` (`list[float]`) (`[0, 0, 0]`) define the point you want to rotate  
+`center` (`list[float]`) (`[0, 0, 0]`) define the center of rotation (around what point it will be rotated)  
+`rotation` (`list[float]`) (`[0, 0, 0]`) define the angle of rotation
+
+This function will return a list of 3 floats corresponding to the point's new position
+
+### `data.rotate_creation()`
+
+This function will rotate a creation
+
+`data.rotate_creation(center, rotation)` takes 2 arguments:
+
+Mandatory:
+`center` (`list[float]`) (`[0, 0, 0]`) define the center of rotation (around what point it will be rotated)  
+`rotation` (`list[float]`) (`[0, 0, 0]`) define the angle of rotation
+
+This function does not return anything.
 
 ## Brick Inputs
 

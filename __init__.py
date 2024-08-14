@@ -20,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C52"  # String, This is equivalent to 3.__ fyi
+_version: str = "C53"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -294,6 +294,13 @@ class BRCI:
             return {brick[0]: brick[1] for brick in self.bricks}
 
         return self.bricks
+    
+    def rotate_creation(self, center: list[float], rotation: list[float]):
+        for brick in self.bricks:
+            brick[1]["Position"] = rotate_point_3d(brick[1]["Position"], center, rotation)
+            brick[1]["Rotation"] = list(map(lambda x, y: x+y, brick[1]["Rotation"], rotation))
+
+
 
     # Deleting all bricks
     def clear_bricks(self):

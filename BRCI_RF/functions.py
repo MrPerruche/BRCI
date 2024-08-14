@@ -1,4 +1,4 @@
-import struct
+import struct, numpy as np
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -207,3 +207,43 @@ class BrickInput:
                     }
                     else: return { f'{self.prefix}.InputAxis': self.brick_input_type }
                 else: return 'invalid_source_bricks'
+
+def rotate_point_3d(point: list[float], center: list[float], rotation: list[float]) -> list[float]:
+    
+    rotation = np.deg2rad(rotation).tolist()
+    pitch, roll, yaw = rotation
+    
+    move = np.array([     [1    ,0  ,0, center[0]],
+                          [0    ,1  ,0, center[1]],
+                          [0    ,0  ,1, center[2]],
+                          [0    ,0  ,0, 1]])
+    
+    move_back = np.array([[1    ,0  ,0, -center[0]],
+                          [0    ,1  ,0, -center[1]],
+                          [0    ,0  ,1, -center[2]],
+                          [0    ,0  ,0, 1]])
+    
+    #roll rotation
+    Ax = np.array([[1,0,0,0],
+                  [0,np.cos(pitch),-np.sin(pitch),0],
+                  [0,np.sin(pitch),np.cos(pitch),0],
+                  [0,0,0,1]])
+    #pitch rotation
+    Ay = np.array([[np.cos(roll),0,np.sin(roll),0],
+                  [0,1,0,0],
+                  [np.sin(roll),0,np.cos(roll),0],
+                  [0,0,0,1]])
+    #yaw rotation
+    Az = np.array([[np.cos(yaw),-np.sin(yaw),0,0],
+                  [np.sin(yaw),np.cos(yaw),0,0],
+                  [0,0,1,0] ,[0,0,0,1]])
+
+    #combining every transformation in one matrix
+    M = move@Az@Ay@Ax@move_back
+
+    #dummy 4th dimension for translation
+    point.append(1)
+    return (M@point)[:3]
+
+# rotate-point-3d alias
+def rot(point: list[float], center: list[float], rotation: list[float]) -> list[float]: return rotate_point_3d(point, center, rotation)
