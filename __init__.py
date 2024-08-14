@@ -489,10 +489,10 @@ class BRCI:
             print(f"Folder cloned successfully from '{self.in_project_folder_directory}' to '{full_path}'.")
         except OSError as e:
             # Failed for some reason -_-
-            FM.error_with_header("Warning", f"Failed to clone folder: {e}\nThis is usually because 'write_to_br' is a windows only function.")
+            FM.warning_with_header("Warning", f"Failed to clone folder: {e}\nThis is usually because 'write_to_br' is a windows only function.")
         except ValueError as ve:
             # Safeguard triggered
-            FM.error_with_header("Fatal Error", f"{ve} \nUsually caused by invalid project name.")
+            FM.warning_with_header("Fatal Error", f"{ve} \nUsually caused by invalid project name.")
 
     def backup(self, folder_name: str | None = None) -> None:
         use_folder_name = get_64_time_100ns() if folder_name is None else folder_name
