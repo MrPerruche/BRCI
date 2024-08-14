@@ -80,6 +80,7 @@ class BRCI:
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
         self.project_name = project_name  # String
+        assert project_name.lower() != "vehicles", "Invalid project name."
         self.write_blank = write_blank  # Boolean
         self.project_display_name = project_display_name  # String (in-game name (.brm))
         self.file_description = file_description  # String (The description of the file (.brm))
@@ -472,7 +473,7 @@ class BRCI:
         # Get the user's home directory and expand the path
         user_home = os.path.expanduser("~")
         # Construct the full path by joining the user's home directory with the relative path
-        full_path = os.path.join(user_home, relative_path, self.project_name)
+        full_path = os.path.join(user_home, relative_path, self.project_name.lower())
         
         try:
             # Check if the target directory is within the Vehicles folder and matches the intended project name
