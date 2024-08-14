@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import datetime
 from time import perf_counter
 from math import ceil
-import re
+import re, shutil
 
 from .BRCI_RF import *
 
@@ -20,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C53"  # String, This is equivalent to 3.__ fyi
+_version: str = "C54"  # String, This is equivalent to 3.__ fyi
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -80,6 +80,7 @@ class BRCI:
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
         self.project_name = project_name  # String
+        assert project_name.lower() != "vehicles", "Invalid project name."
         self.write_blank = write_blank  # Boolean
         self.project_display_name = project_display_name  # String (in-game name (.brm))
         self.file_description = file_description  # String (The description of the file (.brm))
@@ -464,27 +465,36 @@ class BRCI:
 
     # Writing the project folder to brick rigs # only works on windows
     def write_to_br(self) -> None:
-        import shutil
+        """
+        Function to copy the finished project to your Brick Rigs vehicles directory.
+        """
         # Define the relative path to append to the user's home directory
-        relative_path = "AppData/Local/BrickRigs/SavedRemastered/Vehicles"
+        relative_path = os.path.join('AppData', 'Local', 'BrickRigs', 'SavedRemastered', 'Vehicles')
         # Get the user's home directory and expand the path
         user_home = os.path.expanduser("~")
         # Construct the full path by joining the user's home directory with the relative path
-        full_path = os.path.join(user_home, relative_path, self.project_name)
-
+        full_path = os.path.join(user_home, relative_path, self.project_name.lower())
+        
         try:
-            # Remove the destination folder if it exists
-            if os.path.exists(full_path):
+            # Check if the target directory is within the Vehicles folder and matches the intended project name
+            if os.path.commonpath([full_path, os.path.join(user_home, relative_path)]) != os.path.join(user_home, relative_path):
+                raise ValueError("Attempted to delete a directory outside the allowed Vehicles path.")
+
+            # Remove the destination folder if it exists and is not the Vehicles root itself
+            if os.path.exists(full_path) and os.path.basename(full_path) == self.project_name.lower():
                 shutil.rmtree(full_path)
+            
             # Copy the folder
             shutil.copytree(self.in_project_folder_directory, full_path)
+            print(f"Folder cloned successfully from '{self.in_project_folder_directory}' to '{full_path}'.")
         except OSError as e:
             # Failed for some reason -_-
-            FM.warning_with_header(f"Failed to clone folder: {e}",
-                                   f"This may be because .write_to_br() function was made for Windows.")
+            FM.error_with_header("Warning", f"Failed to clone folder: {e}\nThis is usually because 'write_to_br' is a windows only function.")
+        except ValueError as ve:
+            # Safeguard triggered
+            FM.error_with_header("Fatal Error", f"{ve} \nUsually caused by invalid project name.")
 
     def backup(self, folder_name: str | None = None) -> None:
-        import shutil
         use_folder_name = get_64_time_100ns() if folder_name is None else folder_name
         # Define the relative path to append to the user's home directory
         relative_path = os.path.join(os.getenv('LOCALAPPDATA'), 'BrickRigs', 'SavedRemastered', 'Vehicles')
