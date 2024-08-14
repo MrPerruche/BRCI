@@ -29,6 +29,9 @@ As there also appears to be some confusion as to how to set it up, here's a guid
 - In your python file, import BRCI (preferably using `import BRCI as brci`) and use it.
 - Follow remaining instructions in `Doc\DOCUMENTATION.md`.
 
+NumPy is a dependency of BRCI.
+If you do not have NumPy installed in your environment or Python installation, certain functionality will be disabled to prevent errors.
+Install NumPy with `pip install numpy`, or use the requirements file with `pip install -r requirements.txt`.
 
 ## Credits 
 

@@ -295,10 +295,13 @@ class BRCI:
 
         return self.bricks
     
-    def rotate_creation(self, center: list[float], rotation: list[float]):
-        for brick in self.bricks:
-            brick[1]["Position"] = rotate_point_3d(brick[1]["Position"], center, rotation)
-            brick[1]["Rotation"] = list(map(lambda x, y: x+y, brick[1]["Rotation"], rotation))
+    if numpy_features_enabled:
+        def rotate_creation(self, center: list[float], rotation: list[float]):
+            for brick in self.bricks:
+                brick[1]["Position"] = rotate_point_3d(brick[1]["Position"], center, rotation)
+                brick[1]["Rotation"] = list(map(lambda x, y: x+y, brick[1]["Rotation"], rotation))
+    else:
+        print(f"{FM.warning} NumPy is not installed in your Python installation or environment. Rotation functions are disabled.")
 
 
 
