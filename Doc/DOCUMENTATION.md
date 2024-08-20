@@ -42,12 +42,14 @@ Tags :
 `data.logs` (`list[str] | None`) (`None`→`[]`) define what logs will be printed :
 - `'time'` will print how long each step takes to generate.
 - `'bricks'` will print debug information about bricks.
+- `'no_warnings'` will disable printing warnings.
 
 `data.user_appendix` (`bytes`) (`b''`) define what bytes are hidden in the `Vehicle.brv` file.
 This data is cleared when you save it in-game.  
 `data.seat_brick` (`str | None`) (`None`) define what brick is the driver seat. If it is set to `None`, it will set all
 seats to the "Random" setting, which set the driver seat to the first seat loaded. To set the driver seat, you must use
-the brick's name.
+the brick's name.  
+`data.error_sensitive` (`bool`) (`False`) define if an error will be raised when a warning would usually be printed.
 
 Here's an example of how to initialize BRCI:
 ```python
@@ -338,7 +340,9 @@ Optional:
 `load_appendix` (`bool`) (`True`) define if appendix data will be loaded  
 `file_name` (`str`) (`'Vehicle.brv'`) define how the loaded file is named
 
-WARNING: Set `load_brci_data` to `False` if the file you're attempting to load was made before version C45!
+WARNINGS:
+- `load_brci_data` and `load_appendix` are WIP features and as such requires `data.wip_features` to be set to `True`.
+- BRCI will not load vehicles last saved using Brick Rigs versions older than 1.7.0.
 
 Here's an example on how to use `data.load_brv()` :
 

@@ -1,7 +1,7 @@
 import os
 # from warnings import warn as raise_warning
 from copy import deepcopy
-from datetime import datetime
+# from datetime import datetime
 from time import perf_counter
 from math import ceil
 import re, shutil
@@ -20,7 +20,7 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C54"  # String, This is equivalent to 3.__ fyi
+_version: str = "C55"  # String, This is equivalent to 3.__ fyi, e.g. C55 -> 3.55
 
 # Important variables
 _cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
@@ -37,6 +37,22 @@ os_system('color')
 
 
 custom_common_properties: dict[str: any] = {}
+
+
+def is_valid_project_name(folder_name: str):
+
+    invalid_chars = r'[<>:"/\\|?*]'
+
+    # Check if the name is empty or contains invalid characters
+    if not folder_name or re.search(invalid_chars, folder_name):
+        return False
+
+    # Check if the folder name ends with a space or a period (Windows does not allow this)
+    if folder_name[-1] in {' ', '.'}:
+        return False
+
+    # If all checks pass, the name is valid
+    return True
 
 
 def create_brick(brick: str, position: list[float] = None, rotation: list[float] = None,
@@ -75,7 +91,8 @@ class BRCI:
                  update_timestamp: int | None = None,
                  wip_features: bool = False,
                  custom_description_watermark: str | None = None,
-                 backup_directory: str = os.path.join(_cwd, 'Backup')):
+                 backup_directory: str = os.path.join(_cwd, 'Backup'),
+                 error_sensitive: bool = False):
 
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
@@ -103,6 +120,9 @@ class BRCI:
         self.wip_features = wip_features
         self.custom_description_watermark = custom_description_watermark
         self.backup_directory = backup_directory
+        self.error_sensitive = error_sensitive
+
+        self.__brv_version: int = 0x0E
 
     # Creating more variables
     # In project path
@@ -295,6 +315,10 @@ class BRCI:
             return {brick[0]: brick[1] for brick in self.bricks}
 
         return self.bricks
+
+    def _warn_no_numpy(self):
+        if 'no_warnings' not in self.logs:
+            print(f"{FM.warning} NumPy is not installed in your Python installation or environment. Rotation functions are disabled.")
     
     if numpy_features_enabled:
         def rotate_creation(self, center: list[float], rotation: list[float]):
@@ -302,7 +326,7 @@ class BRCI:
                 brick[1]["Position"] = rotate_point_3d(brick[1]["Position"], center, rotation)
                 brick[1]["Rotation"] = list(map(lambda x, y: x+y, brick[1]["Rotation"], rotation))
     else:
-        print(f"{FM.warning} NumPy is not installed in your Python installation or environment. Rotation functions are disabled.")
+        _warn_no_numpy()
 
 
 
@@ -336,21 +360,24 @@ class BRCI:
         match variable_name:
             case 'write_blank':
                 if not isinstance(self.write_blank, bool):
-                    FM.warning_with_header("Invalid write_blank type.",
-                                           f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a {type(self.write_blank).__name__}.\nIt is now set to False.")
+                    if self.error_sensitive: raise TypeError("Invalid write_blank type.")
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Invalid write_blank type.",
+                                               f"Whilst {occured_when}, write_blank was found not to be a boolean, it was instead a {type(self.write_blank).__name__}.\nIt is now set to False.")
                     self.write_blank = False
             case 'bricks_len':
                 if len(self.bricks) > 65535:
-                    FM.warning_with_header("Too many bricks for BRCI.",
-                                           f"Whilst {occured_when}, the length of the list of bricks was found to exceed 65,535.\n"
-                                           f"Therefore, the last {len(self.bricks) - 65535 :,} brick(s) were removed. 65,535 bricks left.")
+                    if self.error_sensitive: raise OverflowError(f"Too many bricks. Unsigned 16-bit integer limit exceeded: {len(self.bricks):,}/65,535")
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Too many bricks for BRCI.",
+                             f"Whilst {occured_when}, the length of the list of bricks was found to exceed 65,535.\n"
+                             f"Therefore, the last {len(self.bricks) - 65535 :,} brick(s) were removed. 65,535 bricks left.")
                     self.bricks = self.bricks[:65535]
                 if len(self.bricks) > 50000:
-                    FM.warning_with_header("Too many bricks for Brick Rigs.",
-                                           f"Whilst {occured_when}, the length of the list of bricks was found to exceed 50,000.\n"
-                                           f"Although BRCI can generate up to 65,535 bricks; Brick Rigs will only load 50,000 of them.")
+                    if self.error_sensitive: raise IndexError("Too many bricks. Brick Rigs will only load 50,000 bricks.")
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Too many bricks for Brick Rigs.",
+                             f"Whilst {occured_when}, the length of the list of bricks was found to exceed 50,000.\n"
+                             f"Although BRCI can generate up to 65,535 bricks; Brick Rigs will only load 50,000 of them.")
             case 'logs':
-                logs_whitelist_list: list[str] = ['time', 'bricks']
+                logs_whitelist_list: list[str] = ['time', 'bricks', 'no_warnings']
                 invalid_logs_list: list[str] = []
                 for log_request_str in self.logs:
                     if not log_request_str in logs_whitelist_list:
@@ -358,9 +385,15 @@ class BRCI:
                 if invalid_logs_list:
                     invalid_logs_str: str = ', '.join(invalid_logs_list)
                     logs_whitelist_str: str = ', '.join(logs_whitelist_list)
-                    FM.warning_with_header("Unknown log(s) type requested.",
-                                           f"Whilst {occured_when}, the following log(s) type requested were found to be invalid: "
-                                           f"{invalid_logs_str}.\nYou may instead use the following: {logs_whitelist_str}.")
+                    if self.error_sensitive: raise ValueError(f"Unknown log(s) type requested: {invalid_logs_str}.")
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Unknown log(s) type requested.",
+                         f"Whilst {occured_when}, the following log(s) type requested were found to be invalid: "
+                         f"{invalid_logs_str}.\nYou may instead use the following: {logs_whitelist_str}.")
+            case 'project_name':
+                if not is_valid_project_name(self.project_name):
+                    if self.error_sensitive: raise OSError(f'\"{self.project_name}\" is not a valid project name: a file cannot be named as such.')
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Invalid project name.",
+                                               f"Whilst {occured_when}, the project name was found to be invalid.")
 
     # Used to create directory for file generators
     def ensure_project_directory_exists(self) -> None:
@@ -378,18 +411,21 @@ class BRCI:
 
         # Create folder if missing
         self.ensure_project_directory_exists()
+        self.ensure_valid_variable_type('project_name', f'writing {file_name} (preview)')
 
         # Verify the image exists.
         if not os.path.exists(_write_preview_regular_image_path):
 
-            FM.warning_with_header("Image not found",
-                                   f"Whilst writing preview ({file_name}) we were unable to find BRCI default image. Please retry.")
+            if self.error_sensitive: raise FileNotFoundError("BRCI default image (Resources/BRCI_Preview_Default.png) was not found.")
+            elif 'no_warnings' not in self.logs: FM.warning_with_header("Image not found",
+                    f"Whilst writing preview ({file_name}) we were unable to find BRCI default image. Please retry.")
 
         # Copy saved image to the project folders.
         else:
             if os.path.exists(os.path.join(self.in_project_folder_directory, file_name)):
-                FM.warning_with_header("Preview.png already created",
-                                       f"Whilst writing preview ({file_name}), we noticed it was already added.\nThe old Preview.png was therefore replaced.")
+                if self.error_sensitive: raise FileExistsError("Preview.png already exists.")
+                elif 'no_warnings' not in self.logs: FM.warning_with_header("Preview.png already created",
+                        f"Whilst writing preview ({file_name}), we noticed it was already added.\nThe old Preview.png was therefore replaced.")
                 os.remove(os.path.join(self.in_project_folder_directory, file_name))
 
             copy_file(os.path.join(_write_preview_regular_image_path),
@@ -402,6 +438,7 @@ class BRCI:
         self.ensure_project_directory_exists()
         self.ensure_valid_variable_type('write_blank', f'writing {file_name}')
         self.ensure_valid_variable_type('bricks_len', f'writing {file_name}')
+        self.ensure_valid_variable_type('project_name', f'writing {file_name} (metadata)')
 
         # Write blank file for metadata (if desired)
         if self.write_blank:
@@ -414,7 +451,7 @@ class BRCI:
             with open(os.path.join(self.in_project_folder_directory, file_name), 'wb') as metadata_file:
 
                 # Writes Carriage Return char
-                metadata_file.write(unsigned_int(14, 1))
+                metadata_file.write(unsigned_int(self.__brv_version, 1))
 
                 # Write all necessary information for the file name
                 metadata_file.write(signed_int(-len(self.project_display_name), 2))
@@ -465,6 +502,8 @@ class BRCI:
 
     # Writing the project folder to brick rigs # only works on windows
     def write_to_br(self) -> None:
+
+        self.ensure_valid_variable_type('project_name', f'porting to Brick Rigs')
         """
         Function to copy the finished project to your Brick Rigs vehicles directory.
         """
@@ -489,12 +528,18 @@ class BRCI:
             print(f"Folder cloned successfully from '{self.in_project_folder_directory}' to '{full_path}'.")
         except OSError as e:
             # Failed for some reason -_-
-            FM.warning_with_header("Warning", f"Failed to clone folder: {e}\nThis is usually because 'write_to_br' is a windows only function.")
+            if self.error_sensitive: raise
+            elif 'no_warnings' not in self.logs: FM.warning_with_header("Warning", f"Failed to clone folder: {e}\nThis is usually because 'write_to_br' is a windows only function.")
         except ValueError as ve:
             # Safeguard triggered
-            FM.warning_with_header("Fatal Error", f"{ve} \nUsually caused by invalid project name.")
+            if self.error_sensitive: raise
+            elif 'no_warnings' not in self.logs: FM.warning_with_header("Fatal Error", f"{ve} \nUsually caused by invalid project name.")
+
 
     def backup(self, folder_name: str | None = None) -> None:
+
+        self.ensure_valid_variable_type('project_name', f'backing up {folder_name}')
+
         use_folder_name = get_64_time_100ns() if folder_name is None else folder_name
         # Define the relative path to append to the user's home directory
         relative_path = os.path.join(os.getenv('LOCALAPPDATA'), 'BrickRigs', 'SavedRemastered', 'Vehicles')
@@ -506,8 +551,9 @@ class BRCI:
 
                 # This file is part of BRCI but not installed by default. Warning would cause confusing; so we don't.
                 if self.backup_directory != os.path.join(_cwd, 'Backup') :
-                    FM.warning_with_header("Cannot find specified backup folder",
-                                           "Unable to find specified backup folder. The folder has been made for you.")
+                    if self.error_sensitive: raise FileNotFoundError("Backup folder not found.")
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Cannot find specified backup folder",
+                            "Unable to find specified backup folder. The folder has been made for you.")
 
                 os.makedirs(self.backup_directory)
 
@@ -516,12 +562,14 @@ class BRCI:
                         shutil.rmtree(os.path.join(self.backup_directory, use_folder_name))
                     shutil.copytree(relative_path, os.path.join(self.backup_directory, use_folder_name))
             else:
-                FM.warning_with_header("Cannot create backup",
-                                       "Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.") 
+                if self.error_sensitive: raise FileNotFoundError("Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.")
+                elif 'no_warnings' not in self.logs: FM.warning_with_header("Cannot create backup",
+                        "Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.")
         except OSError as e:
             # Failed for some reason -_-
-            FM.warning_with_header(f"Failed to clone folder: {type(e).__name__}: {e}",
-                                   f"This may be because .backup() function was made for Windows.")
+            if self.error_sensitive: raise
+            elif 'no_warnings' not in self.logs: FM.warning_with_header(f"Failed to clone folder: {type(e).__name__}: {e}",
+                    f"This may be because .backup() function was made for Windows.")
 
     # Sharing some variables from writing vehicle.brv to the rest of the class
     bricks_writing = []
@@ -536,6 +584,7 @@ class BRCI:
 
         # Verify self.write_blank is valid.
         self.ensure_valid_variable_type('write_blank', f'writing {file_name}')
+        self.ensure_valid_variable_type('project_name', f'writing {file_name} (vehicle)')
 
         # Write blank file for vehicle (if desired)
         if self.write_blank:
@@ -571,10 +620,11 @@ class BRCI:
                             prop_mp_temp = property_value_mp.properties()
                             # If it's incorrect
                             if isinstance(prop_mp_temp, str) and prop_mp_temp == 'invalid_source_bricks':
-                                FM.warning_with_header("Invalid type for brick list.",
-                                                       f"Whilst writing vehicle ({file_name}),"
-                                                       f"we noticed {property_key_mp} (from brick {brick_mp[0]!r}) was not set to a list."
-                                                       f"\nIt was set to type {type(property_value_mp).__name__}. It is now set to None, corresponding to no inputs.")
+                                if self.error_sensitive: raise TypeError(f"Invalid type for brick list: {property_key_mp} from {brick_mp[0]!r}")
+                                elif 'no_warnings' not in self.logs: FM.warning_with_header("Invalid type for brick list.",
+                                        f"Whilst writing vehicle ({file_name}),"
+                                        f"we noticed {property_key_mp} (from brick {brick_mp[0]!r}) was not set to a list."
+                                        f"\nIt was set to type {type(property_value_mp).__name__}. It is now set to None, corresponding to no inputs.")
                                 property_value_mp.brick_input = []
                                 prop_mp_temp = property_value_mp.properties()
                             # Get rid of the old, put the new instead
@@ -599,7 +649,7 @@ class BRCI:
                 self.bricks_writing = deepcopy(self.bricks)
 
                 # Writes Carriage Return char
-                brv_file.write(unsigned_int(14, 1))
+                brv_file.write(unsigned_int(self.__brv_version, 1))
                 # Write brick count
                 brv_file.write(unsigned_int(len(self.bricks_writing), 2))
 
@@ -804,7 +854,12 @@ class BRCI:
 
                                 case 'brick_id':
 
-                                    temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_val], 2)
+                                    try:
+                                        temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_val], 2)
+                                    except KeyError:
+                                        if self.error_sensitive: raise ValueError(f'Unknown source brick "{pt_c_val}" requested for property "{property_type_key}".')
+                                        elif 'no_warnings' not in self.logs: FM.warning_with_header(f'Source brick not found',
+                                                f'Unknown source brick "{pt_c_val}" requested for property "{property_type_key}".')
 
                                 case 'custom':
 
@@ -817,16 +872,28 @@ class BRCI:
 
                                 case 'list[brick_id]':
 
-                                    temp_pre_spl += unsigned_int(len(pt_c_val), 2)
+                                    if isinstance(pt_c_val, list):
+                                        temp_pre_spl += unsigned_int(len(pt_c_val), 2)
 
-                                    for pt_c_sub_val in pt_c_val:
-                                        temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val] + 1, 2)
+                                        for pt_c_sub_val in pt_c_val:
+                                            try:
+                                                temp_pre_spl += unsigned_int(string_name_to_id_table[pt_c_sub_val] + 1, 2)
+                                            except KeyError:
+                                                if self.error_sensitive: raise ValueError(f'Unknown source brick "{pt_c_sub_val}" requested for property "{property_type_key}".')
+                                                elif 'no_warnings' not in self.logs: FM.warning_with_header(f'Source brick not found',
+                                                        f'Unknown source brick "{pt_c_sub_val}" requested for property "{property_type_key}".')
+
+                                    else:
+
+                                        if self.error_sensitive: raise ValueError(f'The property {property_type_key} requires a list of brick IDs, not (a) {type(pt_c_val).__name__} ({pt_c_val}).')
+                                        elif 'no_warnings' not in self.logs: FM.warning_with_header(f'Invalid property type',
+                                                f'The property {property_type_key} requires a list of brick IDs, not (a) {type(pt_c_val).__name__} ({pt_c_val}).')
 
                                 case 'list[3*float]':
 
-                                    temp_pre_spl += bin_float(pt_c_val[0], 4)
-                                    temp_pre_spl += bin_float(pt_c_val[1], 4)
-                                    temp_pre_spl += bin_float(pt_c_val[2], 4)
+                                        temp_pre_spl += bin_float(pt_c_val[0], 4)
+                                        temp_pre_spl += bin_float(pt_c_val[1], 4)
+                                        temp_pre_spl += bin_float(pt_c_val[2], 4)
 
                                 case 'list[3*uint8]':
 
@@ -903,14 +970,17 @@ class BRCI:
                                     temp_pre_spl += unsigned_int(int(pt_c_val), 1)
 
 
-                        elif isinstance(pt_c_val, list) and (isinstance(pt_c_val[0],
-                                                                       str) or isinstance(pt_c_val[0], int)):  # OR if it doesn't end with .InputAxis
+                        elif isinstance(pt_c_val, list) and (isinstance(pt_c_val[0], str) or isinstance(pt_c_val[0], int)):  # OR if it doesn't end with .InputAxis
 
                             temp_pre_spl += unsigned_int(len(pt_c_val), 2)
                             for pt_c_sub_val in pt_c_val:
                                 #print(f"pt_c_sub_val: {pt_c_sub_val}\npt_c_sub_val type: {type(pt_c_sub_val)}\npt_c_val: {pt_c_val}")
-                                temp_pre_spl += unsigned_int(string_name_to_id_table[str(pt_c_sub_val)] + 1, 2)
-
+                                try:
+                                    temp_pre_spl += unsigned_int(string_name_to_id_table[str(pt_c_sub_val)] + 1, 2)
+                                except KeyError:
+                                    if self.error_sensitive: raise KeyError(f'Unknown source brick "{pt_c_sub_val}" requested in property "{property_type_key}"')
+                                    elif 'no_warnings' not in self.logs: FM.warning_with_header(f'Unknown source brick',
+                                            f'Unknown source brick "{pt_c_sub_val}" requested in property "{property_type_key}"')
 
                         elif isinstance(pt_c_val, str):  # OR if it ends with .InputAxis
 
@@ -1095,21 +1165,29 @@ class BRCI:
 
         if print_bricks: print(str_to_write)
 
-    def load_brv(self, load_vehicle: bool = True, load_brci_data: bool = True, load_appendix: bool = True,
+    def load_brv(self, load_vehicle: bool = True, load_brci_data: bool = False, load_appendix: bool = False,
                  file_name: str = 'Vehicle.brv'):
 
         previous_time = perf_counter()
         begin_time = perf_counter()
 
+        if (load_brci_data or load_appendix) and not self.wip_features:
+            raise NotImplementedError("load_brci_data & load_appendix parameters for brci.BRCI().load_brv() are still work in progress.")
+
         self.ensure_project_directory_exists()
         self.ensure_valid_variable_type('logs', f'loading {file_name}')
+        self.ensure_valid_variable_type('project_name', f'loading {file_name} (vehicle)')
 
         with (open(os.path.join(self.in_project_folder_directory, file_name), 'rb') as brv_file_reader):
 
             brv_file = bytearray(brv_file_reader.read())
 
         # Removing the first useless byte
-        del brv_file[:1]
+        file_version: int = r_unsigned_int(b_pop(brv_file, 1))
+        if file_version < self.__brv_version:
+            if self.error_sensitive: raise NotImplementedError(f"BRCI support .brv file version {self.__brv_version} (0x{self.__brv_version:02X}) (BR 1.7) and newer.")
+            elif 'no_warnings' not in self.logs: FM.warning_with_header("Unsupported .brv file version.",
+                    f"BRCI support .brv file version {self.__brv_version} (BR 1.7) and newer.")
 
         # Get brick count and stuff
         brick_count = r_unsigned_int(b_pop(brv_file, 2))
@@ -1235,10 +1313,17 @@ class BRCI:
 
                             case 'list[3*float]':
 
-                                p_val_id_to_val[property_name] |= {i:
+                                try: p_val_id_to_val[property_name] |= {i:
                                                                        [r_bin_float(property_bin[j:j + 4]) for j in
                                                                         range(0, len(property_bin), 4)]
                                                                    }
+                                except ValueError:
+                                    if self.error_sensitive: raise ValueError('Invalid byte length for float. Note: '
+                                                                              'this is a common issue, that occurs when '
+                                                                              'you try to load a .brv file generated '
+                                                                              'in versions before Brick Rigs 1.7.0.')
+                                    elif 'no_warnings' not in self.logs: FM.warning_with_header('Invalid byte length for float',
+                                            'Note: this is a common issue, that occurs when you try to load a .brv file generated in versions before Brick Rigs 1.7.0.')
 
                             case 'list[3*uint8]':
 
@@ -1310,10 +1395,10 @@ class BRCI:
                         p_val_id_to_val[property_name] |= {i: property_bin}
 
                 else:
-
-                    FM.warning_with_header("Unknown property type",
-                                           f"The vehicle file you're attempting to load contains the property {property_name}.\n"
-                                           f"This property is unknown, and was ignored by BRCI. It's contents weren't loaded.")
+                    if self.error_sensitive: raise ValueError(f"Unknown property type: {property_name}.")
+                    elif 'no_warnings' not in self.logs: FM.warning_with_header("Unknown property type",
+                            f"The vehicle file you're attempting to load contains the property {property_name}.\n"
+                            f"This property is unknown, and was ignored by BRCI. It's contents weren't loaded.")
 
         # Debug Logs
         if 'time' in self.logs:
@@ -1404,7 +1489,8 @@ class BRCI:
 
             # Too old version of BRCI warning
             if c_maj_vers < f_maj_vers or (c_maj_vers == f_maj_vers and c_min_vers < f_min_vers):
-                FM.warning_with_header("BRCI is outdated.",
+                # Do not raise an error here -> no if self.error_sensitive:
+                if 'no_warnings' not in self.logs: FM.warning_with_header("BRCI is outdated.",
                                        "It appears the file you're attempting to load was made in a later version\n"
                                        f"than this version of BRCI (BRCI: {_version}. File: {file_version}).\n"
                                        f"Expect unexpected results.")
@@ -1547,16 +1633,26 @@ class BRCI:
                       file_name: str = "MetaData.brm"):
 
         if not self.wip_features:
-            FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_metadata().\n'
-                                                                'This feature is still WIP. Set .wip_features to True\n'
-                                                                'In order to access WIP features.')
+            if self.error_sensitive: raise ValueError("attempted to access a WIP feature whilst they were disabled.")
+            elif 'no_warnings' not in self.logs: FM.warning_with_header('WIP Features not enabled!', 'You are attempting to use .load_metadata().\n'
+                    'This feature is still WIP. Set .wip_features to True\n'
+                     'In order to access WIP features.')
         else:
+            self.ensure_valid_variable_type('project_name', f'loading {file_name} (metadata)')
+
             #print("opening metadata file")
             with open(os.path.join(self.in_project_folder_directory, file_name), 'rb') as metadata_file_reader:
                 #print(f"opening {file_name}")
                 metadata_file = bytearray(metadata_file_reader.read())
 
-            del metadata_file[:1]
+            # del metadata_file[:1]
+            file_version: int = r_unsigned_int(b_pop(metadata_file, 1))
+            if file_version < self.__brv_version:
+                if self.error_sensitive:
+                    raise NotImplementedError(
+                        f"BRCI support .brv file version {self.__brv_version} (0x{self.__brv_version:02X}) (BR 1.7) and newer.")
+                elif 'no_warnings' not in self.logs:
+                    FM.warning_with_header("Unsupported .brv file version.", f"BRCI support .brv file version {self.__brv_version} (BR 1.7) and newer.")
 
             name_len: int = r_signed_int(b_pop(metadata_file, 2))
             #print(f"name len: {name_len}")
