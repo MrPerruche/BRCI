@@ -20,10 +20,11 @@ from .BRCI_RF import *
 
 
 # Setup variables
-_version: str = "C55"  # String, This is equivalent to 3.__ fyi, e.g. C55 -> 3.55
+_version: str = "C56"  # String, This is equivalent to 3.__ fyi, e.g. C55 -> 3.55
 
 # Important variables
-_cwd = os.path.dirname(os.path.realpath(__file__))  # File Path
+_cwd = os.path.dirname(os.path.realpath(__file__))  # File Path of this file (__init__.py)
+_operating_system_name = os.name                    # The name of the operating system. Either 'nt' or 'posix', to specify paths.
 
 # Colors
 
@@ -77,7 +78,7 @@ class BRCI:
     # Grab values
     def __init__(self,
                  bricks: list[str, dict] | None = None,
-                 project_folder_directory: str = '',
+                 project_folder_directory: str = os.path.join(_cwd, 'Projects'),
                  project_name: str = '',
                  write_blank: bool = False,
                  project_display_name: str = '',
@@ -97,7 +98,7 @@ class BRCI:
         # Set each self.x variable to their __init__ counterparts
         self.project_folder_directory = project_folder_directory  # Path
         self.project_name = project_name  # String
-        assert project_name.lower() != "vehicles", "Invalid project name."
+        assert project_name.lower() != "vehicles", "Invalid project name. Using this project name might just delete the vehicles folder."
         self.write_blank = write_blank  # Boolean
         self.project_display_name = project_display_name  # String (in-game name (.brm))
         self.file_description = file_description  # String (The description of the file (.brm))
@@ -500,7 +501,7 @@ class BRCI:
                     metadata_file.write(unsigned_int(len(tag), 1))
                     metadata_file.write(small_bin_str(tag))
 
-    # Writing the project folder to brick rigs # only works on windows
+    # Writing the project folder to brick rigs # only works on windows AND linux!!!! >:)
     def write_to_br(self) -> None:
 
         self.ensure_valid_variable_type('project_name', f'porting to Brick Rigs')
@@ -508,12 +509,44 @@ class BRCI:
         Function to copy the finished project to your Brick Rigs vehicles directory.
         """
         # Define the relative path to append to the user's home directory
-        relative_path = os.path.join('AppData', 'Local', 'BrickRigs', 'SavedRemastered', 'Vehicles')
-        # Get the user's home directory and expand the path
-        user_home = os.path.expanduser("~")
-        # Construct the full path by joining the user's home directory with the relative path
-        full_path = os.path.join(user_home, relative_path, self.project_name.lower())
+        if _operating_system_name == 'nt': # Case: Windows
+            relative_path = os.path.join('AppData', 'Local', 'BrickRigs', 'SavedRemastered', 'Vehicles')
+            # Get the user's home directory and expand the path
+            user_home = os.path.expanduser("~")
+            # Construct the full path by joining the user's home directory with the relative path
+            full_path = os.path.join(user_home, relative_path, self.project_name.lower())
         
+        elif _operating_system_name == 'posix': # Case: Linux
+            # We have to account for the user either:
+            # Using WINE
+            # Using Proton
+            # WINE style path: ~/.wine/drive_c/users/$USER/AppData/Local/BrickRigs/SavedRemastered/Vehicles
+            # PROTON style path: ~/.steam/debian-installation/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles
+            # That's not the only proton style path. We will have to create a list and see which exist.
+            user = os.getenv('USER')
+            user_home = os.path.expanduser("~")
+            linux_possible_paths = [
+                f"{os.path.expanduser('~')}/.wine/drive_c/users/{user}/AppData/Local/BrickRigs/SavedRemastered/Vehicles",
+                f"{os.path.expanduser('~')}/.steam/debian-installation/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles",
+                f"{os.path.expanduser('~')}/.local/share/Steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles",
+            ]
+
+            for index, linux_path in enumerate(linux_possible_paths, start=1):
+                if os.path.exists(linux_path):
+                    # use this path
+                    full_path = linux_path
+                    relative_path = os.path.relpath(full_path, user_home)
+                    break # Don't continue looking for paths. Use this one immediately.
+                else:
+                    if len(linux_possible_paths) == index:
+                        if self.error_sensitive: raise FileNotFoundError("Could not find Linux vehicles path.")
+                        elif 'no_warnings' not in self.logs: FM.warning_with_header("Couldn't Identify Path", "Couldn't identify the Linux vehicles path.")
+        
+        else:
+            if self.error_sensitive: raise NotImplementedError("write_to_br is not implemented for your operating system.")
+            elif 'no_warnings' not in self.logs: FM.warning_with_header("Bad Operating System", "Somehow, your operating system doesn't seem to follow NT-style paths OR the\
+POSIX standard.\nThis is almost certainly a bug with the OS library. Please report it on the BRCI Discord, BRCI Github Issues, and the CPython GitHub Issues.")
+
         try:
             # Check if the target directory is within the Vehicles folder and matches the intended project name
             if os.path.commonpath([full_path, os.path.join(user_home, relative_path)]) != os.path.join(user_home, relative_path):
@@ -529,7 +562,8 @@ class BRCI:
         except OSError as e:
             # Failed for some reason -_-
             if self.error_sensitive: raise
-            elif 'no_warnings' not in self.logs: FM.warning_with_header("Warning", f"Failed to clone folder: {e}\nThis is usually because 'write_to_br' is a windows only function.")
+            elif 'no_warnings' not in self.logs: FM.warning_with_header("Warning", f"Failed to clone folder: {e}\n\
+This is probably because you're on Linux, and Linux/MacOS support is experimental.")
         except ValueError as ve:
             # Safeguard triggered
             if self.error_sensitive: raise
@@ -541,8 +575,35 @@ class BRCI:
         self.ensure_valid_variable_type('project_name', f'backing up {folder_name}')
 
         use_folder_name = get_64_time_100ns() if folder_name is None else folder_name
-        # Define the relative path to append to the user's home directory
-        relative_path = os.path.join(os.getenv('LOCALAPPDATA'), 'BrickRigs', 'SavedRemastered', 'Vehicles')
+        if _operating_system_name == 'nt': # Case: Windows
+            # Define the relative path to append to the user's home directory
+            relative_path = os.path.join(os.getenv('LOCALAPPDATA'), 'BrickRigs', 'SavedRemastered', 'Vehicles')
+        elif _operating_system_name == 'posix': # Case: Linux
+            # We have to account for the user either:
+            # Using WINE
+            # Using Proton
+            # WINE style path: ~/.wine/drive_c/users/$USER/AppData/Local/BrickRigs/SavedRemastered/Vehicles
+            # PROTON style path: ~/.steam/debian-installation/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles
+            # That's not the only proton style path. We will have to create a list and see which exist.
+            user = os.getenv('USER')
+            user_home = os.path.expanduser("~")
+            linux_possible_paths = [
+                f"{os.path.expanduser('~')}/.wine/drive_c/users/{user}/AppData/Local/BrickRigs/SavedRemastered/Vehicles",
+                f"{os.path.expanduser('~')}/.steam/debian-installation/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles",
+                f"{os.path.expanduser('~')}/.local/share/Steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles",
+            ]
+
+            for index, linux_path in enumerate(linux_possible_paths, start=1):
+                if os.path.exists(linux_path):
+                    # use this path
+                    full_path = linux_path
+                    relative_path = os.path.relpath(full_path, user_home)
+                    break # Don't continue looking for paths. Use this one immediately.
+                else:
+                    if len(linux_possible_paths) == index:
+                        if self.error_sensitive: raise FileNotFoundError("Could not find Linux vehicles path.")
+                        elif 'no_warnings' not in self.logs: FM.warning_with_header("Couldn't Identify Path", "Couldn't identify the Linux vehicles path.")
+
         # Chars known to be safe
         pattern = re.compile(r'^[a-zA-Z0-9_\-]+$')
 
@@ -564,12 +625,13 @@ class BRCI:
             else:
                 if self.error_sensitive: raise FileNotFoundError("Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.")
                 elif 'no_warnings' not in self.logs: FM.warning_with_header("Cannot create backup",
-                        "Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS?) or the folder name has invalid characters such as emoji.")
+                        "Either your vehicles folder doesn't exist/isn't found (are you on Linux or MacOS? POSIX support is experimental!) or the folder name has invalid characters\
+such as emoji.")
         except OSError as e:
             # Failed for some reason -_-
             if self.error_sensitive: raise
             elif 'no_warnings' not in self.logs: FM.warning_with_header(f"Failed to clone folder: {type(e).__name__}: {e}",
-                    f"This may be because .backup() function was made for Windows.")
+                    f"This may be because .backup() function was made for Windows, and Linux/MacOS support is experimental.")
 
     # Sharing some variables from writing vehicle.brv to the rest of the class
     bricks_writing = []
