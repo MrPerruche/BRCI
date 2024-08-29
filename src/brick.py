@@ -8,7 +8,7 @@ from .utils import attempt_error_mitigation, FM, Limits
 
 
 # TODO
-def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[str, str], properties: dict[str, Any]) -> (bool, str):
+def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[str, str], properties: dict[str, Any]) -> tuple[bool, str]:
 
     if properties.keys() != default_settings.keys():
 
