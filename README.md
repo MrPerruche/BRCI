@@ -1,4 +1,4 @@
-# Brick Rigs Creation Interface D (Version D2)
+# Brick Rigs Creation Interface D (Version D3)
 
 # WARNING: BRCI-D IS STILL IN ITS EARLY STAGES OF DEVELOPMENT AND IS NOT IN ANY WAY FUNCTIONAL. PLEASE USE BRCI-C INSTEAD.
 

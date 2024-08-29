@@ -70,5 +70,6 @@ An example of using BRCI::
 """
 
 from .src.brci_class import *
+from .src.property_utils import *
 # from brci.src.brick import *  # import from .brci_class
 # from brci..utils import *  # import from .brci_class

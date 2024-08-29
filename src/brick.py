@@ -2,7 +2,7 @@ from typing import Self, Optional
 # from collections.abc import MutableMapping, MutableSequence
 # from copy import deepcopy
 from .bricks import *
-from .utils import attempt_error_mitigation, FM, Limits
+from .utils import settings, FM, Limits
 
 # from typing import Any -> from .bricks.bricks_utils
 
@@ -162,7 +162,7 @@ class Brick14(_Brick):
                      f"Brick name is: {self.name!r} (type: {type(self.name).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 try:
                     self.name = str(self.name)
                     FM.success(f"This brick is now named: {self.name!r} (type: {type(self.name).__name__}).")
@@ -187,7 +187,7 @@ class Brick14(_Brick):
                      f"Brick position is: {self.position!r} (type: {type(self.position).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 try:
                     self.position = [float(x) for x in self.position]
                     FM.success(f"This brick's position is now set to: {self.position!r} (type: {type(self.position).__name__}).")
@@ -210,7 +210,7 @@ class Brick14(_Brick):
                      f"Brick position is: {self.position!r} (type: {type(self.position).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 if len(self.position) > 3:
                     self.position = self.position[:3]
                 else:  # len(self.position) < 3
@@ -234,7 +234,7 @@ class Brick14(_Brick):
                      f"Brick position is: {self.position!r} (type: {type(self.position).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 try:
                     self.position = [float(x) for x in self.position]
                     FM.success(f"This brick's position is now set to: {self.position!r} (type: {type(self.position).__name__}).")
@@ -258,7 +258,7 @@ class Brick14(_Brick):
                      f"Brick rotation is: {self.rotation!r} (type: {type(self.rotation).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 try:
                     self.rotation = [float(x) for x in self.rotation]
                     FM.success(f"This brick's rotation is now set to: {self.rotation!r} (type: {type(self.rotation).__name__}).")
@@ -281,7 +281,7 @@ class Brick14(_Brick):
                      f"Brick rotation is: {self.rotation!r} (type: {type(self.rotation).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 if len(self.rotation) > 3:
                     self.rotation = self.rotation[:3]
                 else:  # len(self.rotation) < 3
@@ -305,7 +305,7 @@ class Brick14(_Brick):
                      f"Brick rotation is: {self.rotation!r} (type: {type(self.rotation).__name__}).")
 
             # See if we can fix the issue (if the user wants to)
-            if attempt_error_mitigation:
+            if settings['attempt_error_mitigation']:
                 try:
                     self.rotation = [float(x) for x in self.rotation]
                     FM.success(f"This brick's rotation is now set to: {self.rotation!r} (type: {type(self.rotation).__name__}).")

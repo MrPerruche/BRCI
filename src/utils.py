@@ -1,5 +1,5 @@
 # from collections.abc import MutableMapping, MutableSequence
-from typing import Final, Optional
+from typing import Final, Optional, Any
 from datetime import datetime, timezone
 import os.path
 import re
@@ -8,7 +8,7 @@ import numpy as np
 # -------------------- DATA --------------------
 
 # Version
-BRCI_VERSION: str = "D2"  # D(...) is basically 4.(...)
+BRCI_VERSION: str = "D3"  # D(...) is basically 4.(...)
 
 # Paths
 _CWD: str = os.path.dirname(os.path.realpath(__file__))
@@ -29,8 +29,10 @@ PROJECT_FOLDER: str = os.path.join(_CWD, 'Projects')
 BACKUP_FOLDER: str = os.path.join(_CWD, 'Backups')
 
 # Settings
-show_logs: bool = True
-attempt_error_mitigation: bool = True
+settings: dict[str, Any] = {
+    'show_logs': True,
+    'attempt_error_mitigation': True
+}
 
 
 class Limits:
@@ -140,7 +142,7 @@ class FM:
         """
 
         # Printing
-        if force_print or show_logs:
+        if force_print or settings['show_logs']:
 
             # If we specified details
             if details is not None:
@@ -169,7 +171,7 @@ class FM:
         :rtype: bool
         """
 
-        if force_print or show_logs:
+        if force_print or settings['show_logs']:
 
             # If we specified details
             if details is not None:
