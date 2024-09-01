@@ -162,7 +162,7 @@ def convert_len(value: float | int | list[float | int], old_unit: float | int, n
 
     # else:
     raise ValueError("Value must be a float, int or list of floats and ints." +
-                     " Error mitigation failed." if settings['attempt_error_mitigation'] else "")
+                     (" Error mitigation failed." if settings['attempt_error_mitigation'] else ""))
 
 
 # Function to calculate position of a brick from any unit
@@ -509,7 +509,7 @@ def hsv(color: list[float | int], old_max: float = 255.0) -> list[int]:
 
         # Error mitigation is impossible
         raise ValueError("Color must be a list of 3 or 4 elements." +
-                         " Error mitigation failed" if settings['attempt_error_mitigation'] else "")
+                         (" Error mitigation failed." if settings['attempt_error_mitigation'] else ""))
 
 
     if not all(isinstance(col, (float, int)) for col in color):

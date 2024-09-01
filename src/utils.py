@@ -8,7 +8,7 @@ import numpy as np
 # -------------------- DATA --------------------
 
 # Version
-BRCI_VERSION: str = "D3"  # D(...) is basically 4.(...)
+BRCI_VERSION: str = "D4"  # D(...) is basically 4.(...)
 
 # Paths
 _CWD: str = os.path.dirname(os.path.realpath(__file__))
@@ -62,32 +62,36 @@ class Limits:
     """
 
     # Integer limits
+    U2_MAX: Final[int] = 3
     U8_MAX: Final[int] = np.iinfo(np.uint8).max
     U16_MAX: Final[int] = np.iinfo(np.uint16).max
     U32_MAX: Final[int] = np.iinfo(np.uint32).max
     U64_MAX: Final[int] = np.iinfo(np.uint64).max
 
+    I2_MAX = 1
     I8_MAX: Final[int] = np.iinfo(np.int8).max
     I16_MAX: Final[int] = np.iinfo(np.int16).max
     I32_MAX: Final[int] = np.iinfo(np.int32).max
     I64_MAX: Final[int] = np.iinfo(np.int64).max
 
+    U2_MIN: Final[int] = 0
     U8_MIN: Final[int] = 0
     U16_MIN: Final[int] = 0
     U32_MIN: Final[int] = 0
     U64_MIN: Final[int] = 0
 
-    I8_MIN = np.iinfo(np.int8).min
-    I16_MIN = np.iinfo(np.int16).min
-    I32_MIN = np.iinfo(np.int32).min
-    I64_MIN = np.iinfo(np.int64).min
+    I2_MIN: Final[int] = -2
+    I8_MIN: Final[int] = np.iinfo(np.int8).min
+    I16_MIN: Final[int] = np.iinfo(np.int16).min
+    I32_MIN: Final[int] = np.iinfo(np.int32).min
+    I64_MIN: Final[int] = np.iinfo(np.int64).min
 
     # Floating-point limits
-    F32_MAX = np.finfo(np.float32).max
-    F64_MAX = np.finfo(np.float64).max
+    F32_MAX: Final[int] = np.finfo(np.float32).max
+    F64_MAX: Final[int] = np.finfo(np.float64).max
 
-    F32_MIN = np.finfo(np.float32).min
-    F64_MIN = np.finfo(np.float64).min
+    F32_MIN: Final[int] = np.finfo(np.float32).min
+    F64_MIN: Final[int] = np.finfo(np.float64).min
 
 
 class FM:
@@ -232,3 +236,7 @@ def is_valid_folder_name(name: str, is_nt: bool) -> bool:
 
     # else: valid
     return True
+
+
+def is_utf_encodable(string: str) -> bool:
+    return all(ord(char) <= 0x10FFFF for char in string)

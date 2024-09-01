@@ -2,18 +2,19 @@ from typing import Self, Optional
 # from collections.abc import MutableMapping, MutableSequence
 # from copy import deepcopy
 from .bricks import *
-from .utils import settings, FM, Limits
+from .utils import settings, FM, Limits, is_utf_encodable
 
 # from typing import Any -> from .bricks.bricks_utils
 
 
-# TODO
-def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[str, str], properties: dict[str, Any]) -> tuple[bool, str]:
+def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[str, str], properties: dict[str, Any], call_callables: bool = False) -> tuple[bool, str]:
 
     if properties.keys() != default_settings.keys():
 
         for key in properties.keys():
             if key not in default_settings:
+
+                # Key shouldn't be there. Is it not supposed to be here or not supposed to be a thing?
                 if key in property_map.keys():
                     return False, f'Property {key} is not a property of this brick.'
                 else:
@@ -25,28 +26,117 @@ def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[s
 
     for property_, value in properties.items():
 
-        match property_map[property_]:
+        # Set value to analyzed value (to make sure no editions happens)
+        analyzed_value = value
 
-            case 'brick_id':
-                if not isinstance(value, (str, int)):
-                    return False
+        # If it's a callable -> e.g. lambda functions
+        if callable(value):
 
-            case 'list[4*uint8]':
-                if not isinstance(value, list):
-                    return False
-                if len(value) != 4:
-                    return False
-                if not all(isinstance(item, int) for item in value):
-                    return False
-                if not all(Limits.U8_MIN <= item <= Limits.U8_MAX for item in value):
-                    return False
+            # If we want to call it, call it
+            if call_callables:
+                analyzed_value = value()
+            # Else don't (maybe because previous executions affect later executions?)
+            else:
+                continue
 
-            # TODO
+        # Get what type the property is (we already checked if it was of a valid type)
+        prop_type = property_map[property_]
 
-# {'brick_id', 'list[4*uint8]', 'uint8', 'strany', 'list[brick_id]', 'str8', 'float', 'list[3*float]', 'list[6*uint2]', 'list[3*uint8]', 'bool'}
+        # Binary: must be bytes or bytearray
+        if prop_type == 'bin':
+            if not isinstance(analyzed_value, (bytes, bytearray)):
+                return False, f'Property {property_} must be bytes or bytearray.'
+
+        # Boolean: must be a boolean
+        elif prop_type == 'bool':
+            if not isinstance(analyzed_value, bool):
+                return False, f'Property {property_} must be a boolean.'
+
+        # Brick id: must be a string or integers (bricks are represented with strings and integers)
+        elif prop_type == 'brick_id':
+            if not isinstance(analyzed_value, (str, int)):
+                return False, f'Property {property_} must be a string or an integer.'
+
+        # Float: must be a float
+        elif prop_type == 'float':
+            if not isinstance(analyzed_value, float):
+                return False, f'Property {property_} must be a float.'
+
+        # List[3*float]: must be a list of 3 floats
+        elif prop_type == 'list[3*float]':
+            if not isinstance(analyzed_value, list):
+                return False, f'Property {property_} must be a list of 3 floats.'
+            if len(analyzed_value) != 3:
+                return False, f'Property {property_} must be a list of 3 floats.'
+            if not all(isinstance(item, float) for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 3 floats.'
+
+        # List[3*uint8]: must be a list of 3 integers between 0 and 255
+        elif prop_type == 'list[3*uint8]':
+            if not isinstance(analyzed_value, list):
+                return False, f'Property {property_} must be a list of 3 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if len(analyzed_value) != 3:
+                return False, f'Property {property_} must be a list of 3 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if not all(isinstance(item, int) for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 3 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if not all(Limits.U8_MIN <= item <= Limits.U8_MAX for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 3 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+
+        # List[4*uint8]: must be a list of 4 integers between 0 and 255
+        elif prop_type == 'list[4*uint8]':
+            if not isinstance(analyzed_value, list):
+                return False, f'Property {property_} must be a list of 4 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if len(analyzed_value) != 4:
+                return False, f'Property {property_} must be a list of 4 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if not all(isinstance(item, int) for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 4 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if not all(Limits.U8_MIN <= item <= Limits.U8_MAX for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 4 integers between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+
+        # List[6*uint2]: must be a list of 6 integers between 0 and 3
+        elif prop_type == 'list[6*uint2]':
+            if not isinstance(analyzed_value, list):
+                return False, f'Property {property_} must be a list of 6 integers between {Limits.U2_MIN} and {Limits.U2_MAX}.'
+            if len(analyzed_value) != 6:
+                return False, f'Property {property_} must be a list of 6 integers between {Limits.U2_MIN} and {Limits.U2_MAX}.'
+            if not all(isinstance(item, int) for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 6 integers between {Limits.U2_MIN} and {Limits.U2_MAX}.'
+            if not all(Limits.U2_MIN <= item <= Limits.U2_MAX for item in analyzed_value):
+                return False, f'Property {property_} must be a list of 6 integers between {Limits.U2_MIN} and {Limits.U2_MAX}.'
+
+        # List[brick_id]: must be a list of brick ids (either strings or integers)
+        elif prop_type == 'list[brick_id]':
+            if not isinstance(analyzed_value, list):
+                return False, f'Property {property_} must be a list of brick ids (either strings or integers).'
+            if not isinstance(analyzed_value, (str, int)):
+                return False, f'Property {property_} must be a list of brick ids (either strings or integers).'
+
+        # String (utf-8): must be a string encodable in utf-8
+        elif prop_type == 'str8':
+            if not isinstance(analyzed_value, str):
+                return False, f'Property {property_} must be a string encodable in utf-8.'
+            # Check if it is encodable in utf-8
+            if not is_utf_encodable(analyzed_value):
+                return False, f'Property {property_} must be a string encodable in utf-8.'
+
+        # String (utf-16): must be a string encodable in utf-16.
+        elif prop_type == 'strany':
+            if not isinstance(analyzed_value, str):
+                return False, f'Property {property_} must be a string encodable in utf-8 or utf-16.'
+            # Check if it is encodable in utf-8 and utf-16
+            if not is_utf_encodable(analyzed_value):
+                return False, f'Property {property_} must be a string encodable in utf-8 or utf-16.'
+
+        # Integer: must be an integer between 0 and 255
+        elif prop_type == 'uint8':
+            if not isinstance(analyzed_value, int):
+                return False, f'Property {property_} must be an integer between {Limits.U8_MIN} and {Limits.U8_MAX}.'
+            if not (Limits.U8_MIN <= analyzed_value <= Limits.U8_MAX):
+                return False, f'Property {property_} must be an integer between {Limits.U8_MIN} and {Limits.U8_MAX}.'
 
 
-class _Brick:
+
+class Brick14:
 
     def __init__(self,
                  brick_type: str,
@@ -56,18 +146,13 @@ class _Brick:
                  properties: Optional[dict[str, Any]] = None) -> None:
 
         """
-        Internal class, blank brick object. Will store all data for a single brick.
+        Will store all data for a single brick.
 
         :param brick_type: Type of the brick.
-        :type brick_type: str
         :param name: Name or identifier of the brick.
-        :type name: str or int
         :param position: (x, y, z) coordinates of the brick's position.
-        :type position: Optional[list[float, float, float]]
         :param rotation: (pitch, yaw, roll) angles in degrees for the brick's rotation.
-        :type rotation: Optional[list[float, float, float]]
         :param properties: Additional properties of the brick as key-value pairs.
-        :type properties: Optional[dict[str, Any]]
         """
 
         # Set all variables
@@ -81,250 +166,55 @@ class _Brick:
         self.set_type(brick_type)
 
 
-    def get_type(self) -> str:
-
-        """
-        Returns the type of the brick.
-
-        :return: Type of the brick.
-        :rtype: str
-        """
-
+    def get_type(self):
         return self._brick_type
 
 
-    def is_valid_brick(self) -> bool:
+    def is_invalid_brick(self, call_callables: bool = False) -> list[str]:
 
         """
-        Checks if it is valid
+        Will return all invalid values for this brick.
 
-        :return: True if it is valid else False
-        :rtype: bool
+        :param call_callables: If True, will call all callables in properties.
+        :return: list of invalid values
         """
-
-        raise NotImplementedError("Blank class. This function depends on the Brick version.")
-
-
-    def set_type(self, new_type: str) -> Self:
-
-        """
-        Change the brick to another type.
-
-        :param new_type: Type of the brick.
-
-        :return: self
-        :rtype: Brick
-        """
-
-        raise NotImplementedError("Blank class. This function depends on the Brick version.")
-
-
-class Brick14(_Brick):
-
-    def __init__(self,
-                 brick_type: str,
-                 name: str | int,
-                 position: Optional[list[float]] = None,
-                 rotation: Optional[list[float]] = None,
-                 properties: Optional[dict[str, Any]] = None) -> None:
-
-        """
-        Brick class for version 14 (Brick Rigs 1.7.0+).
-
-        :param brick_type: Type of the brick.
-        :type brick_type: str
-        :param name: Name or identifier of the brick.
-        :type name: str or int
-        :param position: (x, y, z) coordinates of the brick's position.
-        :type position: Optional[list[float, float, float]]
-        :param rotation: (pitch, yaw, roll) angles in degrees for the brick's rotation.
-        :type rotation: Optional[list[float, float, float]]
-        :param properties: Additional properties of the brick as key-value pairs.
-        :type properties: Optional[dict[str, Any]]
-        """
-
-        super().__init__(brick_type, name, position, rotation, properties)
-
-
-    def is_valid_brick(self, invalid_is_error: bool = False) -> bool:
 
         # Doc inherited from _Brick.is_valid_brick()
+        invalid_values: list[str] = []
 
+        # Check for name: is a string or integer
         if not isinstance(self.name, (str, int)):
+            invalid_values.append('name')
 
-            if not invalid_is_error:
-                return False
+        # Check for position: is a list of 3 floats or integers
+        if not (isinstance(self.position, list) or len(self.position) == 3 or
+                all(isinstance(x, (float, int)) for x in self.position)):
 
-            # else:
-            # Signal there is something wrong
-            FM.error("Brick name must be a string or an integer",
-                     "Bricks must have as a name either a string or an integer.\n"
-                     f"Brick name is: {self.name!r} (type: {type(self.name).__name__}).")
+            invalid_values.append('position')
 
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                try:
-                    self.name = str(self.name)
-                    FM.success(f"This brick is now named: {self.name!r} (type: {type(self.name).__name__}).")
-                except ValueError:
-                    raise ValueError(f"Brick name must be a string or an integer. Error mitigation failed.")
+        # Check for rotation: is a list of 3 floats or integers
+        if not (isinstance(self.rotation, list) or len(self.rotation) == 3 or
+                all(isinstance(x, (float, int)) for x in self.rotation)):
 
-            else:
-                raise ValueError("Brick name must be a string or an integer.")
-
-        # Integers are tolerated for position and rotation
-        # Position
-        # If it is not a list
-        if not isinstance(self.position, list):
-
-            if not invalid_is_error:
-                return False
-
-            #else:
-            # Signal there is something wrong
-            FM.error("Brick position must be a list.",
-                     "Bricks must have as a position a list.\n"
-                     f"Brick position is: {self.position!r} (type: {type(self.position).__name__}).")
-
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                try:
-                    self.position = [float(x) for x in self.position]
-                    FM.success(f"This brick's position is now set to: {self.position!r} (type: {type(self.position).__name__}).")
-                except ValueError:
-                    raise ValueError(f"Brick position must be a list. Error mitigation failed.")
-
-            else:
-                raise ValueError("Brick position must be a list.")
-
-        # If it is not of the right length
-        if not len(self.position) == 3:
-
-            if not invalid_is_error:
-                return False
-
-            #else:
-            # Signal there is something wrong
-            FM.error("Brick position must be a list of 3 floats",
-                     "Bricks must have as a position a list of 3 floats.\n"
-                     f"Brick position is: {self.position!r} (type: {type(self.position).__name__}).")
-
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                if len(self.position) > 3:
-                    self.position = self.position[:3]
-                else:  # len(self.position) < 3
-                    self.position = self.position + [0.0] * (3 - len(self.position))
-
-                FM.success(f"This brick's position is now set to: {self.position!r} (type: {type(self.position).__name__}).")
-
-            else:
-                raise ValueError("Brick position must be a list.")
-
-        # If its elements are not of the right type
-        if not all(isinstance(x, (float, int)) for x in self.position):
-
-            if not invalid_is_error:
-                return False
-
-            #else:
-            # Signal there is something wrong
-            FM.error("Brick position must be a list of 3 floats",
-                     "Bricks must have as a position a list of 3 floats.\n"
-                     f"Brick position is: {self.position!r} (type: {type(self.position).__name__}).")
-
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                try:
-                    self.position = [float(x) for x in self.position]
-                    FM.success(f"This brick's position is now set to: {self.position!r} (type: {type(self.position).__name__}).")
-                except ValueError:
-                    raise ValueError(f"Brick position must be a list of 3 floats. Error mitigation failed.")
-
-            else:
-                raise ValueError("Brick position must be a list of 3 floats.")
-
-        # Rotation
-        # If it is not a list
-        if not isinstance(self.rotation, list):
-
-            if not invalid_is_error:
-                return False
-
-            #else:
-            # Signal there is something wrong
-            FM.error("Brick rotation must be a list.",
-                     "Bricks must have as a rotation a list.\n"
-                     f"Brick rotation is: {self.rotation!r} (type: {type(self.rotation).__name__}).")
-
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                try:
-                    self.rotation = [float(x) for x in self.rotation]
-                    FM.success(f"This brick's rotation is now set to: {self.rotation!r} (type: {type(self.rotation).__name__}).")
-                except ValueError:
-                    raise ValueError(f"Brick rotation must be a list. Error mitigation failed.")
-
-            else:
-                raise ValueError("Brick rotation must be a list.")
-
-        # If it is not of the right length
-        if not len(self.rotation) == 3:
-
-            if not invalid_is_error:
-                return False
-
-            #else:
-            # Signal there is something wrong
-            FM.error("Brick rotation must be a list of 3 floats",
-                     "Bricks must have as a rotation a list of 3 floats.\n"
-                     f"Brick rotation is: {self.rotation!r} (type: {type(self.rotation).__name__}).")
-
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                if len(self.rotation) > 3:
-                    self.rotation = self.rotation[:3]
-                else:  # len(self.rotation) < 3
-                    self.rotation = self.rotation + [0.0] * (3 - len(self.rotation))
-
-                FM.success(f"This brick's rotation is now set to: {self.rotation!r} (type: {type(self.rotation).__name__}).")
-
-            else:
-                raise ValueError("Brick rotation must be a list of 3 floats.")
-
-        # If its elements are not of the right type
-        if not all(isinstance(x, (float, int)) for x in self.rotation):
-
-            if not invalid_is_error:
-                return False
-
-            #else:
-            # Signal there is something wrong
-            FM.error("Brick rotation must be a list of 3 floats",
-                     "Bricks must have as a rotation a list of 3 floats.\n"
-                     f"Brick rotation is: {self.rotation!r} (type: {type(self.rotation).__name__}).")
-
-            # See if we can fix the issue (if the user wants to)
-            if settings['attempt_error_mitigation']:
-                try:
-                    self.rotation = [float(x) for x in self.rotation]
-                    FM.success(f"This brick's rotation is now set to: {self.rotation!r} (type: {type(self.rotation).__name__}).")
-                except ValueError:
-                    raise ValueError(f"Brick rotation must be a list of 3 floats. Error mitigation failed.")
-
-            else:
-                raise ValueError("Brick rotation must be a list of 3 floats.")
+            invalid_values.append('rotation')
 
         # Check properties
-        is_valid, reason = _has_valid_properties(bricks14[self._brick_type], property_types14, self.properties)
-        # TODO
+        valid_properties, _ = _has_valid_properties(bricks14[self._brick_type], property_types14, self.properties, call_callables)
+        if not valid_properties:
 
-        return True
+            invalid_values.append('properties')
+
+        return invalid_values
 
 
     def set_type(self, new_type: str) -> Self:
 
-        # Doc inherited from _Brick.set_type()
+        """
+        Sets the brick to a new type. Attempts to preserve any property in common with the new brick.
+
+        :param new_type: New type of the brick.
+        :return: self
+        """
 
         # Make sure this brick exists
         if new_type in bricks14.keys():
