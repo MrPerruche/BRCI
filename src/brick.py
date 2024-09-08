@@ -1,14 +1,31 @@
-from typing import Self, Optional, TypeVar
+from typing import Self, Optional, TypeVar, Final, Iterable, Literal
 # from collections.abc import MutableMapping, MutableSequence
 # from copy import deepcopy
 from .bricks import *
-from .utils import settings, FM, Limits
+from .utils import Limits, FM, settings
 from .write_utils import is_utf_encodable
 
 # from typing import Any -> from .bricks.bricks_utils
 
 
+SUPPORTED_VERSIONS: Final[frozenset[int]] = frozenset({14})
+SUPPORTED_PROPERTY_TYPES: Final[set[str]] = {"bin", "bool", "brick_id", "float", "list[3*float]", "list[6*uint2]",
+    "list[3*uint8]", "list[4*uint8]", "list[brick_id]"}
+
+
 def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[str, str], properties: dict[str, Any], call_callables: bool = False) -> tuple[bool, str]:
+
+    """
+    Internal function to check if properties are valid.
+
+    :param default_settings: Default settings for a brick
+    :param property_map: List of known properties
+    :param properties: List of properties of the brick
+    :param call_callables: If yes or no we call callable inputs such as lambda functions.
+
+    Returns a boolean indicating if it's valid or not and a string with an error message if not.
+    """
+
 
     if properties.keys() != default_settings.keys():
 
@@ -136,6 +153,91 @@ def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[s
                 return False, f'Property {property_} must be an integer between {Limits.U8_MIN} and {Limits.U8_MAX}.'
 
 
+# TODO
+def new_properties(properties: dict[str, Literal["bin", "bool", "brick_id", "float", "list[3*float]", "list[6*uint2]",
+                       "list[3*uint8]", "list[4*uint8]", "list[brick_id]", "str8", "strany", "uint8"]],
+                   affected_versions: Iterable[int] = SUPPORTED_VERSIONS) -> None:
+
+    """
+    Add or edit a property in the list of known properties and their type.
+
+    :param properties: dictionary with property names (str) as keys and their corresponding property type (str) as values
+    :param affected_versions: list of all versions that will see these changes applied. Defaults to all known versions
+
+    Do not return anything.
+    """
+
+    # Making sure everything is supported
+    sanitized_versions: set[int] = set()
+    sanitized_properties: dict[str, str] = {}
+
+    # Make sure affected versions are right:
+    for ver in affected_versions:
+        if ver not in SUPPORTED_VERSIONS:
+
+            # Warn user something is wrong
+            FM.error(f"Unknown or non-supported file version {ver!r}",
+                     f"BRCI follows the following versions: {", ".join([str(v) for v in SUPPORTED_VERSIONS])}.")
+
+            # See if we can fix it
+            if settings['attempt_error_mitigation']:
+                # Ignore this property
+                FM.success(f"Skipped unknown or non-supported version {ver}.")
+
+            else:
+                raise ValueError(f"Unknown or non-supported file version {ver!r}")
+
+    # Making sure types are right:
+    for p, t in properties.items():
+        if t not in SUPPORTED_PROPERTY_TYPES:
+
+            # Warn user something is wrong
+            FM.error(f"Unknown property type {t!r} (for {p!r})",
+                     f"BRCI follows the following types: {', '.join([repr(t_) for t_ in SUPPORTED_PROPERTY_TYPES])}.")
+
+            # See if we fix it
+            if settings['attempt_error_mitigation']:
+                # Ignore this property
+                FM.success(f"Skipped property {p!r}.")
+
+            else:
+                raise ValueError(f"Unknown property type {t!r} (for {p!r})")
+
+        # else:
+        sanitized_properties.update({p: t})
+
+    for ver in sanitized_versions:
+        if ver == 14:
+            bricks14.update(sanitized_properties)
+
+
+def new_types(types: Iterable[str], properties: dict[str, Any], common_properties: bool = True,
+              affected_versions: Iterable[int] = SUPPORTED_VERSIONS) -> None:
+
+
+    """
+    Function to modify or implement custom (modded) bricks.
+
+    :param types: list of brick types
+    :param properties: dictionary with property names (str) as keys and their corresponding property type (str) as values
+    :param common_properties: whether to add common properties
+    :param affected_versions: list of all versions that will see these changes applied. Defaults to all known versions
+
+    Does not return anything.
+    """
+
+    # I know repetition should be avoided, but speed is more important.
+
+    # Making sure everything is supported
+    sanitized_affected_versions: set[int] = {ver for ver in affected_versions if ver in SUPPORTED_VERSIONS}
+
+    for ver in sanitized_affected_versions:
+
+        if ver == 14:
+            for brick_type in types:
+                bricks14.update({brick_type: properties})  # Puts properties
+                if common_properties: bricks14[brick_type].update(default_properties14())  # Puts common properties
+
 
 class Brick14:
 
@@ -177,7 +279,8 @@ class Brick14:
         Will return all invalid values for this brick.
 
         :param call_callables: If True, will call all callables in properties.
-        :return: list of invalid values
+
+        Return a list of strings corresponding to invalid values.
         """
 
         # Doc inherited from _Brick.is_valid_brick()
@@ -214,21 +317,22 @@ class Brick14:
         Sets the brick to a new type. Attempts to preserve any property in common with the new brick.
 
         :param new_type: New type of the brick.
-        :return: self
+
+        Return the current object.
         """
 
         # Make sure this brick exists
         if new_type in bricks14.keys():
 
             # Get new set of properties
-            new_properties: dict[str, Any] = deepcopy(bricks14[new_type])
+            new_prop: dict[str, Any] = deepcopy(bricks14[new_type])
 
             for property_ in self.properties.keys():
-                if property_ in new_properties:
-                    new_properties[property_] = self.properties[property_]
+                if property_ in new_prop:
+                    new_prop[property_] = self.properties[property_]
 
             # Edit self for the new brick type
-            self.properties = new_properties
+            self.properties = new_prop
             self._brick_type = new_type
 
         else:

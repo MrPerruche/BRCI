@@ -9,8 +9,7 @@ from builtins import print as printb
 # -------------------- DATA --------------------
 
 # Version
-BRCI_VERSION: str = "D6"  # D(...) is basically 4.(...)
-FM_ALIASES = True         # FM attributes in lowercase
+BRCI_VERSION: str = "D7"  # D(...) is basically 4.(...)
 
 # Paths
 _CWD: str = os.path.dirname(os.path.realpath(__file__))
@@ -195,20 +194,25 @@ class FM:
         # else:
         return False
 
-# --------------------    COLOR ADDITIONS    -------------------- #
-if FM_ALIASES:
-    for attribute_name in dir(FM):
-        if not attribute_name.startswith('_'):
-            setattr(FM, attribute_name.lower(), getattr(FM, attribute_name))
 
-def printr(*args, end="\n", **kwargs):
+    @staticmethod
+    def add_color_aliases() -> None:
+        for attribute_name in dir(FM):
+            if not attribute_name.startswith('_'):
+                setattr(FM, attribute_name.lower(), getattr(FM, attribute_name))
+
+# --------------------    COLOR ADDITIONS    -------------------- #
+
+def printr(*args, end: str = "\n", sep: str = " ", clear: str = FM.CLEAR_ALL, **kwargs) -> str:
+
     """Print-Reset-Return. Resets color. Also, will return the text passed to it."""
-    printb(*args, end=f"{end}{FM.CLEAR_ALL}", **kwargs)
-    # return the exact text passed to print
+
+    printb(*args, end=f"{end}{clear}", sep=sep, **kwargs)
+
     return_str = ""
     for arg in args:
-        return_str += str(arg) + " "
-    return repr(return_str.strip()) # sanitization: do not keep color codes in the return string
+        return_str += str(arg) + sep
+    return repr(return_str.strip())[1:-1] # sanitization: do not keep color codes in the return string
 
 # ------------------- TIME-RELATED FUNCTIONS -------------------- #
 

@@ -1,6 +1,5 @@
 import os
 import shutil
-from typing import TypeVar
 
 from .brick import *
 from .utils import *
@@ -15,7 +14,7 @@ VISIBILITY_FRIENDS: Final[int] = 1
 VISIBILITY_PRIVATE: Final[int] = 2
 VISIBILITY_HIDDEN: Final[int] = 3
 
-_VALID_DRIVER_SEATS: Final[set[str]] = {'Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'}
+VALID_DRIVER_SEATS: Final[set[str]] = {'Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'}
 
 
 class Creation14:
@@ -71,6 +70,7 @@ class Creation14:
                   rotation: Optional[list[float]] = None,
                   properties: Optional[dict[str, Any]] = None) -> Self:
 
+        # TODO
         """
         Will add a new brick to the creation.
 
@@ -87,7 +87,20 @@ class Creation14:
         return self
 
 
+    # TODO
     def assert_valid_parameters(self, *args: str) -> None:
+
+        """
+        Will raise errors if class parameters are invalid.
+
+        :param args: List of class parameters name.
+
+        Exceptions:
+        OSError - Project name (project_name) is invalid
+        OSError - Project dir (project_dir) is invalid
+
+        Do not return anything.
+        """
 
         # Project name
         if 'project_name' in args:
@@ -122,7 +135,14 @@ class Creation14:
         :param dst: Directory where the backup will be stored.
         :param name: Name of the folder in which all Brick Rigs file (Vehicle.brv etc.) will be stored. If none, 100s of nanoseconds since 0001-01-01 00:00:00 UTC will be used.
 
-        :return: self
+        Exceptions:
+        OSError - Project name (project_name) is invalid
+        OSError - Project dir (project_dir) is invalid
+        OSError - Backup folder (dst param) not found
+        OSError - Backup failed
+        FileNotFoundError - No Brick Rigs vehicle folder found.
+
+        Returns the current object.
         """
 
         # TODO: CHECK IF THIS IS VALID FOR POSIX SYSTEMS.
@@ -152,7 +172,8 @@ class Creation14:
             raise OSError(f'Backup failed! ({e})')
 
         # Else, then it failed, so we end with an error.
-        raise FileNotFoundError("No Brick Rigs vehicle folder found.")
+        raise FileNotFoundError("No Brick Rigs vehicle folder found." +
+                                (" Error mitigation failed." if settings['attempt_error_mitigation'] else ""))
 
 
     # Following class naming conventions instead.
@@ -173,13 +194,21 @@ class Creation14:
         :param rotation: (pitch, yaw, roll) angles in degrees for the brick's rotation.
         :param properties: Additional properties of the brick as key-value pairs.
 
-        :return: Corresponding Brick14 object.
+        Exceptions:
+        <TODO>
+
+        Returns the created brick class object.
         """
 
         return Brick14(brick_type, name, position, rotation, properties)
 
 
     def get_version(self) -> int:
+
+        """
+        Returns the version of the Creation object (14).
+        """
+
         return self.__FILE_VERSION
 
 
@@ -190,7 +219,11 @@ class Creation14:
 
         :param file_name: Name of the file (Brick Rigs will search for Vehicle.brv)
         :param exist_ok: If Vehicle.brv already exists: if set to True, replace, else raise an error.
-        :return: self
+
+        Exceptions:
+        <TODO>
+
+        Returns the current object.
         """
 
         # ################### VERIFYING PATHS ####################
