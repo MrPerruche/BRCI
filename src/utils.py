@@ -8,7 +8,7 @@ import numpy as np
 # -------------------- DATA --------------------
 
 # Version
-BRCI_VERSION: str = "D4"  # D(...) is basically 4.(...)
+BRCI_VERSION: str = "D5"  # D(...) is basically 4.(...)
 
 # Paths
 _CWD: str = os.path.dirname(os.path.realpath(__file__))
@@ -27,6 +27,9 @@ else:
 
 PROJECT_FOLDER: str = os.path.join(_CWD, 'Projects')
 BACKUP_FOLDER: str = os.path.join(_CWD, 'Backups')
+
+NO_THUMBNAIL: str = os.path.join(_CWD, 'resources', 'no_thumbnail.png')
+BRCI_THUMBNAIL: str = os.path.join(_CWD, 'resources', 'brci.png')
 
 # Settings
 settings: dict[str, Any] = {
@@ -191,6 +194,8 @@ class FM:
         return False
 
 
+# ------------------- TIME-RELATED FUNCTIONS --------------------
+
 
 def get_time_100ns() -> int:
 
@@ -207,6 +212,9 @@ def get_time_100ns() -> int:
     time_delta = now - datetime(1, 1, 1, tzinfo=timezone.utc)
     # Convert to 100 nanoseconds
     return int(time_delta.total_seconds() * 10**7)
+
+
+# -------------------- OS RELATED FUNCTIONS --------------------
 
 
 def is_valid_folder_name(name: str, is_nt: bool) -> bool:
@@ -238,5 +246,3 @@ def is_valid_folder_name(name: str, is_nt: bool) -> bool:
     return True
 
 
-def is_utf_encodable(string: str) -> bool:
-    return all(ord(char) <= 0x10FFFF for char in string)

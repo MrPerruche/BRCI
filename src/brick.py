@@ -1,8 +1,9 @@
-from typing import Self, Optional
+from typing import Self, Optional, TypeVar
 # from collections.abc import MutableMapping, MutableSequence
 # from copy import deepcopy
 from .bricks import *
-from .utils import settings, FM, Limits, is_utf_encodable
+from .utils import settings, FM, Limits
+from .write_utils import is_utf_encodable
 
 # from typing import Any -> from .bricks.bricks_utils
 
@@ -234,3 +235,10 @@ class Brick14:
             raise ValueError(f"Brick type {new_type!r} does not exist")
 
         return Self
+
+
+
+
+Brick = TypeVar('Brick', bound=Brick14)
+
+

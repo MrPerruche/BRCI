@@ -1,8 +1,11 @@
 import os
 import shutil
+from typing import TypeVar
 
 from .brick import *
 from .utils import *
+from .write_utils import *
+from .write_utils import _convert_brick_types
 # import os.path -> from .utils
 # from typing import Self -> from .brick
 # from typing import Final -> from .utils
@@ -18,7 +21,7 @@ _VALID_DRIVER_SEATS: Final[set[str]] = {'Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1
 class Creation14:
 
     def __init__(self, project_name: str, project_dir: str,
-                 name: str = '', description: str = '', appendix: bytearray = bytearray(), tags: list[str] | None = None,
+                 name: str = '', description: str = '', appendix: bytes | bytearray = bytearray(), tags: list[str] | None = None,
                  visibility: int = VISIBILITY_PUBLIC, seat: Optional[str | int] = None, creation_time: Optional[int] = None,
                  update_time: Optional[int] = None) -> None:
 
@@ -37,8 +40,6 @@ class Creation14:
         :param update_time: Time the project was last updated (in 100s of nanoseconds since 0001-01-01 00:00:00 UTC).
         """
 
-        super().__init__(project_name, project_dir)
-
         # Path related
         self.project_name: str = project_name
         self.project_dir: str = project_dir
@@ -52,7 +53,7 @@ class Creation14:
 
         # File
         self.seat: Optional[str | int] = seat
-        self.appendix: bytearray = appendix
+        self.appendix: bytes | bytearray = appendix
 
         # Other
         self.visibility: int = visibility
@@ -60,7 +61,7 @@ class Creation14:
         self.bricks: list[Brick14] = []
 
         # Private
-        self.__BRV_VERSION: Final[int] = 14
+        self.__FILE_VERSION: Final[int] = 14
 
 
     def add_brick(self,
@@ -81,7 +82,7 @@ class Creation14:
         :return:
         """
 
-        self.bricks.append(self.get_new_brick(brick_type, name, position, rotation, properties))
+        self.bricks.append(self.Brick(brick_type, name, position, rotation, properties))
 
         return self
 
@@ -113,13 +114,13 @@ class Creation14:
                               (" Error mitigation failed." if settings['attempt_error_mitigation'] else ""))
 
 
-    def backup(self, dst: str = BACKUP_FOLDER, name: str | None = None) -> Self:
+    def backup(self, dst: str = BACKUP_FOLDER, name: Optional[str] = None) -> Self:
 
         """
         Backup Brick Rigs' vehicle folder.
 
         :param dst: Directory where the backup will be stored.
-        :param name: Name of the folder in which all Brick Rigs file (Vehicle.brv etc.) will be stored.
+        :param name: Name of the folder in which all Brick Rigs file (Vehicle.brv etc.) will be stored. If none, 100s of nanoseconds since 0001-01-01 00:00:00 UTC will be used.
 
         :return: self
         """
@@ -154,12 +155,14 @@ class Creation14:
         raise FileNotFoundError("No Brick Rigs vehicle folder found.")
 
 
+    # Following class naming conventions instead.
+    # noinspection PyPep8Naming
     @staticmethod
-    def get_new_brick(brick_type: str,
-                      name: str | int,
-                      position: Optional[list[float]] = None,
-                      rotation: Optional[list[float]] = None,
-                      properties: Optional[dict[str, Any]] = None) -> Brick14:
+    def Brick(brick_type: str,
+              name: str | int,
+              position: Optional[list[float]] = None,
+              rotation: Optional[list[float]] = None,
+              properties: Optional[dict[str, Any]] = None) -> Brick14:
 
         """
         Will return the brick class used for this creation class.
@@ -170,11 +173,84 @@ class Creation14:
         :param rotation: (pitch, yaw, roll) angles in degrees for the brick's rotation.
         :param properties: Additional properties of the brick as key-value pairs.
 
-        :return: Brick14 object.
+        :return: Corresponding Brick14 object.
         """
 
         return Brick14(brick_type, name, position, rotation, properties)
 
 
     def get_version(self) -> int:
-        return self.__BRV_VERSION
+        return self.__FILE_VERSION
+
+
+    def write_creation(self, file_name: str = 'Vehicle.brv', exist_ok: bool = True) -> Self:
+
+        """
+        Will write the .brv (vehicle) file
+
+        :param file_name: Name of the file (Brick Rigs will search for Vehicle.brv)
+        :param exist_ok: If Vehicle.brv already exists: if set to True, replace, else raise an error.
+        :return: self
+        """
+
+        # #################### TREATMENT ####################
+
+        # Bricks
+        num_bricks: int = len(self.bricks)
+        # Brick Types
+        brick_types: set[str] = {brick.get_type() for brick in self.bricks}
+        num_brick_types: int = len(brick_types)
+
+        # Properties
+        # Initialize variables
+        # property_types: set[str] = set()  # Every single different property
+        property_id_types: dict[int, str] = {}  # Property and their id
+        property_types_id: dict[str, int] = {}  # Property id and their property
+        property_id_values_set: dict[int, set[Any]] = {}  # Property id and their values
+
+        for brick in self.bricks:
+            for property_, value in brick.properties.items():
+
+                # Adding to list of known properties
+                # is None if missing else id (int)
+                property_id = property_types_id.get(property_)
+
+                if property_id is None:
+                    property_id = len(property_types_id)
+                    property_id_types[property_id] = property_
+                    property_types_id[property_] = property_id
+                    property_id_values_set[property_id] = set()
+                property_id_values_set[property_id].add(value)
+        # To avoid later issues or warnings, just in case
+        del i
+
+
+
+
+        # #################### WRITING ####################
+
+        buffer: bytearray = bytearray()
+
+        # -------------------- PART 1: HEADER --------------------
+
+        # Version
+        buffer.extend(unsigned_int(self.__FILE_VERSION, 1))
+
+        # Bricks, unique bricks, unique properties
+        buffer.extend(unsigned_int(num_bricks, 2))
+        buffer.extend(unsigned_int(num_brick_types, 2))
+        buffer.extend()
+
+        # Brick types
+        buffer.extend(_convert_brick_types(brick_types))
+
+
+
+
+
+
+
+
+
+
+Creation = TypeVar('Creation', bound=Creation14)

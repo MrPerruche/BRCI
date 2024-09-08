@@ -85,11 +85,11 @@ def _default_properties14() -> dict[str, Any]:
 bricks14: dict[str, Any] = {}
 
 
-_add_mk(bricks14, ('TestBrick1', 'TestBrick2'), _default_properties14())
-_add_mk(bricks14, ('TestBrick11', 'TestBrick12'), _default_properties14() | {
-    'TestProperty': 1
-})
-_add_mk(bricks14, ('TestBrick21', 'TestBrick22'), _default_properties14() | {
-    'AnotherTestProperty': 2,
-    "TestProperty": 3
-})
+_add_mk(bricks14, ('Actuator_1sx1sx1s_02_Top', 'Actuator_1sx1sx1s_Male', 'Actuator_1sx1sx1s_Top',
+                 'Actuator_1sx1sx2s_Top', 'Actuator_1x1x1s_Top', 'Actuator_1x1x1_Top', 'Actuator_1x1x3_Top',
+                 'Actuator_1x1x6_Top', 'Actuator_2x1x1s_02_Top', 'Actuator_2x1x1s_Male', 'Actuator_2x1x1s_Top',
+                 'Actuator_2x2x1s_Angular_Top', 'Actuator_2x2x1s_Top', 'Actuator_2x2x2_Top', 'Actuator_2x2x15_Top',
+                 'Actuator_4x1x1s_Top', 'Actuator_4x4x1s_Top', 'Actuator_6x2x1s_Top', 'Actuator_8x8x1_Top',
+                 'Actuator_20x2x1s_Top'), _default_properties14())
+
+# _add_mk()
