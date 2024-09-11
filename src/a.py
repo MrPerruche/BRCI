@@ -1,4 +1,3 @@
-# from collections.abc import MutableMapping, MutableSequence
 from typing import Final, Optional, Any
 from datetime import datetime, timezone
 import os.path
@@ -6,9 +5,6 @@ import re
 import numpy as np
 from builtins import print as printb
 
-# -------------------- DATA --------------------
-
-# Version
 BRCI_VERSION: str = "D6"  # D(...) is basically 4.(...)
 FM_ALIASES = True         # FM attributes in lowercase
 
@@ -38,66 +34,6 @@ settings: dict[str, Any] = {
     'show_logs': True,
     'attempt_error_mitigation': True
 }
-
-
-class Limits:
-
-    """
-    Class for holding integer and floating-point limits.
-
-    :var U8_MAX: Maximum unsigned 8-bit integer (255)
-    :var U16_MAX: Maximum unsigned 16-bit integer (65535)
-    :var U32_MAX: Maximum unsigned 32-bit integer (4294967295)
-    :var U64_MAX: Maximum unsigned 64-bit integer (18446744073709551615)
-
-    :var I8_MAX: Maximum signed 8-bit integer (127)
-    :var I16_MAX: Maximum signed 16-bit integer (32767)
-    :var I32_MAX: Maximum signed 32-bit integer (2147483647)
-    :var I64_MAX: Maximum signed 64-bit integer (9223372036854775807)
-
-    :var U8_MIN: Minimum unsigned 8-bit integer (0)
-    :var U16_MIN: Minimum unsigned 16-bit integer (0)
-    :var U32_MIN: Minimum unsigned 32-bit integer (0)
-    :var U64_MIN: Minimum unsigned 64-bit integer (0)
-
-    :var I8_MIN: Minimum signed 8-bit integer (-128)
-    :var I16_MIN: Minimum signed 16-bit integer (-32768)
-    :var I32_MIN: Minimum signed 32-bit integer (-2147483648)
-    :var I64_MIN: Minimum signed 64-bit integer (-9223372036854775808)
-    """
-
-    # Integer limits
-    U2_MAX: Final[int] = 3
-    U8_MAX: Final[int] = np.iinfo(np.uint8).max
-    U16_MAX: Final[int] = np.iinfo(np.uint16).max
-    U32_MAX: Final[int] = np.iinfo(np.uint32).max
-    U64_MAX: Final[int] = np.iinfo(np.uint64).max
-
-    I2_MAX = 1
-    I8_MAX: Final[int] = np.iinfo(np.int8).max
-    I16_MAX: Final[int] = np.iinfo(np.int16).max
-    I32_MAX: Final[int] = np.iinfo(np.int32).max
-    I64_MAX: Final[int] = np.iinfo(np.int64).max
-
-    U2_MIN: Final[int] = 0
-    U8_MIN: Final[int] = 0
-    U16_MIN: Final[int] = 0
-    U32_MIN: Final[int] = 0
-    U64_MIN: Final[int] = 0
-
-    I2_MIN: Final[int] = -2
-    I8_MIN: Final[int] = np.iinfo(np.int8).min
-    I16_MIN: Final[int] = np.iinfo(np.int16).min
-    I32_MIN: Final[int] = np.iinfo(np.int32).min
-    I64_MIN: Final[int] = np.iinfo(np.int64).min
-
-    # Floating-point limits
-    F32_MAX: Final[int] = np.finfo(np.float32).max
-    F64_MAX: Final[int] = np.finfo(np.float64).max
-
-    F32_MIN: Final[int] = np.finfo(np.float32).min
-    F64_MIN: Final[int] = np.finfo(np.float64).min
-
 
 class FM:
 
@@ -195,11 +131,13 @@ class FM:
         # else:
         return False
 
-# --------------------    COLOR ADDITIONS    -------------------- #
 if FM_ALIASES:
     for attribute_name in dir(FM):
         if not attribute_name.startswith('_'):
             setattr(FM, attribute_name.lower(), getattr(FM, attribute_name))
+
+print(f"{FM.LIGHT_GREEN}green text, constant naming{FM.CLEAR_ALL}")
+print(f"{FM.light_green}green text, non-constant naming{FM.clear_all}")
 
 def printr(*args, end="\n", **kwargs):
     """Print-Reset-Return. Resets color. Also, will return the text passed to it."""
@@ -210,55 +148,5 @@ def printr(*args, end="\n", **kwargs):
         return_str += str(arg) + " "
     return repr(return_str.strip()) # sanitization: do not keep color codes in the return string
 
-# ------------------- TIME-RELATED FUNCTIONS -------------------- #
-
-
-def get_time_100ns() -> int:
-
-    """
-    Get the current time in 100 nanoseconds. Notably used in metadata and for BRCI backups.
-
-    :return: 100s of nanoseconds since 0001-01-01 00:00:00
-    :rtype: int
-    """
-
-    # Get current UTC time
-    now = datetime.now(timezone.utc)
-    # Calculate the time since year 1
-    time_delta = now - datetime(1, 1, 1, tzinfo=timezone.utc)
-    # Convert to 100 nanoseconds
-    return int(time_delta.total_seconds() * 10**7)
-
-
-# -------------------- OS RELATED FUNCTIONS --------------------
-
-
-def is_valid_folder_name(name: str, is_nt: bool) -> bool:
-
-    """
-    Check if the folder name is valid.
-
-    :param name: Potentially invalid name
-    :param is_nt: True if we are working with NT, otherwise False (POSIX)
-
-    :return: True if the name is valid, otherwise False
-    :rtype: bool
-    """
-
-    if is_nt:
-        # Check for NT system validity
-        nt_match = r'[<>:"/\\|?*]'
-        if re.search(nt_match, name) or len(name) == 0 or set(name) == set() or name[-1] in {'.', ' '} or name in (
-                "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-                "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"):
-            return False
-    else:
-        # Check for POSIX system validity
-        posix_match = r'[<>:"/\\|?*\x00-\x1F]'
-        if re.search(posix_match, name) or len(name) == 0 or set(name) == set():
-            return False
-
-    # else: valid
-    return True
-
-
+variable = printr(f"{FM.light_blue}some colored text right here")
+print(f"non colored text, printr returned var: {variable}")
