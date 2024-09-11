@@ -38,29 +38,29 @@ Most functions will have docstrings, as well as BRCI having markdown files and a
 An example of using BRCI::
 
   >>> import BRCI as brci
-  >>> 
+  ...
   >>> vehicle = brci.Creation14()
-  >>>
+  ...
   >>> # Some configuration options for the creation...
   >>> vehicle.name = "My Creation"
   >>> vehicle.folder_name = "my_creation" # The name of the folder the creation's vehicle file and metadata are saved in.
   >>>                                     # Please do not use spaces, caps, etc. However, it's sanity checked and they are removed.
   >>> vehicle.project_folder = brci.PROJECT_FOLDER # The path the vehicle folder (vehicle.folder_name) is saved in. Defaults to brci.PROJECT_FOLDER
   >>> vehicle.description = "My brand new creation!"
-  >>>
+  ...
   >>> # Some BRCI configuration...
   >>> TODO ADD VEHICLE CONFIG IN DOCSTRING
-  >>>
+  ...
   >>> # Adding some bricks...
   >>> # Note for BRCI version C users, BRCI now natively includes a whole ton of utilties, such as RGBA brick colors!
   >>> vehicle.new_brick(brick_type="ScalableBrick", brci_name="My New Brick!", properties={"BrickColor": brci.rgba([255, 0, 255, 255])}, position=[0, 0, 0], rotation=[0, 0, 0])
-  >>>
+  ...
   >>> # You can also add it like this:
   >>> brick = brci.Brick14(brick_type="ScalableBrick", brci_name="My Second Brick!", properties={"BrickColor": brci.rgba([255, 0, 255, 255])}, position=[0, 0, 0], rotation=[0, 0, 0])
-  >>>
+  ...
   >>> # But we don't want the red to be 255! We want the green to be 255!
   >>> vehicle.edit_brick(brci_name="My new Brick!", properties_to_update={"BrickColor": brci.rgba([0, 255, 0, 255])})
-  >>>
+  ...
   >>> # Finally, we can save it and put it in our game.
   >>> vehicle.write_creation_image() # Note: you can specify a custom preview! Please, please look at the docstring for all the functions!
   >>> vehicle.write_metadata() # Name can be specified for metadata and vehicle file!

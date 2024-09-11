@@ -16,9 +16,8 @@ def _convert_brick_types(brick_types: set[str]) -> bytearray:
     return buffer
 
 
-# FIXME
 def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
-        dict[int, str], dict[str, int], dict[int, dict[int, Any]], dict[int, dict[Any, int]]):
+        dict[int, str], dict[str, int], dict[int, dict[int, Any]], dict[int, dict[int, int]]):
 
     """
     Internal function to transform property data into userful information for .brv file generation.
@@ -29,8 +28,10 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
         1. Conversion table: property id to type,
         2. Conversion table: type to property id,
         3. Conversion table: property id to (value id to value conversion table),
-        4. Conversion table: property id to (value to value id conversion table)
+        4. Conversion table: property id to (id(value) to value id conversion table)
     """
+
+    # I pray id(value) works
 
     # Init variables
     property_id_types: dict[int, str] = {}  # Property and their id
@@ -43,6 +44,7 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
         # Cache brick type defaults
         brick_type_defaults: dict[str, Any] = default_properties[brick.get_type()]
 
+        # Contents inside better be O(1); worst case it can run up to 1,050,000 (50,000 * 21) times.
         for property_, value in brick.properties.items():
 
             # Clarification:
@@ -71,12 +73,12 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
             # Storing values
             print(property_id_values_value)
             print(property_id_values_value[property_id])
-            value_id: int | None = property_id_values_value[property_id].get(value)  # Error? Issue: value is mutable. FIXME
+            value_id: int | None = property_id_values_value[property_id].get(id(value))
 
             if value_id is None:
                 value_id = len(property_id_values_id[property_id])  # Give it an id
                 property_id_values_id[property_id][value_id] = value  # Store id-to-value
-                property_id_values_value[property_id][value] = value_id  # Store value-to-id
+                property_id_values_value[property_id][id(value)] = value_id  # Store value-to-id
 
             # else: property is known so we can ignore it
 

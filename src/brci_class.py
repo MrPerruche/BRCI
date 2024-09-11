@@ -5,7 +5,7 @@ from typing import TypeVar
 from .brick import *
 from .utils import *
 from .write_utils import *
-from .write_utils import _convert_brick_types
+from .write_utils import _convert_brick_types, _get_property_data
 # import os.path -> from .utils
 # from typing import Self -> from .brick
 # from typing import Final -> from .utils
@@ -193,6 +193,9 @@ class Creation14:
         :return: self
         """
 
+        # ################### VERIFYING PATHS ####################
+
+
         # #################### TREATMENT ####################
 
         # Bricks
@@ -202,30 +205,11 @@ class Creation14:
         num_brick_types: int = len(brick_types)
 
         # Properties
-        # Initialize variables
-        # property_types: set[str] = set()  # Every single different property
-        property_id_types: dict[int, str] = {}  # Property and their id
-        property_types_id: dict[str, int] = {}  # Property id and their property
-        property_id_values_set: dict[int, set[Any]] = {}  # Property id and their values
-
-        for brick in self.bricks:
-            for property_, value in brick.properties.items():
-
-                # Adding to list of known properties
-                # is None if missing else id (int)
-                property_id = property_types_id.get(property_)
-
-                if property_id is None:
-                    property_id = len(property_types_id)
-                    property_id_types[property_id] = property_
-                    property_types_id[property_] = property_id
-                    property_id_values_set[property_id] = set()
-                property_id_values_set[property_id].add(value)
-        # To avoid later issues or warnings, just in case
-        del i
-
-
-
+        prop_id_t_type: dict[int, str]
+        prop_type_t_id: dict[str, int]
+        prop_id_t__val_id_t_val: dict[int, dict[int, Any]]
+        prop_id_t__val_t_val_id: dict[int, dict[int, int]]
+        prop_id_t_type, prop_type_t_id, prop_id_t__val_id_t_val, prop_id_t__val_t_val_id = _get_property_data(self.bricks, bricks14)
 
         # #################### WRITING ####################
 
@@ -239,7 +223,8 @@ class Creation14:
         # Bricks, unique bricks, unique properties
         buffer.extend(unsigned_int(num_bricks, 2))
         buffer.extend(unsigned_int(num_brick_types, 2))
-        buffer.extend()
+        buffer.extend(unsigned_int(len(prop_id_t_type), 2))  # number of properties, could be another var
+
 
         # Brick types
         buffer.extend(_convert_brick_types(brick_types))
