@@ -125,7 +125,8 @@ def _get_prop_bin(prop_type: str, id_: int,
 
             elif prop_type == 'brick_id':
                 try:
-                    converted = unsigned_int(brick_id_table[ite_val], 2)
+                    converted = unsigned_int(1, 2)
+                    converted += unsigned_int(brick_id_table[ite_val]+1, 2)
                 except IndexError:
                     raise IndexError(f"Brick {ite_val!r} is missing from the brick id table: it does not exist.")
 
@@ -167,14 +168,16 @@ def _get_prop_bin(prop_type: str, id_: int,
 
             elif prop_type == 'list[brick_id]':
                 try:
+                    converted = unsigned_int(len(ite_val), 2)
                     for brick_id in ite_val:
-                        converted = unsigned_int(brick_id_table[brick_id], 2)
+                        converted += unsigned_int(brick_id_table[brick_id]+1, 2)
                 except IndexError:
                     raise IndexError(f"Brick {ite_val!r} is missing from the brick id table: it does not exist.")
 
             elif prop_type == 'str8':
                 try:
-                    converted = ite_val.encode('ascii')
+                    converted = unsigned_int(len(ite_val), 1)
+                    converted += ite_val.encode('ascii')
                 except UnicodeEncodeError:
                     raise ValueError("Provided string is not 8-bit ASCII.")
 
@@ -215,6 +218,7 @@ def _get_prop_bin(prop_type: str, id_: int,
         result.extend(converted)
 
 
+    addon = bytearray()
     if len(elements_length) > 1:
         if uniform_length:
             addon: bytearray = bytearray(unsigned_int(last_elem_length, 2))

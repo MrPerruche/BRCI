@@ -38,6 +38,9 @@ property_types14: dict[str, str] = {
     'IdlerWheels': 'list[brick_id]',
     'Image': 'str8',
     'ImageColor': 'list[3*uint8]',
+    'InputChannel.InputAxis': 'str8',
+    'InputChannel.SourceBricks': 'list[brick_id]',
+    'InputChannel.Value': 'float',
     'InputScale': 'float',
     'LightConeAngle': 'float',
     'LightDirection': 'str8',
@@ -101,3 +104,15 @@ _add_mk(bricks14, ('ScalableBrick',),
         })
 
 # _add_mk()
+_add_mk(bricks14, ('Switch_1sx1sx1s', 'Switch_1x1x1s'),
+        default_properties14() | {
+            'OutputChannel.MinIn': -1.0,
+            'OutputChannel.MaxIn': 1.0,
+            'OutputChannel.MinOut': -1.0,
+            'OutputChannel.MaxOut': 1.0,
+            'InputChannel.InputAxis': 'None',
+            'InputChannel.SourceBricks': [],
+            'InputChannel.Value': 1.0,
+            'bReturnToZero': True,
+            'SwitchName': ''
+        })
