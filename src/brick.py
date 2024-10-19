@@ -67,7 +67,7 @@ def _has_valid_properties(default_settings: dict[str, Any], property_map: dict[s
 
         # Boolean: must be a boolean
         elif prop_type == 'bool':
-            if not isinstance(analyzed_value, bool):
+            if not hasattr(analyzed_value, "__bool__"):
                 return False, f'Property {property_} must be a boolean.'
 
         # Brick id: must be a string or integers (bricks are represented with strings and integers)

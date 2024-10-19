@@ -1,5 +1,7 @@
 from typing import SupportsBytes, Any
 # from .brick import Brick
+from .utils import settings, FM
+from struct import pack as struct_pack
 
 
 # ------------------- CREATION GENERATION ---------------------
@@ -7,13 +9,19 @@ from typing import SupportsBytes, Any
 
 
 
-def _convert_brick_types(brick_types: set[str]) -> bytearray:
+def _convert_brick_types(brick_types: set[str] | list[str]) -> bytearray:
     # Returns brick types to write
     buffer: bytearray = bytearray()
     for brick_type in brick_types:
         buffer.extend(unsigned_int(len(brick_type), 1))
         buffer.extend(utf8(brick_type))
     return buffer
+
+
+def _convert_brick_names_to_id(names: list) -> dict[str | int, int]:
+
+    return {brick.name: i for i, brick in enumerate(names)}
+
 
 
 def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
@@ -71,8 +79,8 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
                 property_id_values_value[property_id] = {}  # Initialize second value-to-id container
 
             # Storing values
-            print(property_id_values_value)
-            print(property_id_values_value[property_id])
+            # print(property_id_values_value)
+            # print(property_id_values_value[property_id])
             value_id: int | None = property_id_values_value[property_id].get(id(value))
 
             if value_id is None:
@@ -83,6 +91,142 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
             # else: property is known so we can ignore it
 
     return property_id_types, property_types_id, property_id_values_id, property_id_values_value
+
+
+def _get_prop_bin(prop_type: str, id_: int,
+                  prop_id_t__val_id_t_val: dict[int, dict[int, Any]],
+                  brick_id_table: dict[str | int, int]) -> (bytearray, bytearray):
+
+    # Initialize result variable
+    result: bytearray = bytearray()
+    converted: bytes = b''
+
+    # Clarification:
+    # - prop_id_t_val_t_val_id[id_]: Value memory address to value id (of this property)
+
+    last_elem_length: int = -1
+    elements_length: list[int] = []
+    uniform_length: bool = True
+
+    for val_id, val in prop_id_t__val_id_t_val[id_].items():
+
+        # Treat input
+        # Cannot be mitigated, having debug info is important, so we do not do our warning thing.
+        ite_val = val() if callable(val) else val
+
+        # Convert to binary (bytearray)
+        try:
+
+            if prop_type == 'bin':
+                converted = ite_val
+
+            elif prop_type == 'bool':
+                converted = b'\x01' if ite_val else b'\x00'
+
+            elif prop_type == 'brick_id':
+                try:
+                    converted = unsigned_int(brick_id_table[ite_val], 2)
+                except IndexError:
+                    raise IndexError(f"Brick {ite_val!r} is missing from the brick id table: it does not exist.")
+
+            elif prop_type == 'float':
+                converted = sp_float(ite_val)
+
+            elif prop_type == 'list[3*float]':
+                try:
+                    # Loops are slow in python. Micro optimisation goes brrr
+                    converted = sp_float(ite_val[0])
+                    converted += sp_float(ite_val[1])
+                    converted += sp_float(ite_val[2])
+                except IndexError:
+                    raise ValueError("Provided list is shorter than 3 floats long.")
+
+            elif prop_type == 'list[3*uint8]':
+                try:
+                    # Loops are slow in python. Micro optimisation goes brrr
+                    converted = unsigned_int(ite_val[0], 1)
+                    converted += unsigned_int(ite_val[1], 1)
+                    converted += unsigned_int(ite_val[2], 1)
+                except IndexError:
+                    raise ValueError("Provided list is shorter than 3 unsigned 8-bit integers long.")
+
+            elif prop_type == 'list[4*uint8]':
+                try:
+                    # Loops are slow in python. Micro optimisation goes brrr
+                    converted = unsigned_int(ite_val[0], 1)
+                    converted += unsigned_int(ite_val[1], 1)
+                    converted += unsigned_int(ite_val[2], 1)
+                    converted += unsigned_int(ite_val[3], 1)
+                except IndexError:
+                    raise ValueError("Provided list is shorter than 4 unsigned 8-bit integers long.")
+
+            elif prop_type == 'list[6*uint2]':
+                # Loops are slow in python. Micro optimisation goes brrr
+                converted = unsigned_int(ite_val[0] + (ite_val[1] << 2) + (ite_val[2] << 4) + (ite_val[3] << 6) +
+                                           (ite_val[4] << 8) +  (ite_val[5] << 10), 2)
+
+            elif prop_type == 'list[brick_id]':
+                try:
+                    for brick_id in ite_val:
+                        converted = unsigned_int(brick_id_table[brick_id], 2)
+                except IndexError:
+                    raise IndexError(f"Brick {ite_val!r} is missing from the brick id table: it does not exist.")
+
+            elif prop_type == 'str8':
+                try:
+                    converted = ite_val.encode('ascii')
+                except UnicodeEncodeError:
+                    raise ValueError("Provided string is not 8-bit ASCII.")
+
+            elif prop_type == 'strany':
+                is_ascii: bool = True
+                try:
+                    converted = ite_val.encode('ascii')
+                except UnicodeEncodeError:
+                    is_ascii: bool = False
+                    try:
+                        converted = ite_val.encode('utf-16')[2:]
+                    except UnicodeEncodeError as e:
+                        raise ValueError("Provided string can be encoded in neither ASCII nor UTF-16.") from e
+                if is_ascii:
+                    converted = signed_int(len(ite_val), 2) + converted
+                else:
+                    converted = signed_int(-len(ite_val), 2) + converted
+
+            elif prop_type == 'uint8':
+                converted = unsigned_int(ite_val, 1)
+
+            if uniform_length:
+                if last_elem_length != len(converted) and last_elem_length != -1:
+                    uniform_length = False
+                last_elem_length = len(converted)
+            elements_length.append(len(converted))
+
+
+        except Exception as e:
+
+            # Notify
+            FM.error("Conversion to binary failed",
+                     f"It seems value {val!r} is not accepted by a {prop_type} type property.\n"
+                     f"{type(e).__name__}: {e}")
+
+            raise (type(e))(f"Conversion to binary failed ({e}). Error mitigation failed.")
+
+        result.extend(converted)
+
+
+    if len(elements_length) > 1:
+        if uniform_length:
+            addon: bytearray = bytearray(unsigned_int(last_elem_length, 2))
+        else:
+            addon: bytearray = bytearray(b'\x00\x00')
+            for elem_len in elements_length:
+                addon: bytearray = bytearray(unsigned_int(elem_len, 2))
+
+
+    return result, addon
+
+
 
 
 # ------------------- GENERAL --------------------
@@ -141,6 +285,7 @@ def signed_int(integer: int, byte_len: int) -> bytes:
 
     return integer.to_bytes(byte_len, byteorder='little', signed=True)
 
+# This is a comment.
 
 def unsigned_int(integer: int, byte_len: int) -> bytes:
 
@@ -159,6 +304,13 @@ def unsigned_int(integer: int, byte_len: int) -> bytes:
         raise OverflowError(f'Negative input. {integer} is less than 0.')
 
     return (integer & ((1 << (8 * byte_len)) - 1)).to_bytes(byte_len, byteorder='little', signed=False)
+
+
+def sp_float(float_: float) -> bytes:
+
+    return struct_pack('<f', float_).ljust(4, b'\x00')[:4]
+
+
 
 
 def utf8(string: str) -> bytes:

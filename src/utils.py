@@ -9,7 +9,7 @@ from builtins import print as printb
 # -------------------- DATA --------------------
 
 # Version
-BRCI_VERSION: str = "D7"  # D(...) is basically 4.(...)
+BRCI_VERSION: str = "D8"  # D(...) is basically 4.(...)
 
 # Paths
 _CWD: str = os.path.dirname(os.path.realpath(__file__))
@@ -20,6 +20,7 @@ if os.name == 'nt':
     BRICK_RIGS_FOLDER: list[str] = [os.path.join(_LOCALAPPDATA, 'BrickRigs', 'SavedRemastered', 'Vehicles')]
 else:
     _USER: str = os.getenv('$USER')
+    # TODO: Get something safer than this
     BRICK_RIGS_FOLDER: list[str] = [
         os.path.expanduser(f"~/.steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles"),
         os.path.expanduser(f"~/.wine/drive_c/users/{_USER}/AppData/Local/BrickRigs/SavedRemastered/Vehicles"),
@@ -251,10 +252,21 @@ def is_valid_folder_name(name: str, is_nt: bool) -> bool:
 
     if is_nt:
         # Check for NT system validity
-        nt_match = r'[<>:"/\\|?*]'
-        if re.search(nt_match, name) or len(name) == 0 or set(name) == set() or name[-1] in {'.', ' '} or name in (
+        # nt_match = r'[<>:"/\\|?*]'  # TODO figure out a better solution for path issues
+        nt_match = r'[<>:"/|?*]'
+        """
+        if re.search(nt_match, name): print("fuck you regex")
+        if len(name) == 0: print("fuck you len")
+        if set(name) == set(): print("fuck you sets")
+        if name[-1] in {'.', ' '}: print("fuck you last character")
+        if name in (
                 "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-                "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"):
+                "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"): print("fuck you banned strs")
+        """
+        if re.search(nt_match, name[2:] if len(name) > 1 and name[1] == ':' else name) or len(name) == 0 or set(name
+                ) == set() or name[-1] in {'.', ' '} or name in ("CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3",
+                "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7",
+                "LPT8", "LPT9"):
             return False
     else:
         # Check for POSIX system validity

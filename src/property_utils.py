@@ -26,10 +26,10 @@ class Units:
 
     :var NAUTICAL_MILE, NMI: (1_852m)
     :var MILE, MI: (1_609.344m)
-    :var YARD, YD: (0.9144m)
-    :var FOOT, FEET, FT: (0.3048m)
-    :var INCH, IN: (0.0254m)
-    :var LINE, L: (0.0021666666...m)
+    :var YARD, YD: (0.9_144m)
+    :var FOOT, FEET, FT: (0.3_048m)
+    :var INCH, IN: (0.0_254m)
+    :var LINE, L: (0.0_021_666_666...m)
     :var THOU, MIL: (0.0000254m)
 
     :var PARSEC, PC: (30_856_775_814_913_673m)

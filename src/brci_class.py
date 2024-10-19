@@ -4,7 +4,7 @@ import shutil
 from .brick import *
 from .utils import *
 from .write_utils import *
-from .write_utils import _convert_brick_types, _get_property_data
+from .write_utils import _convert_brick_names_to_id, _convert_brick_types, _get_property_data, _get_prop_bin
 # import os.path -> from .utils
 # from typing import Self -> from .brick
 # from typing import Final -> from .utils
@@ -229,12 +229,23 @@ class Creation14:
         # ################### VERIFYING PATHS ####################
 
 
+        if not is_valid_folder_name(os.path.join(self.project_dir, self.project_name, file_name), os.name == 'nt'):
+
+            # This error cannot be mitigated
+            FM.error("Invalid path", f"Path {os.path.join(self.project_dir, self.project_name, file_name)} is invalid.\n"
+                                     f"A such named folder cannot be created.")
+
+            raise OSError(f"Invalid path {os.path.join(self.project_dir, self.project_name, file_name)}" +
+                          (" Error mitigation failed." if settings['attempt_error_mitigation'] else ""))
+
+
         # #################### TREATMENT ####################
 
         # Bricks
         num_bricks: int = len(self.bricks)
         # Brick Types
         brick_types: set[str] = {brick.get_type() for brick in self.bricks}
+        brick_types_to_index: dict[str, int] = {brick_type: i for i, brick_type in enumerate(brick_types)}
         num_brick_types: int = len(brick_types)
 
         # Properties
@@ -244,7 +255,7 @@ class Creation14:
         prop_id_t__val_t_val_id: dict[int, dict[int, int]]
         prop_id_t_type, prop_type_t_id, prop_id_t__val_id_t_val, prop_id_t__val_t_val_id = _get_property_data(self.bricks, bricks14)
 
-        # #################### WRITING ####################
+        # #################### GENERATION ####################
 
         buffer: bytearray = bytearray()
 
@@ -258,10 +269,96 @@ class Creation14:
         buffer.extend(unsigned_int(num_brick_types, 2))
         buffer.extend(unsigned_int(len(prop_id_t_type), 2))  # number of properties, could be another var
 
-
         # Brick types
         buffer.extend(_convert_brick_types(brick_types))
 
+        # -------------------- PART 2: BRICK TYPES --------------------
+
+        # for brick_t in brick_types:
+        #     buffer.extend(unsigned_int(len(brick_t), 1))  # Str len
+        #     buffer.extend(utf8(brick_t))  # Str
+
+        # -------------------- PART 3: PROPERTIES --------------------
+
+        # Get all brick IDs
+        brick_id_table: dict[str | int, int] = _convert_brick_names_to_id(self.bricks)
+
+        for type_, id_ in prop_type_t_id.items():
+
+            # Property name
+            buffer.extend(unsigned_int(len(type_), 1))
+            buffer.extend(utf8(type_))
+
+            # Number of properties
+            buffer.extend(unsigned_int(len(set(prop_id_t__val_id_t_val[id_])), 2))
+
+            # Convert all properties of this type to binary
+            properties_binary, properties_binary_addon = _get_prop_bin(property_types14[type_], id_, prop_id_t__val_id_t_val, brick_id_table)
+
+            # Write all that
+            buffer.extend(unsigned_int(len(properties_binary), 4))
+            buffer.extend(properties_binary)
+            buffer.extend(properties_binary_addon)
+
+        # -------------------- PART 4: BRICKS --------------------
+
+        for brick in self.bricks:
+
+            property_bin: bytearray = bytearray()
+
+            # Write brick id
+            buffer.extend(unsigned_int(brick_types_to_index[brick.get_type()], 2))
+
+            # Write number of non-default properties
+            brick_properties: dict[str, Any] = {prop: val for prop, val in brick.properties.items()
+                                                if bricks14[brick.get_type()][prop] != val}
+
+            # Write property ids
+            property_bin.extend(unsigned_int(len(brick_properties), 1))  # Number of non-default properties
+            for prop, val in brick_properties.items():
+                prop_id: int = prop_type_t_id[prop]
+                property_bin.extend(unsigned_int(prop_id, 2))  # id of the property type
+                property_bin.extend(unsigned_int(prop_id_t__val_t_val_id[prop_id][id(val)], 2))  # id of the value
+
+            # Position (X, Y, Z)
+            property_bin.extend(sp_float(brick.position[0]))
+            property_bin.extend(sp_float(brick.position[1]))
+            property_bin.extend(sp_float(brick.position[2]))
+            # Rotation (Y, Z, X / Pitch, Yaw, Roll)
+            property_bin.extend(sp_float(brick.rotation[1]))
+            property_bin.extend(sp_float(brick.rotation[2]))
+            property_bin.extend(sp_float(brick.rotation[0]))
+
+            # Write changes
+            buffer.extend(unsigned_int(len(property_bin), 4))
+            buffer.extend(property_bin)
+
+
+        # -------------------- PART 5: FOOTER AND APPENDIX --------------------
+
+        # Footer
+        if self.seat is None:
+            buffer.extend(b'\x00\x00')
+        else:
+            buffer.extend(unsigned_int(brick_id_table[self.seat], 2))
+
+        buffer.extend(self.appendix)
+
+
+
+        # #################### WRITING ####################
+
+        os.makedirs(os.path.join(self.project_dir, self.project_name), exist_ok=True)
+        with open(os.path.join(self.project_dir, self.project_name, file_name), 'wb') as f:
+            f.write(buffer)
+
+
+
+        return self
+
+
+
+            
 
 
 

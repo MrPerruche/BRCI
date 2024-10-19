@@ -1,9 +1,9 @@
 TODO:
 - Implement all bricks (just take a look at BRCI-C:  
 copy values into the right function, change inputs (see src.bricks.\_\_init\_\_ for info))
-- Finish Creation14.write_creation()
+- ~~Finish Creation14.write_creation()~~
 - Ensure all functions affecting files work correctly on all supported OS. Improve safety
-- Revise some functions to add proper error mitigation
+- Revise some functions to add proper error mitigation. For all errors; use from e if possible
 - List everything we will have to document in documentation
 - Find a convention for docstrings and apply it to all docstrings
 - Write proper doc & readme
