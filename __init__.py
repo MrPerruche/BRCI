@@ -6,15 +6,15 @@
 ##                                                                                                           ##
 ##                                          Originally authored by:                                          ##
 ##                                        MrPerruche (@perru_, Perru)                                        ##
-##                                       Copper (@destiny_29, Destiny)                                       ##
+##                                       Copper (@kitethelunatic, Kite)                                      ##
 ##                                       ANC (@absolutely_no_context)                                        ##
 ##                                     Infernia829 (@spectre829, Spectre)                                    ##
 ##                                   Erzbengel Raziel (@erzbengel_raziel)                                    ##
-##                                            TLM (@tlm_gujarati)                                            ##
+##                                        TLM (@tlm_gujarati) (M.I.A)                                        ##
 ##                                                                                                           ##
 ##                                                                                                           ##
 ##                         Rewrite authored primarily by MrPerruche (@perru_, Perru)                         ##
-##                             With some help from Copper (@destiny_29, Destiny)                             ##
+##                             With some help from Copper (@kitethelunatic, Kite)                            ##
 ##                                                                                                           ##
 ##                      Find BRCI's repository here: https://github.com/MrPerruche/BRCI                      ##
 ##                                                                                                           ##
