@@ -96,12 +96,13 @@ _add_mk(bricks14, ('Actuator_1sx1sx1s_02_Top', 'Actuator_1sx1sx1s_Male', 'Actuat
                  'Actuator_20x2x1s_Top'), default_properties14())
 """
 
-_add_mk(bricks14, ('ScalableBrick',),
+_add_mk(bricks14, ('ScalableBrick', 'ScalableZylinder'),
         default_properties14() | {
             'bGenerateLift': False,
             'BrickSize': [3.0, 3.0, 3.0],
             'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
         })
+
 
 # _add_mk()
 _add_mk(bricks14, ('Switch_1sx1sx1s', 'Switch_1x1x1s'),

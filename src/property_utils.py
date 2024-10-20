@@ -12,8 +12,8 @@ class Units:
     Units class for BRCI-D.
 
     :var UE_UNIT: Length unit used in Unreal Engine. (0.01m)
-    :var THIRD: Length of a third of a brick (0.1m)
-    :var BRICK: Length of a brick (0.1m)
+    :var THIRD, STUD: Length of a third of a brick (0.1m)
+    :var BRICK: Length of a brick (0.3m)
 
     :var KILOMETER, KM: (1_000m)
     :var HECTOMETER, HM: (100m)
@@ -24,13 +24,26 @@ class Units:
     :var MILLIMETER, MM: (0.001m)
     :var MICROMETER, UM: (0.000_001m)
 
+    :var LEAGUE, LEA: (4_828.032m)
     :var NAUTICAL_MILE, NMI: (1_852m)
     :var MILE, MI: (1_609.344m)
-    :var YARD, YD: (0.9_144m)
-    :var FOOT, FEET, FT: (0.3_048m)
-    :var INCH, IN: (0.0_254m)
-    :var LINE, L: (0.0_021_666_666...m)
-    :var THOU, MIL: (0.0000254m)
+    :var FURLONG, FUR: (201.168m)
+    :var CABLE: (185.2m)
+    :var CHAIN, CH: (20.116_8m)
+    :var ROD, POLE, PERCH: (5.029_2m)
+    :var FATHOM, FTH: (1.852m)
+    :var YARD, YD: (0.914_4m)
+    :var FOOT, FEET, FT: (0.304_8m)
+    :var LINK: (0.201_168m)
+    :var HAND, HH: (0.101_6m)
+    :var INCH, IN: (0.025_4m)
+    :var BARLEYCORN: (0.008_466_666_6...m)
+    :var FRENCH_PICA, CICERO: (0.004_511_658_1m)
+    :var AMERICAN_PICA: (0.004_217_416m)
+    :var COMPUTER_PICA, PICA: (0.004_233_333_3...m)
+    :var LINE, L: (0.002_166_666_6...m)
+    :var THOU, MIL, TH: (0.000_025_4m)
+    :var TWIP: (0.000_017_638_9m)
 
     :var PARSEC, PC: (30_856_775_814_913_673m)
     :var LIGHT_YEAR, LY: (9_460_730_472_580_800m)
@@ -40,21 +53,25 @@ class Units:
     :var LIGHT_MINUTE, LM: (179_875_474_800m)
     :var LIGHT_SECOND, LS: (299_792_458m)
     :var LIGHT_MILLISECOND, LMS: (299_792.458m)
+    :var LIGHT_MICROSECOND, LUS: (299.792_458m)
+    :var LIGHT_NANOSECOND, LNS: (0.299_792_458m)
+    :var LIGHT_PICOSECOND, LPS: (0.000_299_792_458m)
     """
 
     # Brick rigs & Unreal Engine
     UE_UNIT: Final[float] = 0.01
     THIRD: Final[float] = 0.1
-    BRICK: Final[float] = 0.1
+    STUD = THIRD
+    BRICK: Final[float] = 0.3
 
-    # Metric
-    KILOMETER: Final[float] = 1_000
+    # Metric & SI-Related
+    KILOMETER: Final[float] = 1_000.0
     KM = KILOMETER  # Alias
-    HECTOMETER: Final[float] = 100
+    HECTOMETER: Final[float] = 100.0
     HM = HECTOMETER  # Alias
-    DECAMETER: Final[float] = 10
+    DECAMETER: Final[float] = 10.0
     DAM = DECAMETER  # Alias
-    METER: Final[float] = 1
+    METER: Final[float] = 1.0
     M = METER  # Alias
     DECIMETER: Final[float] = 0.1
     DM = DECIMETER  # Alias
@@ -66,31 +83,52 @@ class Units:
     UM = MICROMETER  # Alias
 
     # Imperial
+    LEAGUE: Final[float] = 4828.032
+    LEA = LEAGUE  # Alias
     NAUTICAL_MILE: Final[float] = 1_852
     NMI = NAUTICAL_MILE  # Alias
     MILE: Final[float] = 1_609.344
     MI = MILE  # Alias
+    FURLONG: Final[float] = 201.168
+    FUR = FURLONG  # Alias
+    CABLE: Final[float] = 185.2
+    CHAIN: Final[float] = 20.1168
+    CH = CHAIN  # Alias
+    ROD: Final[float] = 5.0292
+    PERCH = POLE = ROD  # Alias
+    FATHOM = 1.852
+    FTH = FATHOM
     YARD: Final[float] = 0.9144
     YD = YARD  # Alias
     FOOT: Final[float] = 0.3048
     FT = FEET = FOOT  # Alias
+    LINK: Final[float] = 0.201168
+    HAND: Final[float] = 0.1016
+    HH = HAND  # Alias
     INCH: Final[float] = 0.0254
     IN = INCH  # Alias
+    BARLEYCORN: Final[float] = INCH / 3
+    FRENCH_PICA: Final[float] = 0.0045116581
+    CICERO = FRENCH_PICA  # Alias
+    AMERICAN_PICA: Final[float] = INCH * 400 / 2409
+    COMPUTER_PICA: Final[float] = INCH / 6
+    PICA = COMPUTER_PICA  # Alias
     LINE: Final[float] = INCH / 12
     L = LINE  # Alias
     THOU: Final[float] = INCH / 1_000
-    MIL = THOU  # Alias
+    MIL = TH = THOU  # Alias
+    TWIP: Final[float] = 0.0000176389
 
-    # Astronomical
+    # Astronomical (length)
     PARSEC: Final[float] = 3.085_677_581_4e16
     PC = PARSEC  # Alias
-    LIGHT_YEAR: Final[float] = 9_460_730_472_580_800
+    LIGHT_YEAR: Final[float] = 9_460_730_472_580_800.0
     LY = LIGHT_YEAR  # Alias
-    LIGHT_DAY: Final[float] = 25_902_068_371_200
+    LIGHT_DAY: Final[float] = 25_902_068_371_200.0
     LD = LIGHT_DAY  # Alias
     LIGHT_HOUR: Final[float] = LIGHT_DAY / 24
     LH = LIGHT_HOUR  # Alias
-    ASTRONOMICAL_UNIT: Final[float] = 149_597_870_700
+    ASTRONOMICAL_UNIT: Final[float] = 149_597_870_700.0
     AU = ASTRONOMICAL_UNIT  # Alias
     LIGHT_MINUTE: Final[float] = LIGHT_HOUR / 60
     LM = LIGHT_MINUTE  # Alias
@@ -98,6 +136,12 @@ class Units:
     LS = LIGHT_SECOND  # Alias
     LIGHT_MILLISECOND: Final[float] = LIGHT_SECOND / 1000
     LMS = LIGHT_MILLISECOND  # Alias
+    LIGHT_MICROSECOND: Final[float] = LIGHT_MILLISECOND / 1000
+    LUS = LIGHT_MICROSECOND  # Alias
+    LIGHT_NANOSECOND: Final[float] = LIGHT_MICROSECOND / 1000
+    LNS = LIGHT_NANOSECOND  # Alias
+    LIGHT_PICOSECOND: Final[float] = LIGHT_NANOSECOND / 1000
+    LPS = LIGHT_PICOSECOND  # Alias
 
 
 def convert_len(value: float | int | list[float | int], old_unit: float | int, new_unit: float | int) -> float | list[float]:
@@ -154,11 +198,11 @@ def convert_len(value: float | int | list[float | int], old_unit: float | int, n
 
     # If it's a value we convert it to the new unit
     if isinstance(value, (float, int)):
-        return value / old_unit * new_unit
+        return value / new_unit * old_unit
 
     # Else if it's a list we convert each value to the new unit
     elif isinstance(value, list):
-        return [v / old_unit * new_unit for v in value]
+        return [v / new_unit * old_unit for v in value]
 
     # else:
     raise ValueError("Value must be a float, int or list of floats and ints." +
@@ -390,7 +434,7 @@ def convert_color(color: list[float | int] | tuple[float | int, ...],
     # RGB color space -> nothing to do
     if color_space == 'rgb':
 
-        pass
+        rgb_color = treated_color
 
     # HSV color space
     elif color_space == 'hsv':

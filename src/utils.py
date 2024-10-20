@@ -9,7 +9,7 @@ from builtins import print as printb
 # -------------------- DATA --------------------
 
 # Version
-BRCI_VERSION: str = "D9"  # D(...) is basically 4.(...)
+BRCI_VERSION: str = "D10"  # D(...) is basically 4.(...)
 
 # Paths
 _CWD: str = os.path.dirname(os.path.realpath(__file__))
