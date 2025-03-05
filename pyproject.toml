@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "BRCI"
+name = "brci"
 version = "4.20.0"
 description = "BRCI (Brick Rigs Creation Interface) is a library that allows you to create and edit creation files in the game Brick Rigs."
 readme = "README.md"

@@ -1,7 +1,6 @@
 from typing import Optional
 
-from ..constants import Units
-from ... import ColorSpace
+from ..constants import Units, ColorSpace
 
 
 def convert_len(value: float | int | list[float | int], old_unit: float | int, new_unit: float | int) -> float | list[float]:
