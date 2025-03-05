@@ -44,8 +44,8 @@ def _convert_brick_names_to_id(names: list) -> dict[str | int, int]:
 
 
 
-def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
-        dict[int, str], dict[str, int], dict[int, dict[int, Any]], dict[int, dict[int, int]]):
+def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> tuple[
+        dict[int, str], dict[str, int], dict[int, dict[int, Any]], dict[int, dict[int, int]]]:
 
     """
     Internal function to transform property data into userful information for creation file generation.
@@ -120,7 +120,7 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> (
 
 def _get_prop_bin(prop_type: str, id_: int,
                   prop_id_t__val_id_t_val: dict[int, dict[int, Any]],
-                  brick_id_table: dict[str | int, int]) -> (bytearray, bytearray):
+                  brick_id_table: dict[str | int, int]) -> tuple[bytearray, bytearray]:
 
     """
     Internal function to convert a property type's properties to binary data ready for the creation file.
