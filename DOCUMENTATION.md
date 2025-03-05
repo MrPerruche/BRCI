@@ -14,6 +14,7 @@ copy values into the right function, change inputs (see src.bricks.\_\_init\_\_ 
 - Add brci.Creation14().load_creation()
 - Add brci.Creation14().load_metadata()
 - Create examples
+- Make unit tests
 
 TODO:
 - Add brci.Creation14().create_preview() and brci.generate_text_bitmap()

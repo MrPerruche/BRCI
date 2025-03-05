@@ -1,7 +1,6 @@
 from .bricks_utils import _add_mk
 from copy import deepcopy
 from typing import Any, Final
-from types import SimpleNamespace
 
 """
     '.InputAxis': 'str8',

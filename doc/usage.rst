@@ -11,12 +11,14 @@ Setting up BRCI
 BRCI supports the following versions of Brick Rigs files:
 
 - Version ``14`` for Brick Rigs 1.7 - 1.7.4
+- We plan to support any upcoming file version aswell as Version ``6`` (latest legacy version)
 
 BRCI follows the principles of Object-Oriented Programming (OOP), where each file version is represented by a specific
 class. These classes are named according to the version of the Brick Rigs file they work with. For example:
 
 - ``brci.Creation14`` for Brick Rigs version 14
-- Only version 14 is supported so far.
+- ``brci.Creation15`` for Brick Rigs version 15 (has yet to be released)
+- ``brci.Creation6`` for Brick Rigs version 6 (not supported yet)
 
 When initializing BRCI, you need to create an instance of the appropriate class based on the version of the Brick Rigs
 file you're working with. For type hinting, the generic brci.Creation class is available, but when creating the instance
@@ -41,8 +43,9 @@ inexperienced. Paths marked with an asterix (*) are not recommended if BRCI was 
 
   import brci
 
-  creation: brci.Creation = brci.Creation14(
-      project_name='my_vehicle',
+  creation: brci.Creation = brci.Creation14(  # Creates a Creation object
+      project_name='my_vehicle',  # Set the name of the folder all files will be created in.
+                                  # Files must be stored in (project dir)\(project name) folder
       project_dir=brci.PROJECT_FOLDER
   )
 
@@ -72,14 +75,14 @@ All arguments can be directly modified post-initialization.
 Building with BRCI
 ------------------
 
-To place bricks in our build, we have 3 functions or classes:
+To place bricks in our build, we use 3 methods or classes:
 
 - ``brci.Brick<version>``: Brick class itself
-- ``brci.Creation<version>.Brick``: Returns the provided brick with the same version as the creation class. Common to
+- ``brci.Creation<version>.Brick()``: Returns the provided brick with the same version as the creation class. Common to
   all creation classes.
-- ``brci.Creation<version>.add_brick``: Directly adds a newly created brick to the creation's brick list
+- ``brci.Creation<version>.add_brick()``: Directly adds a newly created brick to the creation's brick list
 
-These 3 functions or classes all take the same arguments:
+These 3 methods or classes all take the same arguments:
 
 - ``brick_type`` (``str``): Type of the brick. e.g ``'ScalableCone'``.
 - ``name`` (``str | int``): Name of the brick.
@@ -94,7 +97,18 @@ If bricks are not directly created using the ``add_brick`` method, they can be a
 modifying the ``.bricks`` attribute. This is a list of ``brci.Brick<version>`` objects, and you can use methods like
 ``.append()`` or ``.extend()`` to add new bricks.
 
-BRCI features many functions to help you build your creation, from
+BRCI features many functions to help you build your creation, from (TODO)
+
+Once the creation built, to write the creation file (``Vehicle.brv``) we use the ``.write_creation()`` method.
+It takes 3 arguments:
+
+- ``filename`` (``str``): Name of the file to write.
+- ``exist_ok`` (``bool``): Overwrite the file if it already exists, raises an error if set to ``False``.
+
+A creation cannot work properly without adding a metadata file (``Metadata.brm``) in the same directory.
+To create one, use the ``brci.Creation<version>.write_metadata()`` method.
+The ``.write_metadata()`` method takes as values the instance's attributes.
+Therefore it takes the same arguments as ``brci.Creation<version>.write_creation()``
 
 **Example of building with BRCI:**
 
@@ -102,20 +116,25 @@ BRCI features many functions to help you build your creation, from
 
   import brci
 
+  # Create a Creation object
   creation: brci.Creation = brci.Creation14(
       project_name='my_vehicle',
       project_dir=brci.PROJECT_FOLDER
   )
 
+  # Add 5 bricks:
   for i in range(5):
-      creation.add_brick(
-          'ScalableCone',
-          f'Random_scalable_{i}',
-          position=brci.pos([random.uniform(0, 100) for _ in range(3)]),
-          rotation=[random.uniform(-180, 180) for _ in range(3)],
-          properties={
-              "BrickSize": [brci.size(random.uniform(10, 20), brci.Units.CENTIMETERS) for _ in range(3)],
+      creation.add_brick(  # Adds brick
+          'ScalableCone',  # Set the brick type to scalable cones
+          f'Random_scalable_{i}',  # Sets the name
+          position=brci.pos([random.uniform(0, 10) for _ in range(3)]),  # Sets the position to 3 random number between 0 and 10 meters on each axis
+          rotation=[random.uniform(-180, 180) for _ in range(3)],  # Sets the rotation to 3 random number between -180 and 180 degrees on each axis
+          properties={  # Sets the brick's properties. For more info on each brick's property names, see bricks14.rst.
+              "BrickSize": [brci.size(random.uniform(10, 20), brci.Units.CENTIMETERS) for _ in range(3)],  # Give it a random size between 10 and 20 centimeters on each axis
           }
       )
 
-  creation.write_creation(exist_ok=True)
+  creation.write_creation(exist_ok=True)  # Create the Vehicle.brv file, overwriting if required
+  creation.write_metadata(exist_ok=True)  # Create the Metadata.brm file, overwriting if required
+
+To learn more about the features of BRCI, see the other documentation files

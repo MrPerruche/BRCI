@@ -2,7 +2,7 @@ from typing import Self, Optional, TypeVar, Final, Iterable, Literal
 # from collections.abc import MutableMapping, MutableSequence
 # from copy import deepcopy
 from .bricks import *
-from .utils import Limits, FM, settings
+from .constants import Limits
 from .write_utils import can_be_encoded_in_utf
 
 # from typing import Any -> from .bricks.bricks_utils

@@ -24,58 +24,57 @@
 Brick Rigs Creation Interface (BRCI)
 ====================================
 
-### Take advantage of Python's dynamic nature to create and edit creations in Brick Rigs.
-BRCI is a package written in python that allows you to create and edit your creations though code.<br>
+Take advantage of Python's dynamic nature to create and edit creations in Brick Rigs.
+-------------------------------------------------------------------------------------
+
+BRCI is a package written in python that allows you to create and edit your creations though code.
+
 This gives you quite a lot of freedom as, for example:
 - Values of things can be determined at runtime depending on specific variables.
 - You can edit an existing vehicle or brick and it's properties.
 - You can convert objects in code to bricks in-game.
 
-One of the most useful things BRCI can be used for is recursive tasks, say, a 10x10 grid of switches.<br>
+One of the most useful things BRCI can be used for is recursive tasks, say, a 10x10 grid of switches.
+
 That would take manually placing 100 switches, or instead, take BRCI a few fractions of a second.
 
 Usage
 -----
-Most functions will have docstrings, as well as BRCI having markdown files and a GitHub wiki (soon:tm:).
+
+Most functions will have docstrings, as well as BRCI having rst files and a GitHub wiki (soon:tm:).
 
 An example of using BRCI::
 
 
   >>> import brci
   ... 
-  >>> vehicle = brci.Creation14()
+  >>> creation = brci.Creation14("my_creation",  # Name of the folder
+  ...                            brci.PROJECT_FOLDER)  # Path of the folder
   ...
   >>> # Some configuration options for the creation...
-  >>> vehicle.name = "My Creation"
-  >>> vehicle.folder_name = "my_creation" # The name of the folder the creation's vehicle file and metadata are saved in.
-  >>>                                     # Please do not use spaces, caps, etc. However, it's sanity checked, and they are removed.
-  >>> vehicle.project_folder = brci.PROJECT_FOLDER # The path the vehicle folder (vehicle.folder_name) is saved in. Defaults to brci.PROJECT_FOLDER
-  >>> vehicle.description = "My brand new creation!"
+  >>> creation.name = "My Creation"  # Set display name
+  >>> creation.description = "My brand new creation!"
   ...
   >>> # Adding some bricks...
-  >>> # Note for BRCI version C users, BRCI now natively includes a whole ton of utilties, such as RGBA brick colors!
-  >>> vehicle.new_brick(brick_type="ScalableBrick", brci_name="My New Brick!", properties={"BrickColor": brci.rgba([255, 0, 0, 255])}, position=[0, 0, 0], rotation=[0, 0, 0])
+  >>> # Note for BRCI version C users, BRCI now natively includes a whole ton of utilities to help deal with properties!
+  >>> creation.add_brick("ScalableBrick", "my_new_brick",
+  ...                   properties={
+  ...                       "BrickColor": brci.from_rgb(255, 0, 0, 255)
+  ...                   }, position=[0, 0, 0], rotation=[0, 0, 0])
   ...
   >>> # You can also add it like this:
-  >>> brick = brci.Brick14(brick_type="ScalableBrick", brci_name="My Second Brick!", properties={"BrickColor": brci.rgba([255, 0, 0, 255])}, position=[0, 0, 0], rotation=[0, 0, 0])
+  >>> my_brick: brci.Brick = creation.Brick("ScalableBrick", "my_second_brick",
+  ...                                       properties={
+  ...                                           "BrickColor": brci.from_rgb(255, 255, 0, 255)
+  ...                                       }, position=brci.pos([0.1, 0, 0], brci.Units.METER), rotation=[0, 0, 0])
   ...
-  >>> # But we don't want the red to be 255! We want the green to be 255!
-  >>> vehicle.edit_brick(brci_name="My new Brick!", properties_to_update={"BrickColor": brci.rgba([0, 255, 0, 255])})
+  >>> creation.bricks.append(my_brick)
   ...
   >>> # Finally, we can save it and put it in our game.
-  >>> vehicle.copy_preview() # Note: You can specify a custom preview path. Please look at documentation/docstrings!
-  >>> vehicle.write_metadata() # Name can be specified for metadata and vehicle file!
-  >>> vehicle.write_creation()
-  >>> vehicle.copy_to_br_vehicles() # You can specify the path of the Vehicles folder as well if your setup is weird, or you want to move it elsewhere, but be very careful.
-  >>>                               # Misuse of BRCI can be dangerous, especially this function.
-  >>> vehicle.clear_all_bricks() # Clear all of the bricks from the creation, but keep the vehicle file and metadata. Good for reusing the same Creation14 object.
+  >>> creation.write_creation()
+  >>> creation.write_metadata() # Name can be specified for metadata and vehicle file!
+  >>> creation.write_preview(brci.BRCI_THUMBNAIL) # Note: You can specify a custom preview path. Please look at documentation/docstrings!
+  >>> creation.bricks = [] # Clear all bricks from the creation, but keep the vehicle file and metadata. Good for reusing the same Creation14 object.
 """
 
-from .src.brci_class import *
-from .src.property_utils import *
-import os.path
-# from brci.src.brick import *  # import from .brci_class
-# from brci..utils import *  # import from .brci_class
-
-# Probably okay to close the logging file.
-file_handler.close()
+from .src import *

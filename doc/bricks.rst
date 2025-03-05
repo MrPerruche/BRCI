@@ -25,7 +25,7 @@ BRCI supports the following types by default:
       - \-
       - Binary data (as bytes or bytearray object).
     * - ``bool``
-      - ``bool`` or has ``__bool__`` attr.
+      - ``bool``
       - ``True``
       - \-
       - Boolean represented with ``0x00`` or ``0x01`` for False or True.
@@ -33,7 +33,7 @@ BRCI supports the following types by default:
       - ``str | int``
       - ``'my_new_brick'``
       - \-
-      - ``1`` as an ``uint16`` followed by the name "translated" to an ID as ``uint16``.
+      - String or number to identify the brick for brick inputs ``uint16``.
     * - ``float``
       - ``float``
       - ``12.0``

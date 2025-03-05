@@ -1,9 +1,12 @@
 # Brick Rigs Creation Interface D (Pre-release versions)
 
-# WARNING: BRCI-D IS STILL IN ITS EARLY STAGES OF DEVELOPMENT AND IS NOT IN ANY WAY FUNCTIONAL. PLEASE USE BRCI-C (main branch) INSTEAD.
+# Slow down and read this!
+BRCI-D is still in development and isn't ready for public use yet. It features no proper documentation. Please use
+BRCI-C for your projects instead.
 
-- Python 3.12+
-- NumPy 2.1+
-- (Optional) Logging (Any version)
+Requirements:
 
-Todo: do this file.
+- Python 3.12 (3.13 may not be supported!)
+- NumPy 2+
+
+TODO: do this file.
