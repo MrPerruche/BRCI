@@ -1,6 +1,105 @@
-from typing import Optional
+from typing import Optional, Iterable
 
-from ..constants import Units, ColorSpace
+from ..constants import Units, ColorSpace, Connection
+
+
+
+class ConnectorSpacing(Iterable[Connection]):
+
+    def __init__(self, tl: int | Connection, tm: int | Connection, tr: int | Connection,
+                       bl: int | Connection, bm: int | Connection, br: int | Connection):
+
+        self._tl = Connection.from_int(tl)
+        self._tm = Connection.from_int(tm)
+        self._tr = Connection.from_int(tr)
+        self._bl = Connection.from_int(bl)
+        self._bm = Connection.from_int(bm)
+        self._br = Connection.from_int(br)
+
+    def get_tl(self) -> Connection:
+        return self._tl
+
+    def get_x_pos(self) -> Connection:
+        return self._tl
+
+    def set_tl(self, value: int | Connection):
+        self._tl = Connection.from_int(value)
+
+    def set_x_pos(self, value: int | Connection):
+        self._tl = Connection.from_int(value)
+
+    def get_tm(self) -> Connection:
+        return self._tm
+
+    def get_y_pos(self) -> Connection:
+        return self._tm
+
+    def set_tm(self, value: int | Connection):
+        self._tm = Connection.from_int(value)
+
+    def set_y_pos(self, value: int | Connection):
+        self._tm = Connection.from_int(value)
+
+    def get_tr(self) -> Connection:
+        return self._tr
+
+    def get_z_pos(self) -> Connection:
+        return self._tr
+
+    def set_tr(self, value: int | Connection):
+        self._tr = Connection.from_int(value)
+
+    def set_z_pos(self, value: int | Connection):
+        self._tr = Connection.from_int(value)
+
+    def get_bl(self) -> Connection:
+        return self._bl
+
+    def get_x_neg(self) -> Connection:
+        return self._bl
+
+    def set_bl(self, value: int | Connection):
+        self._bl = Connection.from_int(value)
+
+    def set_x_neg(self, value: int | Connection):
+        self._bl = Connection.from_int(value)
+
+    def get_bm(self) -> Connection:
+        return self._bm
+
+    def get_y_neg(self) -> Connection:
+        return self._bm
+
+    def set_bm(self, value: int | Connection):
+        self._bm = Connection.from_int(value)
+
+    def set_y_neg(self, value: int | Connection):
+        self._bm = Connection.from_int(value)
+
+    def get_br(self) -> Connection:
+        return self._br
+
+    def get_z_neg(self) -> Connection:
+        return self._br
+
+    def set_br(self, value: int | Connection):
+        self._br = Connection.from_int(value)
+
+    def set_z_neg(self, value: int | Connection):
+        self._br = Connection.from_int(value)
+
+    def __iter__(self):
+
+        """
+        Returns a tuple in the following order: X- X+ Y- Y+ Z- Z+
+        :return:
+        """
+
+        return iter((self.get_x_neg(), self.get_x_pos(),
+                self.get_y_neg(), self.get_y_pos(),
+                self.get_z_neg(), self.get_z_pos()))
+
+
 
 
 def convert_len(value: float | int | list[float | int], old_unit: float | int, new_unit: float | int) -> float | list[float]:
@@ -109,7 +208,7 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
                   old_space: ColorSpace,
                   new_space: ColorSpace,
                   has_alpha: Optional[bool] = None,
-                  maximum: float = 255.0,
+                  maximum: float = 255,
                   new_maximum: Optional[float] = None,
                   return_int: bool = True) -> list[float | int]:
 
@@ -146,10 +245,12 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
 
     alpha = has_alpha
     if has_alpha is None:
-        alpha = old_colorspace_length == len(color) + 1
+        alpha = old_colorspace_length == len(color) - 1
 
     if new_maximum is None:
         new_maximum = maximum
+
+    # print(f'{len(color)=}\n{old_colorspace_length=}\n{alpha=}\n{maximum=}\n{new_maximum=}\n{old_space=}\n{new_space=}\n{has_alpha=}\n')
 
     if not (old_colorspace_length <= len(color) <= old_colorspace_length + int(alpha)):
         if has_alpha is None:
@@ -267,7 +368,7 @@ def convert_byte_color(color: list[int | float] | tuple[int | float, ...],
         ValueError: One of the value arguments has an invalid value.
     """
 
-    return convert_color(color, old_space, new_space, has_alpha, 255.0, return_int=True)  # return_int=True is not necessary but useful for clarity
+    return convert_color(color, old_space, new_space, has_alpha, 255, return_int=True)  # return_int=True is not necessary but useful for clarity
 
 def convert_float_color(color: list[int | float] | tuple[int | float, ...],
                   old_space: ColorSpace,

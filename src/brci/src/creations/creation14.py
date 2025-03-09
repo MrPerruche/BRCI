@@ -104,7 +104,7 @@ class Creation14:
         return self
 
     # TODO
-    def assert_valid_parameters(self, *args: str) -> None:
+    def _assert_valid_parameters(self, *args: str) -> None:
 
         """
         Will raise errors if class parameters are invalid.
@@ -160,7 +160,7 @@ class Creation14:
         folder_name = str(get_time_100ns()) if name is None else name
 
         # Assert everything is valid
-        self.assert_valid_parameters('project_name', 'project_dir')
+        self._assert_valid_parameters('project_name', 'project_dir')
 
         if not os.path.exists(dst):
             raise OSError(f"Backup folder not found: couldn't create a folder at {dst}.")
@@ -536,7 +536,7 @@ class Creation14:
 
         return self
 
-    def read_creation(self, file_name: str = 'Vehicle.brv', brick_name: str | int = 0) -> Self:
+    def read_creation(self, file_name: str = 'Vehicle.brv') -> Self:
         """
         Will read the .brv (vehicle) file, and append it to the creation's bricks.
 
@@ -567,12 +567,6 @@ class Creation14:
 
         # That's all we need from the with statement.
         # Now we need to write, in reverse.
-
-        # Find name of bricks
-        if type(brick_name) == int:
-            name_func = lambda index: index + brick_name
-        else:
-            name_func = lambda index: brick_name.replace("{index}", str(index))
 
         # -------------------- PART 1: HEADER INFO -------------------- #
 
@@ -632,47 +626,8 @@ class Creation14:
 
             for bin_value in bin_values:
 
-                print(prop_name, bin_value)
-                print(first_len)
-
-                match property_types14[prop_name]:
-
-                    case 'bin':
-                        values.append(bin_value)
-
-                    case 'bool':
-                        values.append(bin_value == b'\x01')
-
-                    case 'brick_id':
-                        values.append(name_func(get_unsigned_int(bin_value[-2:]) - 1))
-
-                    case 'float':
-                        values.append(get_sp_float(bin_value))
-
-                    case 'list[3*float]':
-                        values.append([get_sp_float(bin_value[i:i + 4]) for i in range(0, 12, 4)])
-
-                    case 'list[3*uint8]':
-                        values.append([get_unsigned_int(bin_value[i:i + 1]) for i in range(0, 3, 1)])
-
-                    case 'list[4*uint8]':
-                        values.append([get_unsigned_int(bin_value[i:i + 1]) for i in range(0, 4, 1)])
-
-                    case 'list[6*uint2]':
-                        values.append([(get_unsigned_int(bin_value) >> i) & 0b11 for i in range(12, -1, -2)])
-
-                    case 'list[brick_id]':
-                        values.append([name_func(get_unsigned_int(extract_bytes(bin_value, 2)) - 1) for _ in
-                                       range(get_unsigned_int(extract_bytes(bin_value, 2)))])
-
-                    case 'str8':
-                        values.append(extract_str8(bin_value))
-
-                    case 'strany':
-                        values.append(extract_str16(bin_value))
-
-                    case 'uint8':
-                        values.append(get_unsigned_int(bin_value))
+                # Deserialize values
+                values.append(property_types14[prop_name].deserialize(settings['numpy']))
 
             properties.update({prop_name: values})
 
@@ -711,7 +666,7 @@ class Creation14:
 
             # Done. Add the brick to the list
             self.add_brick(brick_type=brick_type,
-                           name=name_func(brick),
+                           name=brick,
                            position=position,
                            rotation=rotation,
                            properties=brick_properties
@@ -722,7 +677,7 @@ class Creation14:
         seat_id: int = get_unsigned_int(extract_bytes(file, 2))
 
         if seat_id != 0:
-            self.seat = name_func(seat_id - 1)
+            self.seat = seat_id - 1
 
         end_t = perf_counter()  # TODO TEMPORARY FOR TEST
         print(f"time (reading excluded): {end_t - start_t:,.6f}")  # TODO TEMPORARY FOR TEST

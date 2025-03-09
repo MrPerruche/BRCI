@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import Final
+from typing import Final, Self
 import numpy as np
 
-BRCI_VERSION: Final[str] = "4.19.0"
+BRCI_VERSION: Final[str] = "4.21.0"
 
 VALID_DRIVER_SEATS: Final[set[str]] = {'Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'}
 
@@ -23,6 +23,42 @@ class ColorSpace(Enum):
     HSV = 3
     HSL = 3
     CMYK = 4
+
+class Connection(Enum):
+
+    """
+    Connection is an enum to select which connection type you're dealing with for the connection-related property utils.
+    You may use .value to get the number of values expected.
+    """
+
+    NONE = 0
+    DEFAULT = 1
+    HALF = 2
+    THIRD = 3
+
+    @staticmethod
+    def from_int(i):
+
+        """
+        Converts an integer to a Connection enum.
+
+        Arguments:
+            i (int): Integer to convert.
+
+        Returns:
+            Connection: Connection enum or None if invalid.
+        """
+        if isinstance(i, Connection):
+            return i
+        match i:
+            case 0:
+                return Connection.NONE
+            case 1:
+                return Connection.DEFAULT
+            case 2:
+                return Connection.HALF
+            case 3:
+                return Connection.THIRD
 
 
 class Units:

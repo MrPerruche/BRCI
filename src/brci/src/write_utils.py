@@ -5,6 +5,9 @@ from struct import pack as struct_pack, unpack as struct_unpack
 from .exceptions import *
 
 
+from .binary_types import BinaryType
+
+
 # ------------------- CREATION GENERATION ---------------------
 
 
@@ -118,7 +121,7 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> tupl
     return property_id_types, property_types_id, property_id_values_id, property_id_values_value
 
 
-def _get_prop_bin(prop_type: str, id_: int,
+def _get_prop_bin(prop_type: BinaryType, id_: int,
                   prop_id_t__val_id_t_val: dict[int, dict[int, Any]],
                   brick_id_table: dict[str | int, int]) -> tuple[bytearray, bytearray]:
 
@@ -161,91 +164,7 @@ def _get_prop_bin(prop_type: str, id_: int,
         # Convert to binary (bytearray)
         try:
 
-            match prop_type:
-                case 'bin':
-                    converted = ite_val
-
-                case 'bool':
-                    converted = b'\x01' if ite_val else b'\x00'
-
-                case 'brick_id':
-                    if ite_val is None:
-                        converted = b'\x00\x00'
-                    else:
-                        try:
-                            converted = unsigned_int(1, 2)
-                            converted += unsigned_int(brick_id_table[ite_val]+1, 2)
-                        except IndexError:
-                            raise NameError(f"Brick {ite_val!r} is missing from the brick id table: it does not exist.")
-
-                case 'float':
-                    converted = sp_float(ite_val)
-
-                case 'list[3*float]':
-                    try:
-                        # Loops are slow in python. Micro optimisation goes brrr
-                        converted = sp_float(ite_val[0])
-                        converted += sp_float(ite_val[1])
-                        converted += sp_float(ite_val[2])
-                    except IndexError:
-                        raise ValueError("Provided list is shorter than 3 floats long.")
-
-                case 'list[3*uint8]':
-                    try:
-                        # Loops are slow in python. Micro optimisation goes brrr
-                        converted = unsigned_int(ite_val[0], 1)
-                        converted += unsigned_int(ite_val[1], 1)
-                        converted += unsigned_int(ite_val[2], 1)
-                    except IndexError:
-                        raise ValueError("Provided list is shorter than 3 unsigned 8-bit integers long.")
-
-                case 'list[4*uint8]':
-                    try:
-                        # Loops are slow in python. Micro optimisation goes brrr
-                        converted = unsigned_int(ite_val[0], 1)
-                        converted += unsigned_int(ite_val[1], 1)
-                        converted += unsigned_int(ite_val[2], 1)
-                        converted += unsigned_int(ite_val[3], 1)
-                    except IndexError:
-                        raise ValueError("Provided list is shorter than 4 unsigned 8-bit integers long.")
-
-                case 'list[6*uint2]':
-                    # Loops are slow in python. Micro optimisation goes brrr
-                    converted = unsigned_int(ite_val[0] + (ite_val[1] << 2) + (ite_val[2] << 4) + (ite_val[3] << 6) +
-                                               (ite_val[4] << 8) +  (ite_val[5] << 10), 2)
-
-                case 'list[brick_id]':
-                    try:
-                        converted = unsigned_int(len(ite_val), 2)
-                        for brick_id in ite_val:
-                            converted += unsigned_int(brick_id_table[brick_id]+1, 2)
-                    except IndexError:
-                        raise NameError(f"Brick {ite_val!r} is missing from the brick id table: it does not exist.")
-
-                case 'str8':
-                    try:
-                        converted = unsigned_int(len(ite_val), 1)
-                        converted += ite_val.encode('ascii')
-                    except UnicodeEncodeError:
-                        raise ValueError("Provided string is not 8-bit ASCII.")
-
-                case 'strany':
-                    is_ascii: bool = True
-                    try:
-                        converted = ite_val.encode('ascii')
-                    except UnicodeEncodeError:
-                        is_ascii: bool = False
-                        try:
-                            converted = ite_val.encode('utf-16')[2:]
-                        except UnicodeEncodeError as e:
-                            raise ValueError("Provided string can be encoded in neither ASCII nor UTF-16.") from e
-                    if is_ascii:
-                        converted = signed_int(len(ite_val), 1) + converted
-                    else:
-                        converted = signed_int(-len(ite_val), 2) + converted
-
-                case 'uint8':
-                    converted = unsigned_int(ite_val, 1)
+            converted = prop_type.serialize(ite_val, brick_id_table)
 
             if uniform_length:
                 if last_elem_length != len(converted) and last_elem_length != -1:

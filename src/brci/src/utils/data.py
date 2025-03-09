@@ -27,6 +27,7 @@ MISSING_THUMBNAIL: str = os.path.join(BRCI_CWD, 'resources', 'missing_thumbnail.
 
 # Settings
 settings: dict[str, Any] = {
+    'numpy': False,
     'show_logs': False,
     'wip_features': False
 }
