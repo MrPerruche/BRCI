@@ -20,7 +20,7 @@ class Creation14:
                  visibility: Visibility = Visibility.PUBLIC, seat: Optional[str | int] = None,
                  creation_time: Optional[int] = None,
                  update_time: Optional[int] = None, size: Optional[list[float]] = None, weight: float = 0.0,
-                 price: float = 0.0) -> None:
+                 price: float = 0.0, author: int = 0) -> None:
 
         """
         Project creation class for version 14 (Brick Rigs 1.7.0 - 1.7.4).
@@ -39,6 +39,7 @@ class Creation14:
             size (Optional[list[float]]): Size of the project (in meters).
             weight (float): Weight of the project (in kilograms).
             price (float): Price of the project (in dollars).
+            author (int): Author of the creation.
         """
 
         # Path related
@@ -56,6 +57,7 @@ class Creation14:
         self.size: list[float] = [0.0, 0.0, 0.0] if size is None else size
         self.price: float = price
         self.weight: float = weight
+        self.author: int = author
 
         # File
         self.seat: Optional[str | int] = seat
@@ -424,9 +426,27 @@ class Creation14:
         for axis_size in self.size:
             buffer.extend(sp_float(axis_size))
 
-        # Author TODO
-        buffer.extend(unsigned_int(16, 1))
-        buffer.extend(b'\x00' * 8)
+        # Weight
+        buffer.extend(sp_float(self.weight))
+
+        # Price
+        buffer.extend(sp_float(self.price))
+
+        # Add the 0x1D (29). Steam
+        buffer.extend(b'\x1D')
+
+        # Get author
+        # Pretty long. basically 1234567 -> ['7', '65', '43', '21']
+        author_str: list[str] = [str(self.author)[i:i+2][::-1] for i in range(0, len(str(self.author)), 2)][::-1]
+        author_coded: int = 0
+        for i, seg in enumerate(author_str):
+            if len(seg) == 2:
+                author_coded += ((int(seg[1]) << 4) + int(seg[0])) << (i * 8)
+            else:
+                author_coded += int(seg[0]) << (i * 8 + 4)
+        if len(str(self.author)) % 2 == 1:
+            author_coded //= 0x10
+        buffer.extend(unsigned_int(author_coded, len(author_str)))
 
         # Write time (100 nanosecond Gregorian bigint value)
         # Creation time
@@ -627,7 +647,7 @@ class Creation14:
             for bin_value in bin_values:
 
                 # Deserialize values
-                values.append(property_types14[prop_name].deserialize(settings['numpy']))
+                values.append(property_types14[prop_name].deserialize(bin_value, settings['numpy']))
 
             properties.update({prop_name: values})
 
@@ -654,9 +674,11 @@ class Creation14:
                 prop_id: int = get_unsigned_int(extract_bytes(file, 2))
                 val_id: int = get_unsigned_int(extract_bytes(file, 2))
 
+                print(f'{prop_id=}, {val_id=}\n{properties=}\n{property_type_names[prop_id]=}\n{properties[property_type_names[prop_id]][val_id]=}')
+
                 # Obtain value from IDs and append them to already collected properties
                 brick_properties.update({
-                    property_type_names[prop_id]: property_type_names[prop_id][val_id]
+                    property_type_names[prop_id]: properties[property_type_names[prop_id]][val_id]
                 })
 
             # Get position and rotation
@@ -681,5 +703,97 @@ class Creation14:
 
         end_t = perf_counter()  # TODO TEMPORARY FOR TEST
         print(f"time (reading excluded): {end_t - start_t:,.6f}")  # TODO TEMPORARY FOR TEST
+
+        return self
+
+
+    def read_metadata(self, file_name: str = 'MetaData.brm', load_last_update: bool = False) -> Self:
+
+        """
+        Will read the metadata file.
+
+        Arguments:
+            file_name (str): Name of the file to read.
+            load_last_update (bool): If True, it will also load the last update timestamp.
+
+        Returns:
+            Self
+
+        Exceptions:
+            OverflowError: One of the values are invalid causing an overflow error.
+            UnicodeEncodeException: One of the values are invalid causing a decoding error.
+        """
+
+        # ################### VERIFYING PATHS ####################
+
+        if not is_valid_folder_name(os.path.join(self.project_dir, self.project_name, file_name), os.name == 'nt'):
+            raise OSError(f"Invalid path {os.path.join(self.project_dir, self.project_name, file_name)}")
+
+        # #################### WRITING ####################
+
+        # logwrap("info", f"Creation14::write_metadata || Instantiating buffer, writing basic details...")
+
+
+        # Initializing stuff
+        with open(os.path.join(self.project_dir, self.project_name, file_name), 'rb') as f:
+            buffer: bytearray = bytearray(f.read())
+
+        # Version number
+        version: int = get_unsigned_int(extract_bytes(buffer, 1))
+        if version != self.get_version():
+            raise NotImplementedError(f"Invalid version number {version}, expected {self.get_version()}")
+
+        # File name
+        self.name = extract_str16(buffer)
+
+        # Description:
+        self.description = extract_str16(buffer)
+
+        # Brick Count ignored
+        extract_bytes(buffer, 2)
+
+        # logwrap("info", "Creation14::write_metadata || Basic details -> Buffer completed...")
+
+        # Vehicle Size
+        self.size = [None, None, None]
+        for i in range(3):
+            self.size[i] = get_sp_float(extract_bytes(buffer, 4))
+
+        # Weight
+        self.weight = get_sp_float(extract_bytes(buffer, 4))
+
+        # Price
+        self.price = get_sp_float(extract_bytes(buffer, 4))
+
+        # Remove the 0x1D (29). Steam
+        extract_bytes(buffer, 1)
+
+        # Get author
+        author_coded: list[int] = [x for x in extract_bytes(buffer, get_unsigned_int(extract_bytes(buffer, 1)))]
+        author_str: list[str] = [f'{x:02x}' for x in author_coded]
+        self.author = int(''.join(author_str))
+
+
+        # Write time (100 nanosecond Gregorian bigint value)
+        self.creation_time = get_unsigned_int(extract_bytes(buffer, 8))
+
+        # logwrap("info", "Creation14::write_metadata || Extended details -> Buffer completed...")
+
+        # Update time
+        if load_last_update:
+            self.update_time = get_unsigned_int(extract_bytes(buffer, 8))
+
+        # Visibility mode
+        buffer.extend(unsigned_int(self.visibility.value, 1))
+
+        # Tags
+        buffer.extend(unsigned_int(len(self.tags), 2))
+        for tag in self.tags:
+            buffer.extend(unsigned_int(len(tag), 1))
+            buffer.extend(utf8(tag))
+
+        # logwrap("info", "Creation14::write_metadata || All details -> Buffer completed. Writing file...")
+
+        # logwrap("info", "Creation14::write_metadata || Metadata writing successful.")
 
         return self

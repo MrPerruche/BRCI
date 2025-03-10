@@ -84,6 +84,10 @@ class BinaryTypes:
         return bytearray(( value & ((1<<(length*8))-1) ).to_bytes(length, byteorder=byteorder, signed=signed))  # Little-endian
 
     @staticmethod
+    def deserialize_safe_int(ba: bytearray, signed: bool, byteorder: Literal['big', 'little'] = 'little') -> int:
+        return int.from_bytes(ba, byteorder=byteorder, signed=signed)
+
+    @staticmethod
     def serialize_float32(value: float | np.floating) -> bytearray:
         if isinstance(value, float):
             value = np.float32(value)
@@ -104,7 +108,7 @@ class BinaryTypes:
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> int:
-            value = int.from_bytes(ba[2:], byteorder='little') - 1
+            value = BinaryTypes.deserialize_safe_int(ba[2:], False) - 1
             return None if value < 0 else value
 
         @staticmethod
@@ -132,7 +136,8 @@ class BinaryTypes:
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
             result = []
             for i in range(int.from_bytes(ba[0:2], byteorder='little')):
-                result.append(BinaryTypes.BrickID.deserialize(ba[ 2+i*2 : 4+i*2 ], try_np))
+                value = BinaryTypes.deserialize_safe_int(ba[ 2+i*2 : 4+i*2 ], False) - 1
+                result.append(None if value < 0 else value)
             return result
 
         @staticmethod
@@ -151,7 +156,7 @@ class BinaryTypes:
 
         @staticmethod
         def serialize(value: bool, brick_id_table: dict[str | int, int]) -> bytearray:
-            return bytearray([1 if value else 0])
+            return bytearray(b'\x01') if value else bytearray(b'\x00')
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> bool:
@@ -185,6 +190,7 @@ class BinaryTypes:
                 raise ValueError(f"Expected 6 connections, not {i + 1}")
             return BinaryTypes.serialize_int(result_int, 2, False)
 
+        # TODO continue changing up deserialization stuff starting here
 
         @staticmethod
         def deserialize(ba: bytearray, context: Optional[dict[str, Any]] = None, try_np: bool = False) -> ConnectorSpacing:
