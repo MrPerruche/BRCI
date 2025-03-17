@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 import os
 
 # Paths
@@ -31,3 +31,42 @@ settings: dict[str, Any] = {
     'show_logs': False,
     'wip_features': False
 }
+
+def wip_features(new_setting: Optional[bool]) -> bool:
+    """
+    Change wip_features setting.
+
+    Arguments:
+        new_setting (Optional[bool]): Set setting or toggle if None.
+
+    Returns:
+        bool: New setting
+    """
+    settings['wip_features'] = new_setting if new_setting is not None else not settings['wip_features']
+    return settings['wip_features']
+
+def try_numpy(new_setting: Optional[bool]) -> bool:
+    """
+    Change try_numpy (numpy) setting.
+
+    Arguments:
+        new_setting (Optional[bool]): Set setting or toggle if None.
+
+    Returns:
+        bool: New setting
+    """
+    settings['numpy'] = new_setting if new_setting is not None else not settings['numpy']
+    return settings['numpy']
+
+def show_logs(new_setting: Optional[bool]) -> bool:
+    """
+    Change show_logs setting.
+
+    Arguments:
+        new_setting (Optional[bool]): Set setting or toggle if None.
+
+    Returns:
+        bool: New setting
+    """
+    settings['show_logs'] = new_setting if new_setting is not None else not settings['show_logs']
+    return settings['show_logs']

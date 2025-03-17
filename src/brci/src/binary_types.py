@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Literal, Optional
 from collections.abc import Iterable
 import numpy as np
+from struct import unpack as _struct_unpack
 
 from .constants import Connection
 from .utils import ConnectorSpacing
@@ -35,7 +36,6 @@ def get_utf8(bin_value: bytes | bytearray) -> str:
     Returns:
         str: String
     """
-    print(bin_value)
     return bin_value.decode('ascii')
 def get_utf16(bin_value: bytes | bytearray) -> str:
 
@@ -89,9 +89,13 @@ class BinaryTypes:
 
     @staticmethod
     def serialize_float32(value: float | np.floating) -> bytearray:
-        if isinstance(value, float):
+        if isinstance(value, (int, float)):
             value = np.float32(value)
         return bytearray(value.tobytes())
+
+    @staticmethod
+    def deserialize_float32(ba: bytearray) -> np.float32:
+        return _struct_unpack('<f', ba[:4])[0]
 
 
     class BrickID(BinaryType):
@@ -129,14 +133,14 @@ class BinaryTypes:
                 id_ = brick_id_table.get(val)
                 if id_ is None:
                     raise ValueError(f"Brick with ID {val} not found")
-                result.extend(BinaryTypes.serialize_safe_int(id_ + 1, 2, False))
+                result.extend(BinaryTypes.serialize_safe_int(id_ + 1, 2, False))  # FIXME: I am convinced this should have a +1 but when I add it I get wrong stuff. Needs investigation
             return result
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
             result = []
             for i in range(int.from_bytes(ba[0:2], byteorder='little')):
-                value = BinaryTypes.deserialize_safe_int(ba[ 2+i*2 : 4+i*2 ], False) - 1
+                value = BinaryTypes.deserialize_safe_int(ba[ 2+i*2 : 4+i*2 ], False) - 1  # FIXME: Same with -1
                 result.append(None if value < 0 else value)
             return result
 
@@ -190,13 +194,11 @@ class BinaryTypes:
                 raise ValueError(f"Expected 6 connections, not {i + 1}")
             return BinaryTypes.serialize_int(result_int, 2, False)
 
-        # TODO continue changing up deserialization stuff starting here
-
         @staticmethod
         def deserialize(ba: bytearray, context: Optional[dict[str, Any]] = None, try_np: bool = False) -> ConnectorSpacing:
-            result_int: int = np.frombuffer(ba, dtype=np.int32)[0].item()
+            result_int: int = BinaryTypes.deserialize_safe_int(ba, False)
             # Split result into 6 2bit uints
-            result_list = [result_int >> (i * 2) & 0b11 for i in range(6)]
+            result_list = [Connection.from_int(result_int >> (i * 2) & 0b11) for i in range(6)]
             return ConnectorSpacing(result_list[1], result_list[3], result_list[5],
                                     result_list[0], result_list[2], result_list[4])
 
@@ -209,8 +211,8 @@ class BinaryTypes:
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
-            result = np.frombuffer(ba, dtype=np.float32)[0]
-            return result if try_np else result.item()
+            result = BinaryTypes.deserialize_float32(ba)
+            return result # if try_np else result.item()
 
 
     # noinspection PyPep8Naming
@@ -241,8 +243,8 @@ class BinaryTypes:
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
-            result = np.frombuffer(ba, dtype=np.int8)[0]
-            return result if try_np else result.item()
+            result = BinaryTypes.deserialize_safe_int(ba, False)
+            return result # if try_np else result.item()
 
 
     # noinspection PyPep8Naming
@@ -293,8 +295,8 @@ class BinaryTypes:
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
-            result = np.frombuffer(ba, dtype=np.int16)[0]
-            return result if try_np else result.item()
+            result = BinaryTypes.deserialize_safe_int(ba, False)
+            return result # if try_np else result.item()
 
 
     class UInteger32(BinaryType):
@@ -305,8 +307,8 @@ class BinaryTypes:
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
-            result = np.frombuffer(ba, dtype=np.int32)[0]
-            return result if try_np else result.item()
+            result = BinaryTypes.deserialize_safe_int(ba, False)
+            return result # if try_np else result.item()
 
 
     class String(BinaryType):
@@ -325,7 +327,7 @@ class BinaryTypes:
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
-            return ba[1:].decode('utf-8')
+            return ba[1: ].decode('utf-8')
 
 
     class Text(BinaryType):
@@ -333,17 +335,17 @@ class BinaryTypes:
         @staticmethod
         def serialize(value: str, brick_id_table: dict[str | int, int]) -> bytearray:
             try:
-                if len(value) > 65535:
+                if len(value) > 32767:
                     raise ValueError("Provided string is too long.")
-                converted = BinaryTypes.serialize_safe_int(len(value), 2, False)
-                converted += value.encode('utf-16')
+                converted = BinaryTypes.serialize_safe_int(-len(value), 2, True)
+                converted += value.encode('utf-16')[2: ]
             except UnicodeEncodeError:
                 raise ValueError("Provided string is not UTF-16.")
             return converted
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
-            str_len: int = np.frombuffer(ba, dtype=np.int16)[0].item()
+            str_len: int = BinaryTypes.deserialize_safe_int(extract_bytes(ba, 2), False)
             if str_len < 0:
                 return get_utf16(extract_bytes(ba, -str_len))
             else:

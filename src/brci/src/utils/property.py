@@ -241,7 +241,7 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
         raise ValueError("Color must be a list or tuple of ints and/or floats")
 
     # Ensure color / color space validity
-    old_colorspace_length: int = old_space.value
+    old_colorspace_length: int = len(old_space.name)
 
     alpha = has_alpha
     if has_alpha is None:
@@ -262,79 +262,81 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
 
     # Get RGB color
     scaled_color: list[float] = [col / maximum for col in color]
-    rgb_color: list[float] = [0.0] * (new_space.value + int(alpha))
+    rgb_color: list[float] = [0.0] * (len(old_space.name) + int(alpha))
 
-    match old_space:  # Ignores mutability issues. Careful with scaled_color after this match block!
-        case ColorSpace.RGB:
-            rgb_color = scaled_color
-        case ColorSpace.HSV, ColorSpace.HSL:
-            h, s, v = scaled_color[:3]
-            if old_space == ColorSpace.HSV:
-                c = v * s
-                m = v - c
-            else:  # HSL
-                c = (1 - abs(2 * v - 1)) * s
-                m = v - c / 2
-            x = c * (1 - abs((h * 6) % 2 - 1))
-            if 0 <= h < 1 / 6:
-                r, g, b = c, x, 0
-            elif 1 / 6 <= h < 2 / 6:
-                r, g, b = x, c, 0
-            elif 2 / 6 <= h < 3 / 6:
-                r, g, b = 0, c, x
-            elif 3 / 6 <= h < 4 / 6:
-                r, g, b = 0, x, c
-            elif 4 / 6 <= h < 5 / 6:
-                r, g, b = x, 0, c
-            else:
-                r, g, b = c, 0, x
-            rgb_color[0] = r + m
-            rgb_color[1] = g + m
-            rgb_color[2] = b + m
-        case ColorSpace.CMYK:
-            c, m, y, k = scaled_color[:4]
-            rgb_color[0] = (1 - c) * (1 - k)
-            rgb_color[1] = (1 - m) * (1 - k)
-            rgb_color[2] = (1 - y) * (1 - k)
+    if old_space is ColorSpace.RGB:
+        rgb_color = scaled_color
+    elif old_space is ColorSpace.HSV or old_space is ColorSpace.HSL:
+        h, s, v = scaled_color[:3]
+        if old_space is ColorSpace.HSV:
+            c = v * s
+            m = v - c
+        else:  # HSL
+            c = (1 - abs(2 * v - 1)) * s
+            m = v - c / 2
+        x = c * (1 - abs((h * 6) % 2 - 1))
+        if 0 <= h < 1 / 6:
+            r, g, b = c, x, 0
+        elif 1 / 6 <= h < 2 / 6:
+            r, g, b = x, c, 0
+        elif 2 / 6 <= h < 3 / 6:
+            r, g, b = 0, c, x
+        elif 3 / 6 <= h < 4 / 6:
+            r, g, b = 0, x, c
+        elif 4 / 6 <= h < 5 / 6:
+            r, g, b = x, 0, c
+        else:
+            r, g, b = c, 0, x
+        rgb_color[0] = r + m
+        rgb_color[1] = g + m
+        rgb_color[2] = b + m
+    elif old_space is ColorSpace.CMYK:
+        c, m, y, k = scaled_color[:4]
+        rgb_color[0] = (1 - c) * (1 - k)
+        rgb_color[1] = (1 - m) * (1 - k)
+        rgb_color[2] = (1 - y) * (1 - k)
+    else:
+        raise AttributeError(f"Color space {old_space} is not supported.")
 
     r, g, b = rgb_color[:3]
     new_color = rgb_color  # Mutability! Careful when using. Here for readability
 
-    match new_space:
-        case ColorSpace.RGB:
-            return rgb_color
-        case ColorSpace.HSV, ColorSpace.HSL:
-            mx = max(r, g, b)  # rgb_color contains alpha. I'm fairly confident this is faster than rgb_color[:3]
-            mn = min(r, g, b)
-            diff = mx - mn
-            new_color[2] = (mx + mn) / 2
-            if diff == 0:
-                new_color[0] = 0
+    if new_space is ColorSpace.RGB:
+        pass
+    elif new_space is ColorSpace.HSV or new_space is ColorSpace.HSL:
+        mx = max(r, g, b)  # rgb_color contains alpha. I'm fairly confident this is faster than rgb_color[:3]
+        mn = min(r, g, b)
+        diff = mx - mn
+        new_color[2] = (mx + mn) / 2
+        if diff == 0:
+            new_color[0] = 0
+        else:
+            if mx == r:
+                new_color[0] = (60 * ((g - b) / diff) + 360) % 360
+            elif mx == g:
+                new_color[0] = (60 * ((b - r) / diff) + 120) % 360
             else:
-                if mx == r:
-                    new_color[0] = (60 * ((g - b) / diff) + 360) % 360
-                elif mx == g:
-                    new_color[0] = (60 * ((b - r) / diff) + 120) % 360
-                else:
-                    new_color[0] = (60 * ((r - g) / diff) + 240) % 360
-            new_color[0] /= 360
-            if new_space == ColorSpace.HSV:
-                new_color[1] = 0 if mx == 0 else (diff / mx)
-                new_color[2] = mx
-            else:  # HSL
-                if new_color[2] == 0 or new_color[2] == 1:
-                    new_color[1] = 0
-                else:
-                    new_color[1] = (mx - mn) / (1 - abs(2 * new_color[2] - 1))
-        case ColorSpace.CMYK:
-            mx = max(r, g, b)
-            new_color.insert(3, k := 1 - mx)  # Adds an extra slot for key (at the 3rd index -> cmyk(a))
-            if mx == 0:  # Check for pure black to avoid zero division errors
-                new_color = [0, 0, 0, 1, rgb_color[-1]] if alpha else [0, 0, 0, 1]
+                new_color[0] = (60 * ((r - g) / diff) + 240) % 360
+        new_color[0] /= 360
+        if new_space == ColorSpace.HSV:
+            new_color[1] = 0 if mx == 0 else (diff / mx)
+            new_color[2] = mx
+        else:  # HSL
+            if new_color[2] == 0 or new_color[2] == 1:
+                new_color[1] = 0
             else:
-                new_color[0] = (1 - r - k) / (1 - k)
-                new_color[1] = (1 - g - k) / (1 - k)
-                new_color[2] = (1 - b - k) / (1 - k)
+                new_color[1] = (mx - mn) / (1 - abs(2 * new_color[2] - 1))
+    elif new_space is ColorSpace.CMYK:
+        mx = max(r, g, b)
+        new_color.insert(3, k := 1 - mx)  # Adds an extra slot for key (at the 3rd index -> cmyk(a))
+        if mx == 0:  # Check for pure black to avoid zero division errors
+            new_color = [0, 0, 0, 1, rgb_color[-1]] if alpha else [0, 0, 0, 1]
+        else:
+            new_color[0] = (1 - r - k) / (1 - k)
+            new_color[1] = (1 - g - k) / (1 - k)
+            new_color[2] = (1 - b - k) / (1 - k)
+    else:
+        raise AttributeError(f"Color space {new_space} is not supported.")
 
     return [int(col * new_maximum) for col in new_color] if return_int else [col * new_maximum for col in new_color]
 
@@ -368,7 +370,7 @@ def convert_byte_color(color: list[int | float] | tuple[int | float, ...],
         ValueError: One of the value arguments has an invalid value.
     """
 
-    return convert_color(color, old_space, new_space, has_alpha, 255, return_int=True)  # return_int=True is not necessary but useful for clarity
+    return convert_color(color, old_space=old_space, new_space=new_space, has_alpha=has_alpha, maximum=255, new_maximum=255, return_int=True)  # return_int=True is not necessary but useful for clarity
 
 def convert_float_color(color: list[int | float] | tuple[int | float, ...],
                   old_space: ColorSpace,
@@ -420,7 +422,7 @@ def from_rgb(r: int, g: int, b: int, a: Optional[int] = None) -> list[int]:
     """
 
     color = [r, g, b] if a is None else [r, g, b, a]
-    return convert_byte_color(color, ColorSpace.RGB, ColorSpace.HSV)
+    return convert_byte_color(color, old_space=ColorSpace.RGB, new_space=ColorSpace.HSV)
 
 def from_hsv(h: float, s: float, v: float, a: Optional[float] = None) -> list[int]:
 

@@ -347,7 +347,7 @@ class Brick14:
         else:
             raise NameError(f"Brick type {new_type!r} does not exist")
 
-        return Self
+        return self
 
 
 Brick = TypeVar('Brick', bound=Brick14)
@@ -361,7 +361,7 @@ def help14(brick: str | Iterable[str] | None, is_rst: bool = False) -> None:
         return
 
     if type(brick) != str:
-        print(type(brick).__name__, brick)
+        # print(type(brick).__name__, brick)
         # Line below raises error for brick being None
         for b in brick:
             help14(b, is_rst)

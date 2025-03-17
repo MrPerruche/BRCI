@@ -203,7 +203,7 @@ class BrickSelector14:
 
 # Assign all properties
 def default_properties14() -> dict[str, Any]:
-    return deepcopy({'BrickColor': [0, 0, 127, 255], 'BrickPattern': 'Default', 'BrickMaterial': 'Plastic'})
+    return {'BrickColor': [0, 0, 127, 255].copy(), 'BrickPattern': 'Default', 'BrickMaterial': 'Plastic'}.copy()
 
 
 # Initialize bricks for later

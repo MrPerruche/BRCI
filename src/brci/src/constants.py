@@ -19,8 +19,8 @@ class ColorSpace(Enum):
     You may use .value to get the number of values expected.
     """
 
-    RGB = 3
-    HSV = 3
+    RGB = 1
+    HSV = 2
     HSL = 3
     CMYK = 4
 

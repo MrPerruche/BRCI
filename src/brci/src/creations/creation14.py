@@ -75,6 +75,12 @@ class Creation14:
         # logwrap("debug",
         #         f"Created BRCI instance with the following parameters:\n{"\n".join([f"{k}={v}" for k, v in self.__dict__.items()])}")
 
+
+    def __repr__(self):
+        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
+        return f"{self.__class__.__name__}({attrs})"
+
+
     def add_brick(self,
                   brick_type: str,
                   name: str | int,
@@ -258,13 +264,52 @@ class Creation14:
         brick_types_to_index: dict[str, int] = {brick_type: i for i, brick_type in enumerate(brick_types)}
         num_brick_types: int = len(brick_types)
 
+        printr(f'{FM.YELLOW}BRICK TYPES [{num_brick_types}]: {brick_types_to_index}')  # DEBUGPRINT
+
         # Properties
-        prop_id_t_type: dict[int, str]
-        prop_type_t_id: dict[str, int]
         prop_id_t__val_id_t_val: dict[int, dict[int, Any]]
         prop_id_t__val_t_val_id: dict[int, dict[int, int]]
-        prop_id_t_type, prop_type_t_id, prop_id_t__val_id_t_val, prop_id_t__val_t_val_id = _get_property_data(
-            self.bricks, bricks14)
+        # prop_id_t_type, prop_type_t_id, prop_id_t__val_id_t_val, prop_id_t__val_t_val_id = _get_property_data(
+        #     self.bricks, bricks14)
+
+        # I pray id(value) works
+        # it works
+
+        # Init variables
+        prop_id_t_type: dict[int, str] = {}  # Property and their id
+        prop_type_t_id: dict[str, int] = {}  # Property id and their property
+        prop_id_t__val_id_t_val: dict[int, dict[int, Any]] = {}  # Property id and their values: id -> value
+
+        default_properties = bricks14
+
+        for brick in self.bricks:
+            brick_type_defaults: dict[str, Any] = default_properties[brick.get_type()]
+
+            for property_, value in brick.properties.items():
+                if brick_type_defaults[property_] == value or value is None:
+                    continue
+
+                # Get or assign property ID
+                property_id = prop_type_t_id.get(property_)
+                if property_id is None:
+                    property_id = len(prop_type_t_id)
+                    prop_id_t_type[property_id] = property_
+                    prop_type_t_id[property_] = property_id
+                    prop_id_t__val_id_t_val[property_id] = {}
+
+                # Instead of using id(), iterate to check for an existing equal value.
+                value_id = None
+                for existing_id, stored_value in prop_id_t__val_id_t_val[property_id].items():
+                    if stored_value == value:
+                        value_id = existing_id
+                        break
+
+                # If no equal value is found, store it with a new ID.
+                if value_id is None:
+                    value_id = len(prop_id_t__val_id_t_val[property_id])
+                    prop_id_t__val_id_t_val[property_id][value_id] = value
+
+                # printr(f'{FM.LIGHT_GREEN}BRICK [{brick.name}] PROPERTY [{property_}] VALUE_ID [{value_id}] VALUE [{value}]')  # DEBUGPRINT
 
         # logwrap("debug", "Creation14::write_creation || Calculated header properties, instantiating buffer...")
 
@@ -298,6 +343,13 @@ class Creation14:
         # Get all brick IDs
         brick_id_table: dict[str | int, int] = _convert_brick_names_to_id(self.bricks)
 
+        printr(f'{FM.LIGHT_CYAN}'
+               f'{prop_id_t_type=}\n'
+               f'{prop_type_t_id=}\n'
+               f'{prop_id_t__val_id_t_val=}\n'
+               # f'{prop_id_t__val_t_val_id=}\n'
+               f'================================================')  # FIXME DEBUGPRINT
+
         for type_, id_ in prop_type_t_id.items():
             # Property name
             buffer.extend(unsigned_int(len(type_), 1))
@@ -310,10 +362,14 @@ class Creation14:
             properties_binary, properties_binary_addon = _get_prop_bin(property_types14[type_], id_,
                                                                        prop_id_t__val_id_t_val, brick_id_table)
 
+            # DEBUGPRINT printr(f'{FM.CYAN}{properties_binary=}\n{properties_binary_addon=}\n=============')
+
             # Write all that
             buffer.extend(unsigned_int(len(properties_binary), 4))
             buffer.extend(properties_binary)
             buffer.extend(properties_binary_addon)
+
+            printr(f'{FM.LIGHT_BLUE}BIN_PROPERTY: TYPE [{type_}] ID [{id_}] LEN [{len(properties_binary)}] BIN_PROPERTY [{properties_binary}] BIN_ADDON [{properties_binary_addon}]')  # FIXME DEBUGPRINT
 
         # logwrap("debug", "Creation14::write_creation || Brick Properties -> Buffer completed...")
 
@@ -335,7 +391,12 @@ class Creation14:
             for prop, val in brick_properties.items():
                 prop_id: int = prop_type_t_id[prop]
                 property_bin.extend(unsigned_int(prop_id, 2))  # id of the property type
-                property_bin.extend(unsigned_int(prop_id_t__val_t_val_id[prop_id][id(val)], 2))  # id of the value
+                value_id = None
+                for existing_id, stored_value in prop_id_t__val_id_t_val[prop_id].items():
+                    if stored_value == val:
+                        property_bin.extend(unsigned_int(existing_id, 2))
+                        break
+                # property_bin.extend(unsigned_int(prop_id_t__val_t_val_id[prop_id][id(val)], 2))  # id of the value
 
             # Position (X, Y, Z)
             property_bin.extend(sp_float(brick.position[0]))
@@ -583,7 +644,7 @@ class Creation14:
         with open(file_path, 'rb') as f:
             file = bytearray(f.read())
 
-        start_t = perf_counter()  # TODO TEMPORARY FOR TEST
+        # DEBUGPRINT start_t = perf_counter()
 
         # That's all we need from the with statement.
         # Now we need to write, in reverse.
@@ -655,6 +716,8 @@ class Creation14:
 
         # -------------------- PART 4: BRICKS -------------------- #
 
+        # DEBUGPRINT print(f'{FM.MAGENTA}FIRST: {file}{FM.CLEAR_ALL}')
+
         # Setting up stuff
         property_type_names: tuple[str, ...] = tuple(properties.keys())
 
@@ -663,9 +726,15 @@ class Creation14:
             # Get type of the brick
             brick_type: str = brick_types_tuple[get_unsigned_int(extract_bytes(file, 2))]
 
+            # Property list len in bytes (useless here)
+            extract_bytes(file, 4)
+
             # PROPERTIES
             # Get number of properties
             num_brick_properties: int = get_unsigned_int(extract_bytes(file, 1))
+
+            # DEBUGPRINT print(f'{FM.LIGHT_GREEN}{FM.BOLD}FOR {brick}: {file}{FM.CLEAR_ALL}')
+            # DEBUGPRINT print(f'{FM.LIGHT_BLUE}{properties=}{FM.CLEAR_ALL}')
 
             # Get properties
             brick_properties: dict = {}
@@ -674,12 +743,14 @@ class Creation14:
                 prop_id: int = get_unsigned_int(extract_bytes(file, 2))
                 val_id: int = get_unsigned_int(extract_bytes(file, 2))
 
-                print(f'{prop_id=}, {val_id=}\n{properties=}\n{property_type_names[prop_id]=}\n{properties[property_type_names[prop_id]][val_id]=}')
+                # DEBUGPRINT print(f'{FM.LIGHT_GREEN}{prop_id=}, {val_id=}\n{brick_properties=}\n{property_type_names[prop_id]=}\n{properties[property_type_names[prop_id]]=}{FM.CLEAR_ALL}')
 
                 # Obtain value from IDs and append them to already collected properties
                 brick_properties.update({
                     property_type_names[prop_id]: properties[property_type_names[prop_id]][val_id]
                 })
+
+                # DEBUGPRINT print(f'{FM.LIGHT_GREEN}NEW {brick_properties=}\n===================================================={FM.CLEAR_ALL}')
 
             # Get position and rotation
             position: list[float] = [get_sp_float(extract_bytes(file, 4)) for _ in range(3)]
@@ -701,8 +772,8 @@ class Creation14:
         if seat_id != 0:
             self.seat = seat_id - 1
 
-        end_t = perf_counter()  # TODO TEMPORARY FOR TEST
-        print(f"time (reading excluded): {end_t - start_t:,.6f}")  # TODO TEMPORARY FOR TEST
+        # DEBUGPRINT end_t = perf_counter()
+        # DEBUGPRINT print(f"time (reading excluded): {end_t - start_t:,.6f}")
 
         return self
 
@@ -782,15 +853,23 @@ class Creation14:
         # Update time
         if load_last_update:
             self.update_time = get_unsigned_int(extract_bytes(buffer, 8))
+        else:
+            extract_bytes(buffer, 8)
+
+        # FIXME OFF BY 4 BITS ??
+        """
 
         # Visibility mode
-        buffer.extend(unsigned_int(self.visibility.value, 1))
+        print(buffer)
+        self.visibility = Visibility(get_unsigned_int(extract_bytes(buffer, 1)))
 
         # Tags
-        buffer.extend(unsigned_int(len(self.tags), 2))
-        for tag in self.tags:
-            buffer.extend(unsigned_int(len(tag), 1))
-            buffer.extend(utf8(tag))
+        self.tags = []
+        lim = 3
+        while buffer and lim > 0:
+            self.tags.append(get_utf8(buffer))
+            lim -= 1
+        """
 
         # logwrap("info", "Creation14::write_metadata || All details -> Buffer completed. Writing file...")
 

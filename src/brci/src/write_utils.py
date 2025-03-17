@@ -6,6 +6,7 @@ from .exceptions import *
 
 
 from .binary_types import BinaryType
+from .utils import printr
 
 
 # ------------------- CREATION GENERATION ---------------------
@@ -163,8 +164,9 @@ def _get_prop_bin(prop_type: BinaryType, id_: int,
 
         # Convert to binary (bytearray)
         try:
-
+            # DEBUGPRINT print(f'{FM.YELLOW}{ite_val=}{FM.CLEAR_ALL}')
             converted = prop_type.serialize(ite_val, brick_id_table)
+            printr(f'{FM.LIGHT_GREEN}    CONVERSION: ITE_VAL [{ite_val}] CONVERTED [{converted}]')  # DEBUGPRINT
 
             if uniform_length:
                 if last_elem_length != len(converted) and last_elem_length != -1:
@@ -175,7 +177,7 @@ def _get_prop_bin(prop_type: BinaryType, id_: int,
 
         except Exception as e:
 
-            raise BrickError(f"Invalid value {val!r} (id: {val_id}) used for property of type {prop_type} raising {e!r}", culprit=None)
+            raise BrickError(f"Invalid value {val!r} (id: {val_id}) used for property of type {prop_type} raising {e!r}", culprit=None) from e
 
         result.extend(converted)
 
@@ -357,7 +359,7 @@ def get_utf8(bin_value: bytes | bytearray) -> str:
     Returns:
         str: String
     """
-    print(bin_value)
+    # print(bin_value)
     return bin_value.decode('ascii')
 
 
