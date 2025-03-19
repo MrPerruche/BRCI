@@ -132,15 +132,15 @@ class BinaryTypes:
             for val in value:
                 id_ = brick_id_table.get(val)
                 if id_ is None:
-                    raise ValueError(f"Brick with ID {val} not found")
-                result.extend(BinaryTypes.serialize_safe_int(id_ + 1, 2, False))  # FIXME: I am convinced this should have a +1 but when I add it I get wrong stuff. Needs investigation
+                    raise NameError(f"Brick with name {val} not found")
+                result.extend(BinaryTypes.serialize_safe_int(id_+1, 2, False))
             return result
 
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
             result = []
             for i in range(int.from_bytes(ba[0:2], byteorder='little')):
-                value = BinaryTypes.deserialize_safe_int(ba[ 2+i*2 : 4+i*2 ], False) - 1  # FIXME: Same with -1
+                value = BinaryTypes.deserialize_safe_int(ba[ 2+i*2 : 4+i*2 ], False) - 1
                 result.append(None if value < 0 else value)
             return result
 

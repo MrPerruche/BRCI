@@ -17,13 +17,14 @@ else:
         os.path.expanduser(f"~/.local/share/Steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles")
     ]
 
-PROJECT_FOLDER: str = os.path.join(BRCI_CWD, 'Projects')
-BACKUP_FOLDER: str = os.path.join(BRCI_CWD, 'Backups')
+PROJECT_FOLDER: str = os.path.join(os.path.dirname(BRCI_CWD), 'Projects')
+BACKUP_FOLDER: str = os.path.join(os.path.dirname(BRCI_CWD), 'Backups')
+BRCI_RESOURCES_FOLDER: str = os.path.join(os.path.dirname(BRCI_CWD), 'resources')
 
-NO_THUMBNAIL: str = os.path.join(BRCI_CWD, 'resources', 'no_thumbnail.png')
-BRCI_THUMBNAIL: str = os.path.join(BRCI_CWD, 'resources', 'brci.png')
-BLANK_THUMBNAIL: str = os.path.join(BRCI_CWD, 'resources', 'blank.png')
-MISSING_THUMBNAIL: str = os.path.join(BRCI_CWD, 'resources', 'missing_thumbnail.png')
+NO_THUMBNAIL: str = os.path.join(BRCI_RESOURCES_FOLDER, 'no_thumbnail.png')
+BRCI_THUMBNAIL: str = os.path.join(BRCI_RESOURCES_FOLDER, 'brci.png')
+BLANK_THUMBNAIL: str = os.path.join(BRCI_RESOURCES_FOLDER, 'blank.png')
+MISSING_THUMBNAIL: str = os.path.join(BRCI_RESOURCES_FOLDER, 'missing_thumbnail.png')
 
 # Settings
 settings: dict[str, Any] = {

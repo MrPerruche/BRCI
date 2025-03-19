@@ -91,7 +91,7 @@ class ConnectorSpacing(Iterable[Connection]):
     def __iter__(self):
 
         """
-        Returns a tuple in the following order: X- X+ Y- Y+ Z- Z+
+        Returns an iter of values in the following order: X- X+ Y- Y+ Z- Z+
         :return:
         """
 
@@ -398,7 +398,7 @@ def convert_float_color(color: list[int | float] | tuple[int | float, ...],
         ValueError: One of the value arguments has an invalid value.
     """
 
-    return convert_color(color, old_space, new_space, has_alpha, 1.0, return_int=False)
+    return convert_color(color, old_space=old_space, new_space=new_space, has_alpha=has_alpha, maximum=1.0, new_maximum=1.0, return_int=False)
 
 def from_rgb(r: int, g: int, b: int, a: Optional[int] = None) -> list[int]:
 

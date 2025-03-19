@@ -63,7 +63,7 @@ Length is typically expressed in three units:
     * - Info
       - This unit comes from earlier versions when size was stored as 16-bit integers. Brick sizes were limited to
         multiples of 10 centimeters.
-      - Centimeters (aka. Unreal Engine Units) is the unit used by default in Unreal Engine.
+      - Centimeters (or Unreal Engine Units) is the unit used by default in Unreal Engine.
       - Meters are used for elements exposed to players.
 
 
@@ -74,8 +74,10 @@ TODO
 
 **Colors**
 
-Colors are typically stored as 3 or 4 unsigned 8-bit integers despite Brick Rigs showing real numbers. This is why
-colors are so imprecise in-game. Colors are stored in the HSV(A) format, where the integers of each channel correspond
-to a 0 to 360 degrees hue or 0 to 100% saturation, value or alpha.
+Colors are stored as 3 or 4 unsigned 8-bit integers despite Brick Rigs showing floats. This is why colors are so
+imprecise in-game. Colors are stored in the HSV(A) format, where the integers of each channel correspond to a 0 to 360
+degrees hue or 0 to 100% saturation, value or alpha.
 
-BRCI contains a few functions to help dealing with the confusing color space.
+BRCI contains a few functions to help dealing with the confusing color space: ``brci.from_rgb(r, g, b, a)``,
+``brci.from_hsv(h, s, v, a)``, ``brci.from_hsl(h, s, l, a)``, ``brci.from_cmyk(c, m, y, k, a)``, all converting to HSV
+as 8-bit integers.

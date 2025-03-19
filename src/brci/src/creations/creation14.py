@@ -347,6 +347,7 @@ class Creation14:
                f'{prop_id_t_type=}\n'
                f'{prop_type_t_id=}\n'
                f'{prop_id_t__val_id_t_val=}\n'
+               f'{brick_id_table=}\n'
                # f'{prop_id_t__val_t_val_id=}\n'
                f'================================================')  # FIXME DEBUGPRINT
 
@@ -543,7 +544,7 @@ class Creation14:
         # Write changes
         if not os.path.exists(os.path.join(self.project_dir, self.project_name)):
             # Create the directory. open() will NOT do it for us.
-            os.makedirs(os.path.join(self.project_dir, self.project_name), exist_ok=True)
+            os.makedirs(os.path.join(self.project_dir, self.project_name), exist_ok=exist_ok)
         with open(os.path.join(self.project_dir, self.project_name, file_name), 'wb') as f:
             f.write(buffer)
 
@@ -572,7 +573,7 @@ class Creation14:
         # ################### VERIFYING PATHS ####################
 
         if not os.path.exists(image_path):
-            raise OSError(f"Image missing {os.path.join(self.project_dir, self.project_name, file_name)}.")
+            raise OSError(f"Image missing {image_path}.")
 
         # TODO CHECK FOR PATH & NAME VALIDITY
 
@@ -771,6 +772,8 @@ class Creation14:
 
         if seat_id != 0:
             self.seat = seat_id - 1
+
+        self.appendix = file
 
         # DEBUGPRINT end_t = perf_counter()
         # DEBUGPRINT print(f"time (reading excluded): {end_t - start_t:,.6f}")

@@ -115,6 +115,7 @@ Therefore it takes the same arguments as ``brci.Creation<version>.write_creation
 .. code-block:: python
 
   import brci
+  import random
 
   # Create a Creation object
   creation: brci.Creation = brci.Creation14(
