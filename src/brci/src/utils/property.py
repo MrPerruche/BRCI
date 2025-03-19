@@ -157,7 +157,7 @@ def position(value: float | int | list[float | int], unit: float | int = Units.M
 
     """
     Function to convert position or distance (not length, see size function) of a brick from any unit to the unit Brick Rigs use.
-    Aliases: `brci.distance()`, `brci.dist()`, `brci.pos()`
+    Aliases: `brci.distance()`, `brci.dist()`, `brci.pos()`, `brci.metadata_size()`
 
     Arguments:
         value: Value or list of values to convert.
@@ -173,7 +173,7 @@ def position(value: float | int | list[float | int], unit: float | int = Units.M
     return convert_len(value, unit, Units.UE_UNIT)
 
 # Aliases
-distance = dist = pos = position
+metadata_size = distance = dist = pos = position
 
 
 # Function to calculate size of a brick from any unit

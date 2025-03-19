@@ -79,5 +79,5 @@ imprecise in-game. Colors are stored in the HSV(A) format, where the integers of
 degrees hue or 0 to 100% saturation, value or alpha.
 
 BRCI contains a few functions to help dealing with the confusing color space: ``brci.from_rgb(r, g, b, a)``,
-``brci.from_hsv(h, s, v, a)``, ``brci.from_hsl(h, s, l, a)``, ``brci.from_cmyk(c, m, y, k, a)``, all converting to HSV
-as 8-bit integers.
+``brci.from_hsv(h, s, v, a)``, ``brci.from_hsl(h, s, l, a)``, ``brci.from_cmyk(c, m, y, k, a)``.
+Learn more about them in :ref:`color.rst`

@@ -264,7 +264,7 @@ class Creation14:
         brick_types_to_index: dict[str, int] = {brick_type: i for i, brick_type in enumerate(brick_types)}
         num_brick_types: int = len(brick_types)
 
-        printr(f'{FM.YELLOW}BRICK TYPES [{num_brick_types}]: {brick_types_to_index}')  # DEBUGPRINT
+        # printr(f'{FM.YELLOW}BRICK TYPES [{num_brick_types}]: {brick_types_to_index}')  # DEBUGPRINT DBU
 
         # Properties
         prop_id_t__val_id_t_val: dict[int, dict[int, Any]]
@@ -343,13 +343,13 @@ class Creation14:
         # Get all brick IDs
         brick_id_table: dict[str | int, int] = _convert_brick_names_to_id(self.bricks)
 
-        printr(f'{FM.LIGHT_CYAN}'
+        """printr(f'{FM.LIGHT_CYAN}'
                f'{prop_id_t_type=}\n'
                f'{prop_type_t_id=}\n'
                f'{prop_id_t__val_id_t_val=}\n'
                f'{brick_id_table=}\n'
                # f'{prop_id_t__val_t_val_id=}\n'
-               f'================================================')  # FIXME DEBUGPRINT
+               f'================================================')  # DEBUGPRINT DBU """
 
         for type_, id_ in prop_type_t_id.items():
             # Property name
@@ -370,7 +370,7 @@ class Creation14:
             buffer.extend(properties_binary)
             buffer.extend(properties_binary_addon)
 
-            printr(f'{FM.LIGHT_BLUE}BIN_PROPERTY: TYPE [{type_}] ID [{id_}] LEN [{len(properties_binary)}] BIN_PROPERTY [{properties_binary}] BIN_ADDON [{properties_binary_addon}]')  # FIXME DEBUGPRINT
+            # printr(f'{FM.LIGHT_BLUE}BIN_PROPERTY: TYPE [{type_}] ID [{id_}] LEN [{len(properties_binary)}] BIN_PROPERTY [{properties_binary}] BIN_ADDON [{properties_binary_addon}]')  # DEBUGPRINT
 
         # logwrap("debug", "Creation14::write_creation || Brick Properties -> Buffer completed...")
 
@@ -509,6 +509,9 @@ class Creation14:
         if len(str(self.author)) % 2 == 1:
             author_coded //= 0x10
         buffer.extend(unsigned_int(author_coded, len(author_str)))
+
+        # No clue.
+        buffer.extend(b'\x00\x00\x00\x00')
 
         # Write time (100 nanosecond Gregorian bigint value)
         # Creation time
@@ -846,6 +849,9 @@ class Creation14:
         author_coded: list[int] = [x for x in extract_bytes(buffer, get_unsigned_int(extract_bytes(buffer, 1)))]
         author_str: list[str] = [f'{x:02x}' for x in author_coded]
         self.author = int(''.join(author_str))
+
+        # No clue
+        extract_bytes(buffer, 4)
 
 
         # Write time (100 nanosecond Gregorian bigint value)

@@ -2,7 +2,7 @@ REQUIRED FOR RELEASE:
 - ~~Implement all bricks (just take a look at BRCI-C:  
 copy values into the right function, change inputs (see src.bricks.\_\_init\_\_ for info))~~
 - ~~Finish brci.Creation14().write_creation()~~
-- Test all serialize / deserializes
+- ~~Test all serialize / deserializes~~
 - ~~Fix colors, read creation~~
 - Ensure all functions affecting files work correctly on all supported OS. Improve safety
 - ~~Revise some functions to add proper error mitigation. For all errors; use from e if possible~~

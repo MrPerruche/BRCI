@@ -164,9 +164,8 @@ def _get_prop_bin(prop_type: BinaryType, id_: int,
 
         # Convert to binary (bytearray)
         try:
-            # DEBUGPRINT print(f'{FM.YELLOW}{ite_val=}{FM.CLEAR_ALL}')
             converted = prop_type.serialize(ite_val, brick_id_table)
-            printr(f'{FM.LIGHT_GREEN}    CONVERSION: ITE_VAL [{ite_val}] CONVERTED [{converted}]')  # DEBUGPRINT
+            # printr(f'{FM.LIGHT_GREEN}    CONVERSION: ITE_VAL [{ite_val}] CONVERTED [{converted}]')  # DEBUGPRINT
 
             if uniform_length:
                 if last_elem_length != len(converted) and last_elem_length != -1:
@@ -189,7 +188,7 @@ def _get_prop_bin(prop_type: BinaryType, id_: int,
         else:
             addon: bytearray = bytearray(b'\x00\x00')
             for elem_len in elements_length:
-                addon: bytearray = bytearray(unsigned_int(elem_len, 2))
+                addon.extend(bytearray(unsigned_int(elem_len, 2)))
 
 
     return result, addon
