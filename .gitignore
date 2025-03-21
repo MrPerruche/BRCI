@@ -174,3 +174,5 @@ cython_debug/
 # Projects directory:
 src/Projects/*
 !src/Projects/**/*.gitkeep
+src/brci/Projects/*
+!src/brci/Projects/**/*.gitkeep
