@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import Optional, Final, Any, Self
 from shutil import copytree as _shutil_copytree
 from time import perf_counter
@@ -227,6 +228,24 @@ class Creation14:
         """
 
         return self.__FILE_VERSION
+
+    def rename_bricks(self, func: Callable[[str | int], str | int]) -> Self:
+        """
+        Rename bricks using a function
+
+        Arguments:
+
+            func (Callable[[str | int], str | int]):
+
+
+        Returns:
+            Self
+
+        """
+        for brick in self.bricks:
+            brick.name = func(brick.name)
+
+        return self
 
     def write_creation(self, file_name: str = 'Vehicle.brv', exist_ok: bool = True) -> Self:
 
