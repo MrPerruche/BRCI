@@ -1,53 +1,40 @@
-import sys, os
+import brci
 
-# written by kal
-# TODO this could be cleaner
-
-dirpath = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(dirpath, '..', 'src'))
-
-import brci # raises a warning in some IDEs (vscode)
-print(brci.__file__) # verify correct path
+from os import system
 
 if __name__ == '__main__':
 
-    user_input = None
+    user_input: int = int(input("How many bricks do you like?\n> "))
+    assert user_input > 0, "There must be at least 1 brick."
+    assert user_input <= brci.Limits.BR_BRICK_LIMIT, "Too many bricks. You can only create up to 50,000 bricks."
 
-    while user_input == None:
-        try:
-            user_input = input("How many bricks do you want to generate? Enter a whole number/integer, at least 1...\n> ")
-            if user_input == "": continue
-            
-            brick_count = int(user_input)
-            if brick_count < 1:
-                raise ValueError
-            
-            break
-        
-        except:
-            brci.printr(f"{brci.FM.LIGHT_RED}Invalid input. Please try again.")
-            continue
+    brci.printr(f"{brci.FM.LIGHT_GREEN}Valid input. Generating {user_input} rainbow brick(s).")
 
-    brci.printr(f"{brci.FM.LIGHT_GREEN}Got it! Generating {brick_count} rainbow brick{'s' if brick_count > 1 else ''}...")
+    data = brci.Creation14(
+        f'demo_rainbow_{user_input}',
+        brci.BRICK_RIGS_FOLDER[0],
+        name=f"Demo rainbow brick(s)",
+        description=f"Demo of {user_input} rainbow brick(s) going in a straight line. Created using brci-{brci.BRCI_VERSION}.",
+        author=76561198882119759,  # SteamID 64 of kal
+        size=brci.metadata_size([0.3 * user_input, 0.3, 0.1], brci.Units.METER)
+    )
 
-    data = brci.Creation14("rainbow", brci.PROJECT_FOLDER, f"Rainbow Brick{'s' if brick_count > 1 else ''}",
-                           f"{brick_count} rainbow brick{'s' if brick_count > 1 else ''} with a rainbow hue. Goes in a straight line.")
-
-    for i in range(brick_count):
+    for i in range(user_input):
         data.add_brick(
-            "ScalableBrick",
-            str(i),
-            brci.pos([i*0.3, 0, 0]),
+            'ScalableBrick',
+            f'rainbow.brick{i}',
+            brci.pos([i*0.3, 0, 0], brci.Units.METER),
             [0, 0, 0],
             {
-                "BrickSize": brci.size([0.3, 0.3, 0.1]),
-                "BrickColor": brci.from_hsv(int((i/brick_count)*360), 100, 100, 100),
+                "BrickSize": brci.size([0.3, 0.3, 0.1], brci.Units.METER),
+                "BrickColor": brci.from_hsv(int((i/user_input)*360), 100, 100, 100),
                 "BrickMaterial": "Glow"
             }
         )
 
+    data.write_creation(exist_ok=True)
+    data.write_metadata(exist_ok=True)
     data.write_preview(brci.BRCI_THUMBNAIL)
-    data.write_metadata()
-    data.write_creation()
 
-    brci.printr(f"{brci.FM.LIGHT_GREEN}Done! You can find the project in `{os.path.join(brci.PROJECT_FOLDER, data.project_name)}`.")
+    brci.printr("Rainbow created successfully.", col=brci.FM.LIGHT_GREEN)
+    system('pause')

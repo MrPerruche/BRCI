@@ -231,19 +231,25 @@ class Creation14:
 
     def rename_bricks(self, func: Callable[[str | int], str | int]) -> Self:
         """
-        Rename bricks using a function
+        Will rename bricks using given a function
 
         Arguments:
-
-            func (Callable[[str | int], str | int]):
-
+            func (Callable[[str | int], str | int]): function giving new names for bricks according to their current name
 
         Returns:
             Self
-
         """
+
+        # Create a map of all bricks
+        names: dict = {brick.name: func(brick.name) for brick in self.bricks}
+
         for brick in self.bricks:
-            brick.name = func(brick.name)
+            # Change brick name
+            brick.name = names[brick.name]
+            # Change properties
+            for key, value in brick.properties.items():
+                # Note: if it shouldn't do anything, switch_names return value argument by default.
+                brick.properties[key] = property_types14[key].switch_names(value, names)
 
         return self
 

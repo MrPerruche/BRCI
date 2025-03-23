@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import Final, Optional
-from builtins import print as _printb
+from builtins import print as _printb, input as _inputb
 import re
 
 from .data import settings
@@ -259,7 +259,7 @@ def is_valid_folder_name(name: str, is_nt: bool) -> bool:
     return True
 
 
-def printr(*args: object, end: str = '\n', sep: str = ' ', col: str = '', clear: str = FM.CLEAR_ALL, **kwargs) -> str:
+def printr(*args: object, end: str = '\n', sep: str = ' ', col: str = '', clear: str = FM.CLEAR_ALL, **kwargs):
 
     """
     Print-Reset-Return. Resets color after printing message.
@@ -268,11 +268,34 @@ def printr(*args: object, end: str = '\n', sep: str = ' ', col: str = '', clear:
         *args (tuple): Arguments to print.
         end (str, optional): End of the print. Defaults to "\n".
         sep (str, optional): Separator between arguments. Defaults to " ".
-        col (Optional[str], optional): Color to use. Defaults to None.
-        clear (str, optional): Color to clear. Defaults to FM.CLEAR_ALL.
+        col (str, optional): Color to apply before print. Defaults to None.
+        clear (str, optional): Color to clear after print. Defaults to FM.CLEAR_ALL.
     """
 
     _printb(f"{col}{sep.join([str(arg) for arg in args])}", end=f"{end}{clear}", **kwargs)
 
-    return_str = sep.join([str(arg) for arg in args])
-    return repr(return_str.strip())[(0 if col else 1):-(1 if clear else 0)] # sanitization: do not keep color codes in the return string
+    # Not sure why this ever was a thing. Uncomment it if needed.
+    # return_str = sep.join([str(arg) for arg in args])
+    # return repr(return_str.strip())[len(col):-len(clear)] # sanitization: do not keep color codes in the return string
+
+
+# Unused, for the sake of completeness
+def inputr(prompt: str, col: str = '', input_format: str = FM.CLEAR_ALL, clear: Optional[str] = FM.CLEAR_ALL) -> str:
+
+    """
+    Input-Reset-Return. Resets color after printing message.
+
+    Arguments:
+        prompt (str): Prompt to print.
+        col (str, optional): Color to apply before print. Defaults to None.
+        input_format (str, optional): Color to apply after print for user input format. Defaults to FM.CLEAR_ALL.
+        clear (Optional[str], optional): Color to clear after user input. Not printed if set to None. Defaults to FM.CLEAR_ALL.
+
+    Returns:
+        str: User input string.
+    """
+
+    result: str = _inputb(f'{col}{prompt}{input_format}')
+    if clear is not None:
+        _printb(clear, end='')
+    return result

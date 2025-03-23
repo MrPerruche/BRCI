@@ -258,7 +258,7 @@ class Units:
 class Limits:
 
     """
-    Class for holding integer and floating-point limits.
+    Class for holding notable (mostly integer and floating-point) limits.
 
     Variables:
         U2_MAX (int): Maximum unsigned 2-bit integer (3)
@@ -284,6 +284,14 @@ class Limits:
         I16_MIN (int): Minimum signed 16-bit integer (-32768)
         I32_MIN (int): Minimum signed 32-bit integer (-2147483648)
         I64_MIN (int): Minimum signed 64-bit integer (-9223372036854775808)
+
+        FP32_MAX (float): Maximum 32-bit floating-point number (3.402823466e+38)
+        FP64_MAX (float): Maximum 64-bit floating-point number (1.7976931348623157e+308)
+
+        FP32_MIN (float): Minimum 32-bit floating-point number (-3.402823466e+38)
+        FP64_MIN (float): Minimum 64-bit floating-point number (-1.7976931348623157e+308)
+
+        BR_BRICK_LIMIT (int): Maximum number of bricks (50000)
     """
 
     # Integer limits
@@ -317,3 +325,5 @@ class Limits:
 
     F32_MIN: Final[int] = np.finfo(np.float32).min
     F64_MIN: Final[int] = np.finfo(np.float64).min
+
+    BR_BRICK_LIMIT: Final[int] = 50000

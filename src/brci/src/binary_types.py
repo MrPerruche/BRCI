@@ -67,7 +67,7 @@ class BinaryType(ABC):
 
     @staticmethod
     def switch_names(source: Any, name_table: dict[str | int, str | int]) -> Any:
-        pass
+        return source
 
 
 class BinaryTypes:
