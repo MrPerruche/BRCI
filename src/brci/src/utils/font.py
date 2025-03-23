@@ -6,12 +6,16 @@ from .data import BRCI_CWD
 from ..exceptions import *
 
 
+# Soon:tm:
+
+"""
+
 fonts: dict[ str, dict[str, list[list[ list[int] ]] ] ] = {}
 font_colors: dict[str, dict[str, list[int]]] = {}
 
 def load_font(json_font_path: str, font_name: str) -> None:
 
-    """
+    \"""
     Will load a font from a json file. The json file must have the following structure:
     {
         "colors": {
@@ -38,7 +42,7 @@ def load_font(json_font_path: str, font_name: str) -> None:
         JSONDecodeError: json file is invalid
         FontError: If the json files' structure is invalid
 
-    """
+    \"""
 
     global fonts, font_colors
 
@@ -61,9 +65,9 @@ load_font(os.path.join(BRCI_CWD, 'resources', 'font.json'), 'default')
 
 def generate_text_bitmap(text: str, size_x: int = 256, size_y: int = 256, scale: int = 3, background: Optional[list[int]] = None, font: str = 'default') -> list[list[ list[int] ]]:
 
-    """
+    \"""
     Will convert text to a grid of RGBA values.
-    """
+    \"""
 
     used_font: dict[str, list[list[ list[int] ]]] = fonts[font]
     used_colors = {char: col.copy() for char, col in font_colors[font].items()}  # faster than deepcopy
@@ -107,3 +111,5 @@ def generate_text_bitmap(text: str, size_x: int = 256, size_y: int = 256, scale:
 
 def crc32(data):
     return zlib_crc32(data) & 0xffffffff
+
+"""

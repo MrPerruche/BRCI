@@ -22,7 +22,7 @@ if __name__ == '__main__':
         brci.BRICK_RIGS_FOLDER[0],
         name=f"Demo piano with {notes} notes",
         description=f"Demo of a piano created using brci-{brci.BRCI_VERSION}.",
-        author=76561199130146863,  # SteamID 64 of Perru
+        author=76561199095329086,  # SteamID 64 of Raized
         size=brci.metadata_size([max(0.6, notes / 10), 0.4, 0.436], brci.Units.METER)  # 0.336: Exact size of a horn
     )
 

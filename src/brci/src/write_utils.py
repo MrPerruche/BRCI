@@ -63,8 +63,6 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> tupl
         dict[str, int]: type to property id,
         dict[int, dict[int, Any]]: property id to (value id to value conversion table),
         dict[int, dict[int, int]]: property id to (id(value) to value id conversion table)
-
-    TODO EXCEPTIONS
     """
 
     # I pray id(value) works
@@ -147,7 +145,7 @@ def _get_prop_bin(prop_type: BinaryType, id_: int,
 
     # Initialize result variable
     result: bytearray = bytearray()
-    converted: bytes = b''
+    # converted: bytes = b''
 
     # Clarification:
     # - prop_id_t_val_t_val_id[id_]: Value memory address to value id (of this property)

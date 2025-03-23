@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import Final, Self
+from typing import Final
 import numpy as np
 
-BRCI_VERSION: Final[str] = "4.21.0"
+BRCI_VERSION: Final[str] = "4.22.0"
 
 VALID_DRIVER_SEATS: Final[set[str]] = {'Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'}
 
@@ -127,17 +127,17 @@ class Units:
         THOU, MIL, TH (float): (0.000_025_4m)
         TWIP (float): (0.000_017_638_9m)
 
-        :var PARSEC, PC: (30_856_775_814_913_673m)
-        :var LIGHT_YEAR, LY: (9_460_730_472_580_800m)
-        :var LIGHT_DAY, LD: (259_020_683_712_000m)
-        :var LIGHT_HOUR, LH: (10_792_528_488_000m)
-        :var ASTRONOMICAL_UNIT, AU: (149_597_870_700m)
-        :var LIGHT_MINUTE, LM: (179_875_474_800m)
-        :var LIGHT_SECOND, LS: (299_792_458m)
-        :var LIGHT_MILLISECOND, LMS: (299_792.458m)
-        :var LIGHT_MICROSECOND, LUS: (299.792_458m)
-        :var LIGHT_NANOSECOND, LNS: (0.299_792_458m)
-        :var LIGHT_PICOSECOND, LPS: (0.000_299_792_458m)
+        PARSEC, PC (30_856_775_814_913_673m)
+        LIGHT_YEAR, LY (9_460_730_472_580_800m)
+        LIGHT_DAY, LD (259_020_683_712_000m)
+        LIGHT_HOUR, LH (10_792_528_488_000m)
+        ASTRONOMICAL_UNIT, AU (149_597_870_700m)
+        LIGHT_MINUTE, LM (179_875_474_800m)
+        LIGHT_SECOND, LS (299_792_458m)
+        LIGHT_MILLISECOND, LMS (299_792.458m)
+        LIGHT_MICROSECOND, LUS (299.792_458m)
+        LIGHT_NANOSECOND, LNS (0.299_792_458m)
+        LIGHT_PICOSECOND, LPS (0.000_299_792_458m)
     """
 
     # Metric Prefixes

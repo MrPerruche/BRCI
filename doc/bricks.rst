@@ -8,6 +8,11 @@ Here you will find all brick types and properties in the base, un-modded game.
 DATA TYPES
 ==========
 
+.. raw:: html
+
+    <h1 style="color: #e13; text-align: center; font-size: 48px;">WARNING: This document is outdated and WIP.</h1>
+
+
 BRCI supports the following types by default:
 
 .. list-table::
