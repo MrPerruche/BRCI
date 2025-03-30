@@ -10,17 +10,17 @@ if __name__ == '__main__':
 
     brci.printr(f"{brci.FM.LIGHT_GREEN}Valid input. Generating {user_input} rainbow brick(s).")
 
-    data = brci.Creation14(
+    creation: brci.ModernCreation = brci.Creation14(
         f'demo_rainbow_{user_input}',
-        brci.BRICK_RIGS_FOLDER[0],
-        name=f"Demo rainbow brick(s)",
+        brci.ModernCreation.get_brick_rigs_vehicle_folder(),
+        name=f"Demo {user_input} rainbow brick(s)",
         description=f"Demo of {user_input} rainbow brick(s) going in a straight line. Created using brci-{brci.BRCI_VERSION}.",
         author=76561198882119759,  # SteamID 64 of kal
         size=brci.metadata_size([0.3 * user_input, 0.3, 0.1], brci.Units.METER)
     )
 
     for i in range(user_input):
-        data.add_brick(
+        creation.add_brick(
             'ScalableBrick',
             f'rainbow.brick{i}',
             brci.pos([i*0.3, 0, 0], brci.Units.METER),
@@ -32,9 +32,9 @@ if __name__ == '__main__':
             }
         )
 
-    data.write_creation(exist_ok=True)
-    data.write_metadata(exist_ok=True)
-    data.write_preview(brci.BRCI_THUMBNAIL)
+    creation.write_creation(exist_ok=True)
+    creation.write_metadata(exist_ok=True)
+    creation.write_preview(brci.BRCI_THUMBNAIL)
 
     brci.printr("Rainbow created successfully.", col=brci.FM.LIGHT_GREEN)
     system('pause')

@@ -1,4 +1,4 @@
-from typing import SupportsBytes, Any
+from typing import SupportsBytes, Any, Type
 # from .brick import Brick
 from .utils import settings, FM
 from struct import pack as struct_pack, unpack as struct_unpack
@@ -120,7 +120,7 @@ def _get_property_data(bricks: list, default_properties: dict[str, Any]) -> tupl
     return property_id_types, property_types_id, property_id_values_id, property_id_values_value
 
 
-def _get_prop_bin(prop_type: BinaryType, id_: int,
+def _get_prop_bin(prop_type: Type[BinaryType], id_: int,
                   prop_id_t__val_id_t_val: dict[int, dict[int, Any]],
                   brick_id_table: dict[str | int, int]) -> tuple[bytearray, bytearray]:
 

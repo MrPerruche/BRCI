@@ -8,6 +8,8 @@ _LOCALAPPDATA: str = os.getenv("LOCALAPPDATA")
 if os.name == 'nt':
     _USER: str = os.getenv('%USERNAME%')
     BRICK_RIGS_FOLDER: list[str] = [os.path.join(_LOCALAPPDATA, 'BrickRigs', 'SavedRemastered', 'Vehicles')]
+    BRICK_RIGS_LEGACY_FOLDER: list[str] = [os.path.join(_LOCALAPPDATA, 'BrickRigs', 'Saved', 'Vehicles')]
+    BRICK_RIGS_LEGACY_THUMBNAILS_FOLDER: list[str] = [os.path.join(_LOCALAPPDATA, 'BrickRigs', 'Saved', 'Thumbnails')]
 else:
     _USER: str = os.getenv('$USER')
     # TODO: Get something safer than this
@@ -15,6 +17,16 @@ else:
         os.path.expanduser(f"~/.steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles"),
         os.path.expanduser(f"~/.wine/drive_c/users/{_USER}/AppData/Local/BrickRigs/SavedRemastered/Vehicles"),
         os.path.expanduser(f"~/.local/share/Steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/SavedRemastered/Vehicles")
+    ]
+    BRICK_RIGS_LEGACY_FOLDER: list[str] = [
+        os.path.expanduser(f"~/.steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/Saved/Vehicles"),
+        os.path.expanduser(f"~/.wine/drive_c/users/{_USER}/AppData/Local/BrickRigs/Saved/Vehicles"),
+        os.path.expanduser(f"~/.local/share/Steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/Saved/Vehicles")
+    ]
+    BRICK_RIGS_LEGACY_THUMBNAILS_FOLDER: list[str] = [
+        os.path.expanduser(f"~/.steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/Saved/Thumbnails"),
+        os.path.expanduser(f"~/.wine/drive_c/users/{_USER}/AppData/Local/BrickRigs/Saved/Thumbnails"),
+        os.path.expanduser(f"~/.local/share/Steam/steamapps/compatdata/552100/pfx/drive_c/users/steamuser/AppData/Local/BrickRigs/Saved/Thumbnails")
     ]
 
 PROJECT_FOLDER: str = os.path.join(os.path.dirname(BRCI_CWD), 'Projects')

@@ -17,9 +17,9 @@ if __name__ == '__main__':
     brci.printr(f"Valid input. Generating {notes} notes...", col=brci.FM.LIGHT_GREEN)
 
     # Initialize a BRCI creation instance
-    creation: brci.Creation = brci.Creation14(
+    creation: brci.ModernCreation = brci.Creation14(
         f'demo_piano_{notes}',
-        brci.BRICK_RIGS_FOLDER[0],
+        brci.ModernCreation.get_brick_rigs_vehicle_folder(),
         name=f"Demo piano with {notes} notes",
         description=f"Demo of a piano created using brci-{brci.BRCI_VERSION}.",
         author=76561199095329086,  # SteamID 64 of Raized

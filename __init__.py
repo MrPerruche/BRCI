@@ -48,15 +48,15 @@ An example of using BRCI::
 
   >>> import brci
   ... 
-  >>> creation = brci.Creation14("my_creation",  # Name of the folder
-  ...                            brci.PROJECT_FOLDER)  # Path of the folder
+  >>> creation: brci.ModernCreation = brci.Creation14("my_creation",  # Name of the folder
+  ...                                                 brci.ModernCreation.get_brick_rigs_vehicle_folder())  # Path of the folder
   ...
   >>> # Some configuration options for the creation...
   >>> creation.name = "My Creation"  # Set display name
-  >>> creation.description = "My brand new creation!"
+  >>> creation.description = "My brand-new creation!"
   ...
   >>> # Adding some bricks...
-  >>> # Note for BRCI version C users, BRCI now natively includes a whole ton of utilities to help deal with properties!
+  >>> # Note for BRCI-3 users, BRCI now natively includes a whole ton of utilities to help deal with properties!
   >>> creation.add_brick("ScalableBrick", "my_new_brick",
   ...                   properties={
   ...                       "BrickColor": brci.from_rgb(255, 0, 0, 255)

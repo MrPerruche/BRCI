@@ -21,21 +21,33 @@ class. These classes are named according to the version of the Brick Rigs file t
 - ``brci.Creation6`` for Brick Rigs version 6 (not supported yet)
 
 When initializing BRCI, you need to create an instance of the appropriate class based on the version of the Brick Rigs
-file you're working with. For type hinting, the generic brci.Creation class is available, but when creating the instance
-you must specify the version of the Brick Rigs file (e.g., ``brci.Creation14()``).
+file you're working with. When creating the instance you must specify the version of the Brick Rigs file (e.g.,
+``brci.Creation14()``).
+
+For versions 7 and later, inherit from the ``brci.ModernCreation`` class; for older versions, use ``brci.LegacyCreation``.
+These two base classes are fundamentally different, so we do not recommend using brci.Creation for type hinting.
+Instead, use ``brci.ModernCreation`` or ``brci.LegacyCreation`` for type hinting, as they're easy to switch between when
+upgrading or downgrading within the same major version by simply changing the class name.
+
+Throughout this file we will only cover the latest file version (``brci.Creation14``).
 
 To initialize an instance, two arguments are required: ``project_name`` and ``project_dir``.
 These define the location where your Brick Rigs files are created. For example, if ``project_name`` is ``'my_vehicle'``
 and ``project_dir`` is ``'C:\\my_script\\Projects'``, the files will be created in the
 ``C:\\my_script\\Projects\\my_vehicle`` directory. These variables can be modified at any time.
 
-BRCI provides several predefined paths options that you can choose, that could help you especially if you are
-inexperienced. Paths marked with an asterix (*) are not recommended if BRCI was installed using pip. They are:
+BRCI provides several predefined paths options that you can choose, that could come in handy. Paths marked with an
+asterix (*) are not recommended if BRCI was installed using pip. They are:
 
 - \* ``brci.BRCI_CWD``: Current Working Directory of BRCI.
 - ``brci.BRICK_RIGS_FOLDER``: List of paths where Brick Rigs vehicle files *could* be stored.
 - \* ``brci.PROJECT_FOLDER``: Folder included in BRCI for storing projects.
 - \* ``brci.BACKUP_FOLDER``: Folder included in BRCI for storing backups.
+
+If you wish to directly work in Brick Rigs' vehicles directory, consider using the class method
+``brci.<Modern/Legacy>Creation.get_brick_rigs_vehicle_folder()`` instead. It will try to find a valid folder (helpful
+for Linux support) and raise an error if nothing was found. Plus, it will automatically deal between
+``brci.ModernCreation`` and ``brci.LegacyCreation``. Do not directly call it from ``brci.Creation`` class.
 
 **Example of initializing BRCI:**
 
@@ -43,10 +55,10 @@ inexperienced. Paths marked with an asterix (*) are not recommended if BRCI was 
 
   import brci
 
-  creation: brci.Creation = brci.Creation14(  # Creates a Creation object
+  creation: brci.ModernCreation = brci.Creation14(  # Creates a Creation object
       project_name='my_vehicle',  # Set the name of the folder all files will be created in.
                                   # Files must be stored in (project dir)\(project name) folder
-      project_dir=brci.PROJECT_FOLDER
+      project_dir=brci.ModernCreation.get_brick_rigs_vehicle_folder()
   )
 
 Creation classes can take a lot more arguments:
@@ -72,8 +84,8 @@ Creation classes can take a lot more arguments:
 All arguments can be directly modified post-initialization.
 
 
-Building with BRCI
-------------------
+Building with BRCI for the latest file version
+----------------------------------------------
 
 To place bricks in our build, we use 3 methods or classes:
 
@@ -118,9 +130,9 @@ Therefore it takes the same arguments as ``brci.Creation<version>.write_creation
   import random
 
   # Create a Creation object
-  creation: brci.Creation = brci.Creation14(
+  creation: brci.ModernCreation = brci.Creation14(
       project_name='my_vehicle',
-      project_dir=brci.PROJECT_FOLDER
+      project_dir=brci.ModernCreation.get_brick_rigs_vehicle_folder()
   )
 
   # Add 5 bricks:

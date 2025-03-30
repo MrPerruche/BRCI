@@ -1,7 +1,7 @@
-# Brick Rigs Creation Interface 4 (Pre-release versions)
+# Brick Rigs Creation Interface 4
 
 ## Slow down and read this!
-BRCI-4 is still in development. We do not recommend you using it yet. 
+BRCI-4 is still in development. Use carefully.
 
 ## What is BRCI?
 Brick Rigs Creation Interface 4 is a python package written in python to create and edit creations in Brick Rigs.
@@ -24,6 +24,7 @@ To learn more, report bug and suggest features, consider joining our discord: ht
 ## Installation
 It is (or soon will be) available on pip. To install it, run `pip install brci`. Then import it with `import brci`.
 BRCI requires NumPy. You may install it with `pip install numpy`.
+If you downloaded BRCI from github, simply move brci to your current working directory then import it with `import brci`.
 
 ## License
 BRCI-4 is licensed under the GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007. Learn more in the `LICENSE` file.
