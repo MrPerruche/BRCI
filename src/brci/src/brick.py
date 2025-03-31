@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Self, Optional, TypeVar, Final, Iterable, Literal
 # from collections.abc import MutableMapping, MutableSequence
 # from copy import deepcopy
@@ -41,9 +42,9 @@ def new_brick_types(brick_types: Iterable[str], properties: dict[str, Any], comm
                 if common_properties: bricks14[brick_type].update(default_properties14())  # Puts common properties
 
 
-class Brick14:
+class Brick(ABC):
 
-    def __init__(self,
+    def __init__(self, version: int,
                  brick_type: str,
                  name: str | int,
                  position: Optional[list[float]] = None,
@@ -75,6 +76,8 @@ class Brick14:
         self.rotation: list[float] = [0.0, 0.0, 0.0] if rotation is None else rotation
         self.properties: dict[str, Any] = {} if properties is None else properties
 
+        self.__FILE_VERSION: int = version
+
         # Set properties to something meaningful (will keep already set properties if they've valid!)
         self.set_type(brick_type)
 
@@ -83,13 +86,33 @@ class Brick14:
         return f'Brick14({self._brick_type!r}, {self.name!r}, {self.position!r}, {self.rotation!r}, {self.properties!r})'
 
 
+    @abstractmethod
+    def get_brick_list(self) -> dict[str, Any]:
+        """
+        Will return a list of all bricks for this file version.
+        """
+        pass
+
+
+    def get_file_version(self) -> int:
+
+        """
+        Will return the file version of the Brick object.
+
+        Returns:
+            int: File version number
+        """
+
+        return self.__FILE_VERSION
+
+
     def get_type(self) -> str:
 
         """
-        Will return the brick type of the Brick14 object.
+        Will return the brick type of the Brick object.
 
         Returns:
-            str: Type of the Brick14 object
+            str: Type of the Brick object
         """
         return self._brick_type
 
@@ -110,10 +133,10 @@ class Brick14:
         """
 
         # Make sure this brick exists
-        if new_type in bricks14.keys():
+        if new_type in self.get_brick_list().keys():
 
             # Get new set of properties
-            new_prop: dict[str, Any] = deepcopy(bricks14[new_type])
+            new_prop: dict[str, Any] = deepcopy(self.get_brick_list()[new_type])
 
             for property_ in self.properties.keys():
                 if property_ in new_prop:
@@ -129,7 +152,23 @@ class Brick14:
         return self
 
 
-Brick = TypeVar('Brick', bound=Brick14)
+class Brick14(Brick):
+
+
+    def __init__(self,
+                 brick_type: str,
+                 name: str | int,
+                 position: Optional[list[float]] = None,
+                 rotation: Optional[list[float]] = None,
+                 properties: Optional[dict[str, Any]] = None) -> None:
+
+        super().__init__(14, brick_type, name, position, rotation, properties)
+
+
+    def get_brick_list(self) -> dict[str, Any]:
+        return bricks14
+
+
 
 
 def help14(brick: str | Iterable[str] | None, is_rst: bool = False) -> None:

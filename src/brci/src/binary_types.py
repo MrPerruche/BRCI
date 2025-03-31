@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Any, Literal, Optional
 from collections.abc import Iterable
 import numpy as np
@@ -328,6 +329,16 @@ class BinaryTypes:
         @staticmethod
         def deserialize(ba: bytearray, try_np: bool = False) -> Any:
             return ba[1: ].decode('utf-8')
+
+
+    class StringOrEnum(String):
+
+        @staticmethod
+        def serialize(value: str | Enum, brick_id_table: dict[str | int, int]) -> bytearray:
+            if isinstance(value, Enum):
+                return BinaryTypes.serialize_int(value.value, 1, False)
+            # else:
+            return super().serialize(value, brick_id_table)
 
 
     class Text(BinaryType):

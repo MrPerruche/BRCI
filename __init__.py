@@ -72,7 +72,7 @@ An example of using BRCI::
   ...
   >>> # Finally, we can save it and put it in our game.
   >>> creation.write_creation()
-  >>> creation.write_metadata() # Name can be specified for metadata and vehicle file!
+  >>> creation.write_metadata()
   >>> creation.write_preview(brci.BRCI_THUMBNAIL) # Note: You can specify a custom preview path. Please look at documentation/docstrings!
   >>> creation.bricks = [] # Clear all bricks from the creation, but keep the vehicle file and metadata. Good for reusing the same Creation14 object.
 """
