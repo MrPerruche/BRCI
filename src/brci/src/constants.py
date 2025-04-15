@@ -23,6 +23,25 @@ class ColorSpace(Enum):
     HSV = 2
     HSL = 3
     CMYK = 4
+    # OKLAB = 5
+    # OKLCH = 6
+
+    @staticmethod
+    def get_len_of(elem):
+        match elem:
+            case ColorSpace.RGB:
+                return 3
+            case ColorSpace.HSV:
+                return 3
+            case ColorSpace.HSL:
+                return 3
+            case ColorSpace.CMYK:
+                return 4
+            # case ColorSpace.OKLAB:
+            #     return 3
+            # case ColorSpace.OKLCH:
+            #     return 3
+
 
 class Connection(Enum):
 

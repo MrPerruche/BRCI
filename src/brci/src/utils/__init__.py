@@ -1,5 +1,6 @@
 # Not done yet # from .brick_types import *
 from .data import *
+from .enums import *
 from .misc import *
 from .property import *
 from .write import *

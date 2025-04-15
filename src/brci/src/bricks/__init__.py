@@ -1,4 +1,5 @@
 from .bricks14 import *
+from .bricks15 import *
 
 # Input channels:
 # InputChannel.InputAxis     -> BrickInput(<this>, ...)

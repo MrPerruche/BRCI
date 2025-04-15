@@ -216,6 +216,25 @@ class BinaryTypes:
             return result # if try_np else result.item()
 
 
+    class List2_Float32(BinaryType):
+
+        @staticmethod
+        def serialize(value: list[float | np.floating], brick_id_table: dict[str | int, int]) -> bytearray:
+            result = bytearray()
+            if len(value) != 2:
+                raise ValueError(f"Expected 2 floats, not {len(value)}")
+            for val in value:
+                result.extend(BinaryTypes.Float32.serialize(val, brick_id_table))
+            return result
+
+        @staticmethod
+        def deserialize(ba: bytearray, try_np: bool = False) -> Any:
+            result = []
+            for i in range(2):
+                result.append(BinaryTypes.Float32.deserialize(ba[i*4:(i+1)*4], try_np))
+            return result
+
+
     # noinspection PyPep8Naming
     class List3_Float32(BinaryType):
 
@@ -312,7 +331,7 @@ class BinaryTypes:
             return result # if try_np else result.item()
 
 
-    class String(BinaryType):
+    class StrictString(BinaryType):
 
         @staticmethod
         def serialize(value: str, brick_id_table: dict[str | int, int]) -> bytearray:
@@ -331,14 +350,13 @@ class BinaryTypes:
             return ba[1: ].decode('utf-8')
 
 
-    class StringOrEnum(String):
+    class String(StrictString):
 
         @staticmethod
         def serialize(value: str | Enum, brick_id_table: dict[str | int, int]) -> bytearray:
             if isinstance(value, Enum):
-                return BinaryTypes.serialize_int(value.value, 1, False)
-            # else:
-            return super().serialize(value, brick_id_table)
+                value = value.value
+            return BinaryTypes.StrictString.serialize(value, brick_id_table)
 
 
     class Text(BinaryType):

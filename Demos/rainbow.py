@@ -28,7 +28,7 @@ if __name__ == '__main__':
             {
                 "BrickSize": brci.size([0.3, 0.3, 0.1], brci.Units.METER),
                 "BrickColor": brci.from_hsv(int((i/user_input)*360), 100, 100, 100),
-                "BrickMaterial": "Glow"
+                "BrickMaterial": brci.Value.Material.GLOW
             }
         )
 

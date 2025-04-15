@@ -60,6 +60,11 @@ class Creation14(ModernCreation):
         return property_types14
 
 
+    @staticmethod
+    def get_bricks_dict() -> dict[str, Brick]:
+        return bricks14
+
+
 
     @staticmethod
     def Brick(brick_type: str, name: str | int, position: Optional[list[float]] = None,
@@ -201,68 +206,67 @@ class Creation14(ModernCreation):
 
 
 
-    def deserialize_metadata(self, file_name: str = 'MetaData.brm', load_last_update: bool = False) -> Self:
+    def deserialize_metadata(self, file: bytearray, load_last_update: bool = False) -> Self:
 
 
-        if not is_valid_folder_name(os.path.join(self.project_dir, self.project_name, file_name), os.name == 'nt'):
-            raise OSError(f"Invalid path {os.path.join(self.project_dir, self.project_name, file_name)}")
+        # if not is_valid_folder_name(os.path.join(self.project_dir, self.project_name, file_name), os.name == 'nt'):
+        #     raise OSError(f"Invalid path {os.path.join(self.project_dir, self.project_name, file_name)}")
 
         # #################### WRITING ####################
 
         # logwrap("info", f"Creation14::write_metadata || Instantiating buffer, writing basic details...")
 
         # Initializing stuff
-        with open(os.path.join(self.project_dir, self.project_name, file_name), 'rb') as f:
-            buffer: bytearray = bytearray(f.read())
-
+        # with open(os.path.join(self.project_dir, self.project_name, file_name), 'rb') as f:
+        #     buffer: bytearray = bytearray(f.read())
         # Version number
-        version: int = get_unsigned_int(extract_bytes(buffer, 1))
+        version: int = get_unsigned_int(extract_bytes(file, 1))
         if version != self.get_file_version():
             raise NotImplementedError(f"Invalid version number {version}, expected {self.get_file_version()}")
 
         # File name
-        self.name = extract_str16(buffer)
+        self.name = extract_str16(file)
 
         # Description:
-        self.description = extract_str16(buffer)
+        self.description = extract_str16(file)
 
         # Brick Count ignored
-        extract_bytes(buffer, 2)
+        extract_bytes(file, 2)
 
         # logwrap("info", "Creation14::write_metadata || Basic details -> Buffer completed...")
 
         # Vehicle Size
         self.size = [None, None, None]
         for i in range(3):
-            self.size[i] = get_sp_float(extract_bytes(buffer, 4))
+            self.size[i] = get_sp_float(extract_bytes(file, 4))
 
         # Weight
-        self.weight = get_sp_float(extract_bytes(buffer, 4))
+        self.weight = get_sp_float(extract_bytes(file, 4))
 
         # Price
-        self.price = get_sp_float(extract_bytes(buffer, 4))
+        self.price = get_sp_float(extract_bytes(file, 4))
 
         # Remove the 0x1D (29). Steam
-        extract_bytes(buffer, 1)
+        extract_bytes(file, 1)
 
         # Get author
-        author_coded: list[int] = [x for x in extract_bytes(buffer, get_unsigned_int(extract_bytes(buffer, 1)))]
+        author_coded: list[int] = [x for x in extract_bytes(file, get_unsigned_int(extract_bytes(file, 1)))]
         author_str: list[str] = [f'{x:02x}' for x in author_coded]
         self.author = int(''.join(author_str))
 
         # No clue
-        extract_bytes(buffer, 4)
+        extract_bytes(file, 4)
 
         # Write time (100 nanosecond Gregorian bigint value)
-        self.creation_time = get_unsigned_int(extract_bytes(buffer, 8))
+        self.creation_time = get_unsigned_int(extract_bytes(file, 8))
 
         # logwrap("info", "Creation14::write_metadata || Extended details -> Buffer completed...")
 
         # Update time
         if load_last_update:
-            self.update_time = get_unsigned_int(extract_bytes(buffer, 8))
+            self.update_time = get_unsigned_int(extract_bytes(file, 8))
         else:
-            extract_bytes(buffer, 8)
+            extract_bytes(file, 8)
 
         """
 

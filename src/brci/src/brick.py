@@ -169,6 +169,22 @@ class Brick14(Brick):
         return bricks14
 
 
+class Brick15(Brick):
+
+    def __init__(self,
+                 brick_type: str,
+                 name: str | int,
+                 position: Optional[list[float]] = None,
+                 rotation: Optional[list[float]] = None,
+                 properties: Optional[dict[str, Any]] = None) -> None:
+
+        super().__init__(15, brick_type, name, position, rotation, properties)
+
+
+    def get_brick_list(self) -> dict[str, Any]:
+        return bricks15
+
+
 
 
 def help14(brick: str | Iterable[str] | None, is_rst: bool = False) -> None:
@@ -203,5 +219,41 @@ def help14(brick: str | Iterable[str] | None, is_rst: bool = False) -> None:
 
         result += f'Brick type: {brick}\n'
         result += f'Properties: {{\n{',\n'.join([f'    {prop!r}: {val!r}' for prop, val in bricks14[brick].items()])}\n}}'
+
+    print(result)
+
+
+def help15(brick: str | Iterable[str] | None, is_rst: bool = False) -> None:
+
+    if brick is None or brick == '*':
+        for b in sorted(bricks15.keys()):
+            help15(b, is_rst)
+        return
+
+    if type(brick) != str:
+        # print(type(brick).__name__, brick)
+        # Line below raises error for brick being None
+        for b in brick:
+            help15(b, is_rst)
+        return
+
+    if brick not in bricks15.keys():
+        raise NameError(f"Unknown brick type {brick!r}")
+
+
+    result: str = ''
+
+    if is_rst:
+
+        result += f'**{brick}**\n\n'
+
+        # result += '.. code-block:: none\n\n'
+        for prop, val in bricks15[brick].items():
+            result += f'- {prop}: ``{val!r}``\n'
+
+    else:
+
+        result += f'Brick type: {brick}\n'
+        result += f'Properties: {{\n{',\n'.join([f'    {prop!r}: {val!r}' for prop, val in bricks15[brick].items()])}\n}}'
 
     print(result)

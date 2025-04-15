@@ -1,3 +1,10 @@
+UPDATING TO BRICK RIGS 1.8.0-exp (VERSION 15) TODO LIST:
+- Implement bricks15 and property_types15.
+- Implement Creation15. Careful with seats! Needs testing.
+- Figure out a new implementation for colors.
+
+
+
 REQUIRED FOR RELEASE:
 - ~~Implement all bricks (just take a look at BRCI-C:  
 copy values into the right function, change inputs (see src.bricks.\_\_init\_\_ for info))~~
@@ -13,7 +20,7 @@ copy values into the right function, change inputs (see src.bricks.\_\_init\_\_ 
 - ~~Redo main \_\_init\_\_ file to put code that's helpful and won't raise errors~~
 - ~~Add brci.Creation14().write_metadata()~~
 - ~~Add brci.Creation14().write_preview()~~
-- ~~Add brci.Creation14().read_creation()~~ NEEDS TESTING
+- Fix brci.Creation14().read_creation() AND TEST A SHITTON OF CREATIONS
 - ~~Add brci.Creation14().read_metadata()~~ NEEDS TESTING
 - Create examples (NEEDS MORE!)
 - Make unit tests

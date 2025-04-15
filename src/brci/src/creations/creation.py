@@ -3,6 +3,7 @@ import os
 from typing import Final, Self, Optional, Any, Callable, Type
 from shutil import copytree as _shutil_copytree
 
+from ..brick import *
 from ..binary_types import BinaryType
 from ..utils import *
 
@@ -28,7 +29,7 @@ class Creation(ABC):
 
 
     def __repr__(self):
-        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
+        attrs: str = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
         return f"{self.__class__.__name__}({attrs})"
 
 
@@ -89,6 +90,12 @@ class Creation(ABC):
     @staticmethod
     @abstractmethod
     def get_property_types_dict() -> dict[str, Type[BinaryType]]:
+        pass
+
+
+    @staticmethod
+    @abstractmethod
+    def get_bricks_dict() -> dict[str, Brick]:
         pass
 
 

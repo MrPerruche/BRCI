@@ -31,7 +31,7 @@ if __name__ == '__main__':
                        position=brci.pos([max(30, notes * 5), 20, 0], brci.Units.CENTIMETER),
                        properties={
                            'BrickColor': brci.from_rgb(0, 0, 0, 0),
-                           'BrickMaterial': 'Oak',
+                           'BrickMaterial': brci.Value.Material.OAK,
                            'BrickSize': brci.size([max(60, notes * 10), 40, 10], brci.Units.CENTIMETER),
                        })
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
                            position=brci.pos([i * 10 + 5, 5, 5], brci.Units.CENTIMETER),
                            properties={
                                'BrickColor': brci.from_rgb(0, 0, 0, 0),
-                               'BrickMaterial': 'Oak',
+                               'BrickMaterial': brci.Value.Material.OAK,
                                'OutputChannel.MinIn': 0.0,
                                'OutputChannel.MaxIn': 1.0,
                                'OutputChannel.MinOut': 0.0,
@@ -55,8 +55,8 @@ if __name__ == '__main__':
                            rotation=[0, 0, 90],
                            properties={
                                'BrickColor': brci.from_rgb(0, 0, 0, 0),
-                               'BrickMaterial': 'Oak',
-                               'InputChannel.InputAxis': 'Custom',
+                               'BrickMaterial': brci.Value.Material.OAK,
+                               'InputChannel.InputAxis': brci.Value.InputAxis.CUSTOM,
                                'InputChannel.SourceBricks': [f'note{i}.input'],
                                'HornPitch': get_pitch(i, notes)
                            })
