@@ -9,6 +9,7 @@ from ..brick import *
 from ..constants import *
 from ..utils import *
 from ..write_utils import *
+from ..value_enums import Value14
 
 # TODO: Get rid of this terrible function system
 from ..write_utils import _get_property_data, _convert_brick_types, _convert_brick_names_to_id, _get_prop_bin
@@ -46,7 +47,7 @@ class Creation14(ModernCreation):
 
         self.bricks: list[Brick14] = []  # Correct type hinting
 
-        super().__init__(14, project_name, project_dir,
+        super().__init__(14, Value14, project_name, project_dir,
                          name, description, appendix,
                          tags, visibility,
                          seat,

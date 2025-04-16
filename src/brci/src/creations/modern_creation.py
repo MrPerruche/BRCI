@@ -16,14 +16,14 @@ class ModernCreation(Creation, ABC):
     # 3. Other (alphabetical order)
 
 
-    def __init__(self, file_version: int, project_name: str, project_dir: str,
+    def __init__(self, file_version: int, value_enums: Type[Value], project_name: str, project_dir: str,
                  name: str = '', description: str = '', appendix: bytes | bytearray = bytearray(),
                  tags: list[str] | None = None, visibility: Visibility = Visibility.PUBLIC,
                  seat: Optional[str | int] = None,
                  creation_time: Optional[int] = None, update_time: Optional[int] = None,
                  size: Optional[list[float]] = None, weight: float = 0.0, price: float = 0.0, author: int = 0) -> None:
 
-        super().__init__(file_version, project_name, project_dir)
+        super().__init__(file_version, value_enums, project_name, project_dir)
 
         self.name: str = name
         self.description: str = description

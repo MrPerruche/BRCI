@@ -6,6 +6,7 @@ from shutil import copytree as _shutil_copytree
 from ..brick import *
 from ..binary_types import BinaryType
 from ..utils import *
+from ..value_enums import Value
 
 
 class Creation(ABC):
@@ -18,9 +19,10 @@ class Creation(ABC):
     # 3. Other (alphabetical order)
 
 
-    def __init__(self, file_version: int, project_name: str, project_dir: str) -> None:
+    def __init__(self, file_version: int, value_enums: Type[Value], project_name: str, project_dir: str) -> None:
 
         self.__FILE_VERSION: int = file_version
+        self.Value = value_enums
         self.project_name: str = project_name
         self.project_dir: str = project_dir
 

@@ -1,7 +1,8 @@
 UPDATING TO BRICK RIGS 1.8.0-exp (VERSION 15) TODO LIST:
-- Implement bricks15 and property_types15.
-- Implement Creation15. Careful with seats! Needs testing.
-- Figure out a new implementation for colors.
+- ~~Implement bricks15 and property_types15.~~
+- ~~Implement Creation15. Careful with seats!~~ Needs testing.
+- ~~Figure out a new implementation for colors.~~ Needs testing.
+- Figure out a new implementation for other util functions.
 
 
 

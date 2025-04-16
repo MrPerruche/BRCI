@@ -23,8 +23,8 @@ class ColorSpace(Enum):
     HSV = 2
     HSL = 3
     CMYK = 4
-    # OKLAB = 5
-    # OKLCH = 6
+    OKLAB = 5
+    OKLCH = 6
 
     @staticmethod
     def get_len_of(elem):
@@ -37,10 +37,14 @@ class ColorSpace(Enum):
                 return 3
             case ColorSpace.CMYK:
                 return 4
-            # case ColorSpace.OKLAB:
-            #     return 3
-            # case ColorSpace.OKLCH:
-            #     return 3
+            case ColorSpace.OKLAB:
+                return 3
+            case ColorSpace.OKLCH:
+                return 3
+
+    @staticmethod
+    def is_perceptual(elem):
+        return elem in (ColorSpace.OKLAB, ColorSpace.OKLCH)
 
 
 class Connection(Enum):

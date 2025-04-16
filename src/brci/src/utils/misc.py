@@ -6,6 +6,10 @@ import re
 from .data import settings
 
 
+def clamp(min_val: float, x: float, max_val: float) -> float:
+    return max(min_val, min(x, max_val))
+
+
 class FM:
 
     """

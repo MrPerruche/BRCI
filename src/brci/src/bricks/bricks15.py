@@ -304,6 +304,19 @@ _add_mk(bricks15, ('TextBrick', 'TextCylinder'),
     }
 )
 
+_add_mk(bricks15, ('TextBrick', 'TextCylinder'),
+    default_properties15() | {
+        'bGenerateLift': False,
+        'BrickSize': [60.0, 60.0, 10.0],
+        'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
+        'Text': 'Text',
+        'Font': 'Roboto',
+        'FontSize': 60.0,
+        'TextColor': [0x00, 0x00, 0x00, 0xFF],
+        'OutlineThickness': 0.0
+    }
+)
+
 _add_mk(bricks15, ('Antenna_1x1x8', 'Antenna_2x1x1s', 'Handle_1x2x4s', 'Handle_4x1x1'),
     default_properties15()
 )
