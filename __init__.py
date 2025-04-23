@@ -6,7 +6,7 @@
 ##                                                                                                           ##
 ##                                          Originally authored by:                                          ##
 ##                                        MrPerruche (@perru_, Perru)                                        ##
-##                                       Copper (@kitethelunatic, Kite)                                      ##
+##                                        Copper (@kalthelunatic, Kal)                                       ##
 ##                                       ANC (@absolutely_no_context)                                        ##
 ##                                     Infernia829 (@spectre829, Spectre)                                    ##
 ##                                   Erzbengel Raziel (@erzbengel_raziel)                                    ##
@@ -14,12 +14,14 @@
 ##                                                                                                           ##
 ##                                                                                                           ##
 ##                         Rewrite authored primarily by MrPerruche (@perru_, Perru)                         ##
-##                             With some help from Copper (@kitethelunatic, Kite)                            ##
+##                              With some help from Copper (@kalthelunatic, Kal)                             ##
 ##                                                                                                           ##
 ##                      Find BRCI's repository here: https://github.com/MrPerruche/BRCI                      ##
 ##                                                                                                           ##
 ###############################################################################################################
 
+
+# TODO. this is trash!! fix this \/\/\/
 """
 Brick Rigs Creation Interface (BRCI)
 ====================================
@@ -36,7 +38,7 @@ This gives you quite a lot of freedom as, for example:
 
 One of the most useful things BRCI can be used for is recursive tasks, say, a 10x10 grid of switches.
 
-That would take manually placing 100 switches, or instead, take BRCI a few fractions of a second.
+That would take manually placing *and* connecting 100 switches, or instead, take BRCI a few fractions of a second.
 
 Usage
 -----
@@ -48,7 +50,7 @@ An example of using BRCI::
 
   >>> import brci
   ... 
-  >>> creation: brci.ModernCreation = brci.Creation14("my_creation",  # Name of the folder
+  >>> creation: brci.ModernCreation = brci.Creation15("my_creation",  # Name of the folder
   ...                                                 brci.ModernCreation.get_brick_rigs_vehicle_folder())  # Path of the folder
   ...
   >>> # Some configuration options for the creation...
@@ -56,7 +58,7 @@ An example of using BRCI::
   >>> creation.description = "My brand-new creation!"
   ...
   >>> # Adding some bricks...
-  >>> # Note for BRCI-3 users, BRCI now natively includes a whole ton of utilities to help deal with properties!
+  >>> # Note for BRCI-3 users, BRCI now natively includes many utilities to help deal with properties.
   >>> creation.add_brick("ScalableBrick", "my_new_brick",
   ...                   properties={
   ...                       "BrickColor": brci.from_rgb(255, 0, 0, 255)
