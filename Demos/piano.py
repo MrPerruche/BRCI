@@ -20,8 +20,8 @@ if __name__ == '__main__':
     creation: brci.ModernCreation = brci.Creation14(
         f'demo_piano_{notes}',
         brci.ModernCreation.get_brick_rigs_vehicle_folder(),
-        name=f"Demo piano with {notes} notes",
-        description=f"Demo of a piano created using brci-{brci.BRCI_VERSION}.",
+        name=f"Demo: piano with {notes} notes",
+        description=f"Demo: piano created using brci-{brci.BRCI_VERSION}.",
         author=76561199095329086,  # SteamID 64 of Raized
         size=brci.metadata_size([max(0.6, notes / 10), 0.4, 0.436], brci.Units.METER)  # 0.336: Exact size of a horn
     )

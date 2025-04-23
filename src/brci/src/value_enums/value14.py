@@ -2,25 +2,38 @@ from enum import Enum
 from typing import Optional
 
 from .value import *
-from ..utils import convert_color
+from ..utils import convert_color, convert_len
 from ..constants import ColorSpace
 
 
 class Value14(Value):
 
-    """
-    Will convert a list of integers or floats corresponding to a color from one color space to another.
-    Maximum and new_maximum may be "ignored" by some channels if dealing with perceptual color spaces like OKLab or OKLCH.
+    @staticmethod
+    def length(*args: int | float, unit: float | int = Units.METER) -> int | float | list[int | float]:
+        result = convert_len(args, unit, Units.THIRD)
+        return result[0] if len(result) == 1 else list(result)
 
-    Arguments:
-        color (list[int | float]): A list of integers or floats (of length depending on the color space) corresponding to the color to convert.
-        old_space (ColorSpace): The color space of the color to convert.
-        new_space (ColorSpace): The color space to convert the color to.
-        return_alpha (Optional[bool]): Whether the output color has an alpha channel. Leave none to determine automatically from the input.
-        maximum (float | int | list[float | int]): The maximum value of each color channel.
-        new_maximum (Optional[float | int | list[float | int]]): If set, it is the maximum value of each color channel in the new color space.
-        return_int (bool): Whether to return the color as integers or floats.
-    """
+    @staticmethod
+    def size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value14.length(*args, unit=unit)
+
+    @staticmethod
+    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value14.distance(*args, unit=unit)
+
+    @staticmethod
+    def distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        result = convert_len(args, unit, Units.UE_UNIT)
+        return result[0] if len(result) == 1 else list(result)
+
+    @staticmethod
+    def position(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value14.distance(*args, unit=unit)
+
+    @staticmethod
+    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        result = convert_len(args, unit, Units.METER)
+        return result[0] if len(result) == 1 else list(result)
 
     @staticmethod
     def from_rgb(r: int, g: int, b: int, a: Optional[int] = None):
@@ -66,6 +79,8 @@ class Value14(Value):
     def from_oklch(l: float, c: float, h: float, a: Optional[float] = None):
         return convert_color([l, c, h] + ([a] if a is not None else []), ColorSpace.OKLCH, ColorSpace.HSV,
                              new_maximum=255, return_int=True)
+
+
 
     class ActuatorMode(Enum):
         ACCUMULATED = 'Accumulated'

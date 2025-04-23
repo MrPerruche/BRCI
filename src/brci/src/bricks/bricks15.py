@@ -444,8 +444,10 @@ _add_mk(bricks15, ('Sensor_1sx1sx1s', 'Sensor_1x1x1s'),
     }
 )
 
-_add_mk(bricks15, ('MathBrick_1sx1sx1s',),
+_add_mk(bricks15, ('MathBrick',),
     default_properties15() | {
+        'BrickSize': [10.0, 10.0, 10.0],
+        'ConnectorSpacing': [3, 3, 3, 3, 3, 3],
         'Operation': 'Add',
         'InputChannelA.InputAxis': 'Custom',
         'InputChannelA.SourceBricks': [],
@@ -476,10 +478,13 @@ _add_mk(bricks15, ('LightBrick', 'LightCone', 'LightConeFlat', 'LightCylinder', 
 )
 
 
-# PLAYER. Last update: 1.8.0
+# PLAYER. Last update: 1.8.0-p2
 
-_add_mk(bricks15, ('RemoteController_2x1x1s',),
-    default_properties15()
+_add_mk(bricks15, ('RCBrick',),
+    default_properties15() | {
+        'BrickSize': [10.0, 10.0, 10.0],
+        'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
+    }
 )
 
 _add_mk(bricks15, ('Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'),

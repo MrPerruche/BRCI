@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Optional
+
+from ..utils import Units
 
 
 class Value(ABC):
@@ -172,3 +175,101 @@ class Value(ABC):
             a (Optional[float], optional): Alpha (transparency) component.
         """
         pass
+
+
+    @staticmethod
+    @abstractmethod
+    def length(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        """
+        Outputs the value in this file version representing the given length
+
+        Arguments:
+            *args (int | float): Length(s) to convert.
+            unit (float | int, optional): Unit of provided values.
+
+        Returns:
+            int | float: Length in this file version
+        """
+        pass
+
+
+    @staticmethod
+    @abstractmethod
+    def size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        """
+        Outputs the value in this file version representing the given size
+
+        Arguments:
+            *args (int | float): Size(s) to convert.
+            unit (float | int, optional): Unit of provided values.
+
+        Returns:
+            int | float: Size in this file version
+        """
+        pass
+
+
+    @staticmethod
+    @abstractmethod
+    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        """
+        Outputs the value in this file version representing the given size
+
+        Arguments:
+            *args (int | float): Size(s) to convert.
+            unit (float | int, optional): Unit of provided values.
+
+        Returns:
+            int | float: Size (to be used for metadata) in this file version
+        """
+        pass
+
+
+    @staticmethod
+    @abstractmethod
+    def distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        """
+        Outputs the value in this file version representing the given distance
+
+        Arguments:
+            *args (int | float): Distance(s) to convert.
+            unit (float | int, optional): Unit of provided values.
+
+        Returns:
+            int | float: Distance in this file version
+        """
+        pass
+
+
+    @staticmethod
+    @abstractmethod
+    def position(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        """
+        Outputs the value in this file version representing the given position
+
+        Arguments:
+            *args (int | float): Position(s) to convert.
+            unit (float | int, optional): Unit of provided values.
+
+        Returns:
+            int | float: Position in this file version
+        """
+        pass
+
+
+    @staticmethod
+    @abstractmethod
+    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        """
+        Outputs the value in this file version representing the given distance
+
+        Arguments:
+            *args (int | float): Distance(s) to convert.
+            unit (float | int, optional): Unit of provided values.
+
+        Returns:
+            int | float: Distance in this file version
+        """
+        pass
+
+

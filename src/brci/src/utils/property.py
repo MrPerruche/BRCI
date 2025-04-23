@@ -103,8 +103,67 @@ class ConnectorSpacing(Iterable[Connection]):
 
 
 
+def srgb_to_linear(*args: int | float, maximum: int | float | list[int | float] = 255,
+                   new_maximum: Optional[int | float | list[int | float]] = None, return_int: bool = True) -> list[int | float]:
+    """
+    Will correct colors from sRGB to linear, typically resulting in darker outputs
 
-def convert_len(value: float | int | list[float | int], old_unit: float | int, new_unit: float | int) -> float | list[float]:
+    Arguments:
+        *args (int | float): Integers or floats corresponding to the color to convert.
+        maximum (int | float | list[int | float], optional): Maximum value of the color.
+        new_maximum (int | float | list[int | float], optional): New maximum value of the color.
+
+    Returns:
+        list[int | float]: Corrected color.
+    """
+    if isinstance(maximum, (int, float)):
+        maximum = [maximum] * len(args)
+    elif len(args) != len(maximum):
+        raise ValueError(f"Maximum has an invalid amount of elements")
+
+    if new_maximum is None:
+        new_maximum = maximum
+    elif isinstance(new_maximum, (int, float)):
+        new_maximum = [new_maximum] * len(args)
+    elif len(args) != len(new_maximum):
+        raise ValueError(f"New maximum has an invalid amount of elements")
+
+    args = [c / m for c, m in zip(args, maximum)]
+    result = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in args]
+    return [int(c * m) for c, m in zip(result, new_maximum)] if return_int else [c * m for c, m in zip(result, new_maximum)]
+
+
+def linear_to_srgb(*args: int | float, maximum: int | float | list[int | float] = 255,
+                   new_maximum: Optional[int | float | list[int | float]] = None, return_int: bool = True) -> list[int | float]:
+    """
+    Will correct colors from linear to sRGB, typically resulting in brighter outputs
+
+    Arguments:
+        *args (int | float): Integers or floats corresponding to the color to convert.
+        maximum (int | float | list[int | float], optional): Maximum value of the color.
+        new_maximum (int | float | list[int | float], optional): New maximum value of the color.
+
+    Returns:
+        list[int | float]: Corrected color.
+    """
+    if isinstance(maximum, (int, float)):
+        maximum = [maximum] * len(args)
+    elif len(args) != len(maximum):
+        raise ValueError(f"Maximum has an invalid amount of elements")
+
+    if new_maximum is None:
+        new_maximum = maximum
+    elif isinstance(new_maximum, (int, float)):
+        new_maximum = [new_maximum] * len(args)
+    elif len(args) != len(new_maximum):
+        raise ValueError(f"New maximum has an invalid amount of elements")
+
+    args = [c / m for c, m in zip(args, maximum)]
+    result = [12.92 * c if c <= 0.00304 else 1.055 * c ** (1 / 2.4) - 0.055 for c in args]
+    return [int(c * m) for c, m in zip(result, new_maximum)] if return_int else [c * m for c, m in zip(result, new_maximum)]
+
+
+def convert_len(value: float | int | list[float | int] | tuple[float | int, ...], old_unit: float | int, new_unit: float | int) -> float | list[float]:
 
     """
     Convert a value or list of values from one unit to another. Both unit arguments must be use the same unit.
@@ -270,7 +329,7 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
 
     # Get RGB color
     if ColorSpace.is_perceptual(old_space):
-        normalized_color: list[float] = color[ :-1] + [color[-1] / maximum[-1]]
+        normalized_color: list[float] = (color[ :-1] + [color[-1] / maximum[-1]]) if input_has_alpha else color
     else:
         normalized_color: list[float] = [c / m for c, m in zip(color, maximum)]
     r, g, b, a = 0.0, 0.0, 0.0, normalized_color[-1] if input_has_alpha else 1.0
@@ -334,8 +393,8 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
     elif old_space in (ColorSpace.OKLAB, ColorSpace.OKLCH):
         if old_space is ColorSpace.OKLCH:
             L, C, H = normalized_color[ :3]
-            a_ = C * math.cos(H * 2 * math.pi)
-            b_ = C * math.sin(H * 2 * math.pi)
+            a_ = C * math.cos(H / 360 * 2 * math.pi)
+            b_ = C * math.sin(H / 360 * 2 * math.pi)
         else:
             L, a_, b_ = normalized_color[ :3]
 
@@ -426,7 +485,7 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
             new_color[:3] = L, a_, b_
         else:
             C = math.sqrt(a_ * a_ + b_ * b_)
-            H = (math.atan2(b_, a_) / (2 * math.pi)) % 1.0
+            H = ((math.atan2(b_, a_) / (2 * math.pi)) % 1.0) * 360.0
             new_color[:3] = L, C, H
 
     else:
@@ -437,6 +496,38 @@ def convert_color(color: list[int | float] | tuple[int | float, ...],
     else:
         return [int(clamp(0, c, 1) * m) for c, m in zip(new_color, new_maximum)] if return_int \
                 else [clamp(0, c, 1) * m for c, m in zip(new_color, new_maximum)]
+
+
+def rgb_to_oklab(r: int | float, g: int | float, b: int | float, a: Optional[int | float] = None) -> list[float]:
+    """
+    Convers RGB to OKLAB. Exceptionally included to make working with gradients easier.
+
+    Arguments:
+        r (int | float): Red value.
+        g (int | float): Green value.
+        b (int | float): Blue value.
+        a (Optional[int | float], optional): Alpha value.
+
+    Returns:
+        list[float]: OKLAB values.
+    """
+    return convert_color([r, g, b] + ([] if a is None else [a]), ColorSpace.RGB, ColorSpace.OKLAB, maximum=255, return_int=False)
+
+
+def rgb_to_oklch(r: int | float, g: int | float, b: int | float, a: Optional[int | float] = None) -> list[float]:
+    """
+    Convers RGB to OKLCH. Exceptionally included to make working with gradients easier.
+
+    Arguments:
+        r (int | float): Red value.
+        g (int | float): Green value.
+        b (int | float): Blue value.
+        a (Optional[int | float], optional): Alpha value.
+
+    Returns:
+        list[float]: OKLCH values.
+    """
+    return convert_color([r, g, b] + ([] if a is None else [a]), ColorSpace.RGB, ColorSpace.OKLCH, maximum=255, return_int=False)
 
 
 def brick_input14(prop_name: str, input_type: str, value: float | int = 1.0, source_bricks: Optional[list[str]] = None) -> dict[str, float | int | list[str]]:

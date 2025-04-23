@@ -2,11 +2,37 @@ from enum import Enum
 from typing import Optional
 
 from .value import *
-from ..utils import convert_color
+from ..utils import convert_color, convert_len
 from ..constants import ColorSpace
 
 
 class Value15(Value):
+
+    @staticmethod
+    def length(*args: int | float, unit: float | int = Units.METER) -> int | float | list[int | float]:
+        result = convert_len(args, unit, Units.UE_UNIT)
+        return result[0] if len(result) == 1 else list(result)
+
+    @staticmethod
+    def size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value15.length(*args, unit=unit)
+
+    @staticmethod
+    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value15.length(*args, unit=unit)
+
+    @staticmethod
+    def distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value15.length(*args, unit=unit)
+
+    @staticmethod
+    def position(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        return Value15.length(*args, unit=unit)
+
+    @staticmethod
+    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+        result = convert_len(args, unit, Units.METER)
+        return result[0] if len(result) == 1 else list(result)
 
     @staticmethod
     def from_rgb(r: int, g: int, b: int, a: Optional[int] = None):

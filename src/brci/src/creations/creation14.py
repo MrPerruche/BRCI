@@ -68,6 +68,12 @@ class Creation14(ModernCreation):
 
 
     @staticmethod
+    def Value():
+        return Value14
+
+
+
+    @staticmethod
     def Brick(brick_type: str, name: str | int, position: Optional[list[float]] = None,
               rotation: Optional[list[float]] = None, properties: Optional[dict[str, Any]] = None):
 

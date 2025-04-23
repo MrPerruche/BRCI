@@ -22,7 +22,6 @@ class Creation(ABC):
     def __init__(self, file_version: int, value_enums: Type[Value], project_name: str, project_dir: str) -> None:
 
         self.__FILE_VERSION: int = file_version
-        self.Value = value_enums
         self.project_name: str = project_name
         self.project_dir: str = project_dir
 
@@ -92,6 +91,14 @@ class Creation(ABC):
     @staticmethod
     @abstractmethod
     def get_property_types_dict() -> dict[str, Type[BinaryType]]:
+        pass
+
+
+
+
+    @staticmethod
+    @abstractmethod
+    def Value():
         pass
 
 
