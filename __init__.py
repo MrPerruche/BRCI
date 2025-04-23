@@ -1,25 +1,23 @@
-###############################################################################################################
-##                                                                                                           ##
-##                                                                                                           ##
-##                                    Brick Rigs Creation Interface (BRCI)                                   ##
-##           Take advantage of Python's dynamic nature to create and edit creations in Brick Rigs.           ##
-##                                                                                                           ##
-##                                          Originally authored by:                                          ##
-##                                        MrPerruche (@perru_, Perru)                                        ##
-##                                        Copper (@kalthelunatic, Kal)                                       ##
-##                                       ANC (@absolutely_no_context)                                        ##
-##                                     Infernia829 (@spectre829, Spectre)                                    ##
-##                                   Erzbengel Raziel (@erzbengel_raziel)                                    ##
-##                                        TLM (@tlm_gujarati) (M.I.A)                                        ##
-##                                                                                                           ##
-##                                                                                                           ##
-##                         Rewrite authored primarily by MrPerruche (@perru_, Perru)                         ##
-##                              With some help from Copper (@kalthelunatic, Kal)                             ##
-##                                                                                                           ##
-##                      Find BRCI's repository here: https://github.com/MrPerruche/BRCI                      ##
-##                                                                                                           ##
-###############################################################################################################
-
+# / + / ++- + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + -++ \ + \ #
+# +                                                                                                           + #
+# +                                                                                                           + #
+# +                                    Brick Rigs Creation Interface (BRCI)                                   + #
+# +           Take advantage of Python's dynamic nature to create and edit creations in Brick Rigs.           + #
+# +                                                                                                           + #
+# +                                          Originally authored by:                                          + #
+# +                                        MrPerruche (@perru_, Perru)                                        + #
+# +                                        Copper (@kalthelunatic, Kal)                                       + #
+# +                                        ANC (@absolutely_no_context)                                       + #
+# +                                      Infernia829 (@prounce, Prounce)                                      + #
+# +                                    Erzbengel Raziel (@erzbengel_raziel)                                   + #
+# +                                                                                                           + #
+# +                                                                                                           + #
+# +                         Rewrite authored primarily by MrPerruche (@perru_, Perru)                         + #
+# +                             With some help from Copper (@kalthelunatic, Kal)                              + #
+# +                                                                                                           + #
+# +                      Find BRCI's repository here: https://github.com/MrPerruche/BRCI                      + #
+# +                                                                                                           + #
+# \ - \ --+ - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - +-- / - / #
 
 # TODO. this is trash!! fix this \/\/\/
 """
