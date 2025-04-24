@@ -9,14 +9,14 @@ from .write_utils import can_be_encoded_in_utf
 # from typing import Any -> from .bricks.bricks_utils
 
 
-SUPPORTED_VERSIONS: Final[frozenset[int]] = frozenset({14})
+# TODO look into how to get rid of this bs
+SUPPORTED_VERSIONS: Final[frozenset[int]] = frozenset({14, 15})
 
 
 
 
 
-def new_brick_types(brick_types: Iterable[str], properties: dict[str, Any], common_properties: bool = True,
-              affected_versions: Iterable[int] = SUPPORTED_VERSIONS) -> None:
+def new_brick_types(brick_types: Iterable[str], properties: dict[str, Any], common_properties: bool = True) -> None:
 
 
     """

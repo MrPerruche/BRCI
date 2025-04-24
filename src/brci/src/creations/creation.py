@@ -323,3 +323,16 @@ class Creation(ABC):
             self.bricks[i] = fn(brick)
 
         return self
+
+
+
+
+creation_classes: dict[int, Type[Creation]] = {}
+
+
+def register_creation(version: int, creation: Type[Creation]) -> None:
+    creation_classes[version] = creation
+
+
+def get_creation(version: int) -> Type[Creation] | None:
+    return creation_classes.get(version)  # To get None

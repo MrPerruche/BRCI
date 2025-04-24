@@ -4,7 +4,8 @@ from shutil import copytree as _shutil_copytree
 from time import perf_counter
 import os
 
-from .modern_creation import ModernCreation
+from brci import register_creation
+from .modern_creation import *
 from ..brick import *
 from ..constants import *
 from ..utils import *
@@ -558,6 +559,8 @@ class Creation14(ModernCreation):
 
         return buffer
 
+
+register_creation(14, Creation14)
 
 """
 

@@ -4,7 +4,7 @@ from shutil import copytree as _shutil_copytree
 from time import perf_counter
 import os
 
-from .modern_creation import ModernCreation
+from .modern_creation import *
 from ..brick import *
 from ..constants import *
 from ..utils import *
@@ -545,3 +545,7 @@ class Creation15(ModernCreation):
         # logwrap("info", "Creation14::write_metadata || Metadata writing successful.")
 
         return buffer
+
+
+
+register_creation(15, Creation15)
