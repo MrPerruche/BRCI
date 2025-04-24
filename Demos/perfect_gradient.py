@@ -1,6 +1,6 @@
 import brci
 
-from os import system  # for 'pause'
+from os import system, name as osname  # for 'pause'
 
 
 def lerp(a: float, b: float, t: float) -> float:
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     creation.write_preview(brci.BRCI_THUMBNAIL)
 
     brci.printr("Near-perfect gradient created successfully.", col=brci.FM.LIGHT_GREEN)
-    system('pause')
+    if osname == 'nt': system('pause')

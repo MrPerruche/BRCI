@@ -1,5 +1,5 @@
 import brci
-from os import system  # For pause
+from os import system, name as osname  # For pause
 
 
 # Function to get pitch based on index in the loop
@@ -67,4 +67,4 @@ if __name__ == '__main__':
     creation.write_preview(brci.BRCI_THUMBNAIL)
 
     brci.printr("Piano created successfully.", col=brci.FM.LIGHT_GREEN)
-    system('pause')
+    if osname == 'nt': system('pause')

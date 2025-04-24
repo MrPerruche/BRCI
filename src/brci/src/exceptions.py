@@ -15,7 +15,7 @@ class BrickError(Exception):
 
         super().__init__()
         self.message: str = message
-        self.culprit: Optional[str, int] = culprit
+        self.culprit: Optional[str | int] = culprit
 
 
     def __str__(self) -> str:
@@ -32,3 +32,23 @@ class BrickError(Exception):
 
 class FontError(Exception):
     pass
+
+
+class SerializationError(Exception):
+    """Raised during serialization if something goes wrong.
+    Also raised if the requested creation type does not allow writing (See: SubassemblyXX).
+
+    Attributes:
+        message (str): A human-readable error message."""
+    # Culprit is not applicable here
+
+    def __init__(self, message: str):
+        super().__init__()
+        self.message: str = message
+
+    def __str__(self) -> str:
+        return self.message
+
+    def __reduce__(self) -> tuple[Any, tuple[str]]:
+
+        return self.__class__, (self.message,)

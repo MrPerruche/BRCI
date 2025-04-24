@@ -1,6 +1,6 @@
 import brci
 
-from os import system
+from os import system, name as osname
 
 if __name__ == '__main__':
 
@@ -15,7 +15,6 @@ if __name__ == '__main__':
         brci.ModernCreation.get_brick_rigs_vehicle_folder(),
         name=f"Demo {user_input} rainbow brick(s)",
         description=f"Demo of {user_input} rainbow brick(s) going in a straight line. Created using brci-{brci.BRCI_VERSION}.",
-        author=76561198882119759,  # SteamID 64 of kal
         size=brci.metadata_size([0.3 * user_input, 0.3, 0.1], brci.Units.METER)
     )
 
@@ -37,4 +36,4 @@ if __name__ == '__main__':
     creation.write_preview(brci.BRCI_THUMBNAIL)
 
     brci.printr("Rainbow created successfully.", col=brci.FM.LIGHT_GREEN)
-    system('pause')
+    if osname == 'nt': system('pause')

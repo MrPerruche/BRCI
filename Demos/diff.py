@@ -3,7 +3,7 @@ from typing import Final
 import brci
 
 import os
-from os import system  # for 'pause'
+from os import system, name as osname  # for 'pause'
 
 
 # This program will show diff for the first brick. It's useful to test properties.
@@ -13,7 +13,7 @@ REMOVED_STYLE: Final[str] = brci.FM.CLEAR_ALL + brci.FM.LIGHT_RED + brci.FM.BOLD
 ADDED_STYLE: Final[str] = brci.FM.CLEAR_ALL + brci.FM.LIGHT_GREEN + brci.FM.BOLD
 
 def halt():
-    system('pause')
+    if osname == 'nt': system('pause')
 
 
 def print_sep():

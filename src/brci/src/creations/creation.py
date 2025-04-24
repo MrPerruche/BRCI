@@ -304,3 +304,22 @@ class Creation(ABC):
 
     def write_preview(self, *args, **kwargs) -> Self:
         pass
+
+
+    # FIXME this is basically just map() but returning self and not some weird map object
+    def apply(self, fn: callable) -> Self:
+
+        """
+        Will apply a function to the creation's bricks, and replace the current brick with the return value.
+
+        Arguments:
+            fn (callable): Function to apply.
+
+        Returns:
+            Self
+        """
+
+        for i, brick in enumerate(self.bricks):
+            self.bricks[i] = fn(brick)
+
+        return self
