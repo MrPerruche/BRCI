@@ -9,39 +9,6 @@ from .write_utils import can_be_encoded_in_utf
 # from typing import Any -> from .bricks.bricks_utils
 
 
-# TODO look into how to get rid of this bs
-SUPPORTED_VERSIONS: Final[frozenset[int]] = frozenset({14, 15})
-
-
-
-
-
-def new_brick_types(brick_types: Iterable[str], properties: dict[str, Any], common_properties: bool = True) -> None:
-
-
-    """
-    Function to modify or implement custom (modded) bricks.
-
-    Arguments:
-        brick_types (Iterable[str]): List of custom brick types.
-        properties (dict[str, Any]): Dictionary with property names (str) as keys and their corresponding property type (str) as values.
-        common_properties (bool, optional): Whether to add common properties. Defaults to True.
-        affected_versions (Iterable[int], optional): List of all versions that will see these changes applied. Defaults to all known versions.
-    """
-
-    # I know repetition should be avoided, but speed is more important.
-
-    # Making sure everything is supported
-    sanitized_affected_versions: set[int] = {ver for ver in affected_versions if ver in SUPPORTED_VERSIONS}
-
-    for ver in sanitized_affected_versions:
-
-        if ver == 14:
-            for brick_type in brick_types:
-                bricks14.update({brick_type: properties})  # Puts properties
-                if common_properties: bricks14[brick_type].update(default_properties14())  # Puts common properties
-
-
 class Brick(ABC):
 
     def __init__(self, version: int,
@@ -83,7 +50,7 @@ class Brick(ABC):
 
 
     def __repr__(self):
-        return f'Brick14({self._brick_type!r}, {self.name!r}, {self.position!r}, {self.rotation!r}, {self.properties!r})'
+        return f'Brick{self.__FILE_VERSION}({self._brick_type!r}, {self.name!r}, {self.position!r}, {self.rotation!r}, {self.properties!r})'
 
 
     @abstractmethod
@@ -150,6 +117,10 @@ class Brick(ABC):
             raise NameError(f"Brick type {new_type!r} does not exist")
 
         return self
+
+
+    def copy(self):
+        return deepcopy(self)
 
 
 class Brick14(Brick):

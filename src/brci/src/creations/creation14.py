@@ -4,7 +4,6 @@ from shutil import copytree as _shutil_copytree
 from time import perf_counter
 import os
 
-from brci import register_creation
 from .modern_creation import *
 from ..brick import *
 from ..constants import *
@@ -69,7 +68,7 @@ class Creation14(ModernCreation):
 
 
     @staticmethod
-    def Value():
+    def Value() -> Type[Value14]:
         return Value14
 
 

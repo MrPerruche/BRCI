@@ -64,7 +64,7 @@ class Creation15(ModernCreation):
 
 
     @staticmethod
-    def Value():
+    def Value() -> Type[Value15]:
         return Value15
 
 

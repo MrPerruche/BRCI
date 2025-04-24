@@ -9,31 +9,28 @@ from ..constants import ColorSpace
 class Value14(Value):
 
     @staticmethod
-    def length(*args: int | float, unit: float | int = Units.METER) -> int | float | list[int | float]:
-        result = convert_len(args, unit, Units.THIRD)
-        return result[0] if len(result) == 1 else list(result)
+    def length(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
+        return convert_len(args, unit, Units.THIRD)
 
     @staticmethod
-    def size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def size(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value14.length(*args, unit=unit)
 
     @staticmethod
-    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value14.distance(*args, unit=unit)
 
     @staticmethod
-    def distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
-        result = convert_len(args, unit, Units.UE_UNIT)
-        return result[0] if len(result) == 1 else list(result)
+    def distance(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
+        return convert_len(args, unit, Units.UE_UNIT)
 
     @staticmethod
-    def position(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def position(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value14.distance(*args, unit=unit)
 
     @staticmethod
-    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
-        result = convert_len(args, unit, Units.METER)
-        return result[0] if len(result) == 1 else list(result)
+    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
+        return convert_len(args, unit, Units.METER)
 
     @staticmethod
     def from_rgb(r: int, g: int, b: int, a: Optional[int] = None):

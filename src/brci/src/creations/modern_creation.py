@@ -4,6 +4,7 @@ from .creation import *
 from ..brick import *
 from ..utils import BRICK_RIGS_FOLDER
 from ..constants import Visibility
+from ..exceptions import BrickError
 
 
 class ModernCreation(Creation, ABC):
@@ -88,6 +89,45 @@ class ModernCreation(Creation, ABC):
             UnicodeEncodeException: One of the values are invalid causing a decoding error.
         """
         pass
+
+
+
+    def merge(self, creation: Self | list[Brick], safe: bool = True, selection_filter: Callable[[Brick], bool] | None = None) -> Self:
+        """
+        Will merge bricks of the given creation into the current creation.
+
+        Arguments:
+            creation (ModernCreation | list[Brick]): Creation or bricks to merge.
+            safe (bool, optional): If True, it will raise an error if it encounters duplicate names. Can be disabled to improve performance.
+            selection_filter (Callable[[Brick], bool], optional): Filter to select which bricks to merge. Defaults to None which includes all bricks.
+
+        Returns:
+            Self
+
+        Exceptions:
+            BrickError: If safe is True and there are duplicate names
+            TypeError: If creation is not a subclass of ModernCreation or a list of Bricks
+            ValueError: If selection_filter is not a callable
+        """
+
+        if isinstance(creation, ModernCreation):
+            creation = creation.bricks
+        elif not isinstance(creation, list):
+            raise TypeError("Creation must be a subclass of ModernCreation or a list of Bricks")
+
+        if safe:
+            self_set, creation_set = set(self.bricks), set(creation)
+            if not self_set.isdisjoint(creation_set):
+                raise BrickError("Bricks with same name already exist in the creation", ', '.join(map(str, self_set & creation_set)))
+
+        if selection_filter is None:
+            self.bricks.extend(creation)
+        elif callable(selection_filter):
+            self.bricks.extend(filter(selection_filter, creation))
+        else:
+            raise ValueError("selection_filter must be a callable or None")
+
+        return self
 
 
 

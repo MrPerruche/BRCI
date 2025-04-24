@@ -414,8 +414,10 @@ _add_mk(bricks15, ('DisplayBrick',),
     }
 )
 
-_add_mk(bricks15, ('Switch_1sx1sx1s', 'Switch_1x1x1s'),
+_add_mk(bricks15, ('SwitchBrick', 'SwitchCylinder', 'SwitchButton'),
     default_properties15() | {
+        'BrickSize': [10.0, 10.0, 10.0],
+        'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
         'OutputChannel.MinIn': -1.0,
         'OutputChannel.MaxIn': 1.0,
         'OutputChannel.MinOut': -1.0,
@@ -429,8 +431,10 @@ _add_mk(bricks15, ('Switch_1sx1sx1s', 'Switch_1x1x1s'),
 )
 
 
-_add_mk(bricks15, ('Sensor_1sx1sx1s', 'Sensor_1x1x1s'),
+_add_mk(bricks15, ('SensorBrick', 'SensorCylinder'),
     default_properties15() | {
+        'BrickSize': [10.0, 10.0, 10.0],
+        'ConnectorSpacing': [3, 3, 3, 3, 3, 0],
         'OutputChannel.MinIn': -1.0,
         'OutputChannel.MaxIn': 1.0,
         'OutputChannel.MinOut': -1.0,
@@ -459,6 +463,15 @@ _add_mk(bricks15, ('MathBrick',),
 )
 
 
+
+_add_mk(bricks15, ('RCBrick',),
+    default_properties15() | {
+        'BrickSize': [10.0, 10.0, 10.0],
+        'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
+    }
+)
+
+
 # LIGHTS. Last update: 1.8.0
 
 _add_mk(bricks15, ('LightBrick', 'LightCone', 'LightConeFlat', 'LightCylinder', 'LightHemisphere', 'LightRamp',
@@ -479,13 +492,6 @@ _add_mk(bricks15, ('LightBrick', 'LightCone', 'LightConeFlat', 'LightCylinder', 
 
 
 # PLAYER. Last update: 1.8.0-p2
-
-_add_mk(bricks15, ('RCBrick',),
-    default_properties15() | {
-        'BrickSize': [10.0, 10.0, 10.0],
-        'ConnectorSpacing': [3, 3, 3, 3, 3, 3]
-    }
-)
 
 _add_mk(bricks15, ('Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'),
     default_properties15() | {
@@ -572,7 +578,7 @@ _add_mk(bricks15, ('SpinnerBrick',),
         'ConnectorSpacing': [3, 3, 0, 0, 0, 0],
         'SpinnerAngle': 90.0,
         'SpinnerRadius': [30.0, 30.0],
-        'SpinnerShape': 'Square',  # TODO: Add enum
+        'SpinnerShape': 'Square',
         'SpinnerSize': [30.0, 30.0],
     })
 

@@ -84,7 +84,21 @@ class Creation(ABC):
             str: Path
         """
 
-        return os.path.join(self.project_dir, self.project_name)
+        return self.get_full_path_of(self.project_dir, self.project_name)
+
+
+
+    @staticmethod
+    def get_full_path_of(project_dir: str, project_name: str):
+
+        """
+        Will return the path where all files will be written
+
+        Returns:
+            str: Path
+        """
+
+        return os.path.join(project_dir, project_name)
 
 
 
@@ -92,7 +106,6 @@ class Creation(ABC):
     @abstractmethod
     def get_property_types_dict() -> dict[str, Type[BinaryType]]:
         pass
-
 
 
 
@@ -132,6 +145,26 @@ class Creation(ABC):
         """
 
         self.bricks.append(self.Brick(brick_type, name, position, rotation, properties))
+        return self
+
+
+
+    def apply(self, fn: Callable[[Brick], Brick | None]) -> Self:
+        """
+        Will apply a function to the creation's bricks, and replace the current brick with the return value, such as:
+
+        Arguments:
+            fn (Callable[[Brick], Brick | None]): Function to apply. May return None to make use of mutability or skip a brick.
+
+        Returns:
+            Self
+        """
+
+        for i, brick in enumerate(self.bricks):
+            result = fn(brick)
+            if result is not None:
+                self.bricks[i] = result
+
         return self
 
 
@@ -218,9 +251,42 @@ class Creation(ABC):
         pass
 
 
+
+    def copy(self):
+        return deepcopy(self)
+
+
+
     @abstractmethod
     def deserialize_creation(self, file: bytearray) -> Self:
         pass
+
+
+
+    @abstractmethod
+    def merge(self, *args, **kwargs) -> Self:
+        pass
+
+
+
+    def move(self, x: int | float, y: int | float, z: int | float) -> Self:
+
+        """
+        Will move the creation's bricks.
+
+        Arguments:
+            x (int | float): X offset
+            y (int | float): Y offset
+            z (int | float): Z offset
+
+        Returns:
+            Self
+        """
+
+        for b in self.bricks:
+            b.position = [x + b.position[0], y + b.position[1], z + b.position[2]]
+
+        return self
 
 
 
@@ -335,4 +401,44 @@ def register_creation(version: int, creation: Type[Creation]) -> None:
 
 
 def get_creation(version: int) -> Type[Creation] | None:
-    return creation_classes.get(version)  # To get None
+    result = creation_classes.get(version)  # To get None
+    if result is None:
+        raise NotImplementedError(f"Creation version {version} is not supported")
+
+
+def get_file_version(path: str) -> int:
+
+    """
+    Will return the file version of a Brick Rigs file.
+
+    Arguments:
+        path (str): Path to the creation file.
+
+    Returns:
+        int: File version
+    """
+
+    with open(path, 'rb') as f:
+        return int(f.read()[0])
+
+
+def get_creation_of(path: str) -> Type[Creation]:
+
+    """
+    Will return the creation class of a Brick Rigs file.
+
+    Arguments:
+        path (str): Path to the creation file.
+
+    Returns:
+        Type[Creation]: Creation class
+
+    Exceptions:
+        NotImplementedError: If the file version is not supported
+    """
+
+    result = get_creation(get_file_version(path))
+    if result is None:
+        raise NotImplementedError(f"Creation version {get_file_version(path)} is not supported")
+
+    return result

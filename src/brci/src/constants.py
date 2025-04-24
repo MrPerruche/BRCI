@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Final
 import numpy as np
 
-BRCI_VERSION: Final[str] = "4.23.0"  # Modify in pyproject.toml too!
+BRCI_VERSION: Final[str] = "4.26.0"  # Modify in pyproject.toml too!
 
 VALID_DRIVER_SEATS: Final[set[str]] = {'Seat_2x2x7s', 'Seat_3x2x2', 'Seat_5x2x1s'}
 

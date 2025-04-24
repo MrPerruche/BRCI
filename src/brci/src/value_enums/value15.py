@@ -9,30 +9,28 @@ from ..constants import ColorSpace
 class Value15(Value):
 
     @staticmethod
-    def length(*args: int | float, unit: float | int = Units.METER) -> int | float | list[int | float]:
-        result = convert_len(args, unit, Units.UE_UNIT)
-        return result[0] if len(result) == 1 else list(result)
+    def length(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
+        return convert_len(args, unit, Units.UE_UNIT)
 
     @staticmethod
-    def size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def size(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value15.length(*args, unit=unit)
 
     @staticmethod
-    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def metadata_size(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value15.length(*args, unit=unit)
 
     @staticmethod
-    def distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def distance(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value15.length(*args, unit=unit)
 
     @staticmethod
-    def position(*args: int | float, unit: float | int = Units.METER) -> int | float:
+    def position(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
         return Value15.length(*args, unit=unit)
 
     @staticmethod
-    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> int | float:
-        result = convert_len(args, unit, Units.METER)
-        return result[0] if len(result) == 1 else list(result)
+    def sensor_distance(*args: int | float, unit: float | int = Units.METER) -> float | list[float]:
+        return convert_len(args, unit, Units.METER)
 
     @staticmethod
     def from_rgb(r: int, g: int, b: int, a: Optional[int] = None):
@@ -90,7 +88,7 @@ class Value15(Value):
         STANDARD = 'Standard'
         INCENDIARY = 'Incendiary'
         HIGH_EXPLOSIVE = 'HighExplosive'
-        TARGET_SEEKING = 'HeatSeeking'
+        TARGET_SEEKING = 'TargetSeeking'
         GUIDED = 'Guided'
 
     class CouplingMode(Enum):
@@ -161,10 +159,8 @@ class Value15(Value):
 
     class InputAxis(Enum):
         NONE = 'None'
-        ALWAYS_ON = 'AlwaysOn'
-        CONSTANT_VALUE = ALWAYS_ON
-        CUSTOM = 'Custom'
-        OUTPUT_CHANNEL = CUSTOM
+        CONSTANT_VALUE = ALWAYS_ON = 'AlwaysOn'
+        OUTPUT_CHANNEL = CUSTOM = 'Custom'
         STEERING = 'Steering'
         STEERING_ALT = 'SteeringAlt'
         THROTTLE = 'Throttle'
@@ -212,8 +208,7 @@ class Value15(Value):
         ALUMINIUM = 'Aluminium'
         BRUSHED_ALU = 'BrushedAlu'
         CARBON = 'Carbon'
-        CHANNELLED_ALU = 'ChannelledAlu'
-        TRACTION_PLATE = CHANNELLED_ALU
+        TRACTION_PLATE = CHANNELLED_ALU = 'ChannelledAlu'
         CHROME = 'Chrome'
         CLOUDY_GLASS = 'CloudyGlass'
         COPPER = 'Copper'
@@ -225,8 +220,7 @@ class Value15(Value):
         OAK = 'Oak'
         PINE = 'Pine'
         PLASTIC = 'Plastic'
-        ROUGH_WOOD = 'RoughWood'
-        OLD_WOOD = ROUGH_WOOD
+        OLD_WOOD = ROUGH_WOOD = 'RoughWood'
         RUBBER = 'Rubber'
         RUSTED_STEEL = 'RustedSteel'
         STEEL = 'Steel'
@@ -263,66 +257,36 @@ class Value15(Value):
         ATAN_RAD = 'Atan'
 
     class Pattern(Enum):
-        DEFAULT = 'Default'
-        A1 = NONE = DEFAULT
-        ARMY = 'C_Army'
-        A2 = ARMY
-        ARMY_DIGITAL = 'C_ArmyDigital'
-        A3 = ARMY_DIGITAL
-        AUTUMN = 'C_Autumn'
-        B1 = AUTUMN
-        BERLIN_2 = 'C_Berlin_2'
-        B2 = BERLIN_2
-        BERLIN = 'C_Berlin'
-        B3 = BERLIN
-        BERLIN_DIGITAL = 'C_Berlin_Digital'
-        C1 = BERLIN_DIGITAL
-        CRISTAL_CONTRAST = 'C_CristalContrast'
-        C2 = CRISTAL_CONTRAST
-        CRISTAL_RED = 'C_Cristal_Red'
-        C3 = CRISTAL_RED
-        DARK = 'C_Dark'
-        D1 = DARK
-        DESERT_2 = 'C_Desert_2'
-        D2 = DESERT_2
-        DESERT = 'C_Desert'
-        D3 = DESERT
-        DESERT_DIGITAL = 'C_Desert_Digital'
-        E1 = DESERT_DIGITAL
-        FLECKTARN = 'C_Flecktarn'
-        E2 = FLECKTARN
-        HEAT = 'C_Heat'
-        E3 = HEAT
-        NAVY = 'C_Navy'
-        F1 = NAVY
-        SHARP = 'C_Sharp'
-        F2 = SHARP
-        SKY = 'C_Sky'
-        F3 = SKY
-        SWEDEN = 'C_Sweden'
-        G1 = SWEDEN
-        SWIRL = 'C_Swirl'
-        G2 = SWIRL
-        TIGER = 'C_Tiger'
-        G3 = TIGER
-        URBAN = 'C_Urban'
-        H1 = URBAN
-        YELLOW = 'C_Yellow'
-        H2 = YELLOW
-        BURNT = 'P_Burnt'
-        H3 = BURNT
-        FIRE = 'P_Fire'
-        I1 = FIRE
-        HEXAGON = 'P_Hexagon'
-        I2 = HEXAGON
-        SWIRL_ARABICA = 'P_SwirlArabica'
-        I3 = SWIRL_ARABICA
-        WARNING = 'P_Warning'
-        J1 = WARNING
-        WARNING_RED = 'P_Warning_Red'
-        J2 = WARNING_RED
-        YELLOW_CIRCLES = 'P_YellowCircles'
-        J3 = YELLOW_CIRCLES
+        A1 = NONE = DEFAULT = 'Default'
+        A2 = ARMY = 'C_Army'
+        A3 = ARMY_DIGITAL = 'C_ArmyDigital'
+        B1 = AUTUMN = 'C_Autumn'
+        B2 = BERLIN_2 = 'C_Berlin_2'
+        B3 = BERLIN = 'C_Berlin'
+        C1 = BERLIN_DIGITAL = 'C_Berlin_Digital'
+        C2 = CRISTAL_CONTRAST = 'C_CristalContrast'
+        C3 = CRISTAL_RED = 'C_Cristal_Red'
+        D1 = DARK = 'C_Dark'
+        D2 = DESERT_2 = 'C_Desert_2'
+        D3 = DESERT = 'C_Desert'
+        E1 = DESERT_DIGITAL = 'C_Desert_Digital'
+        E2 = FLECKTARN = 'C_Flecktarn'
+        E3 = HEAT = 'C_Heat'
+        F1 = NAVY = 'C_Navy'
+        F2 = SHARP = 'C_Sharp'
+        F3 = SKY = 'C_Sky'
+        G1 = SWEDEN = 'C_Sweden'
+        G2 = SWIRL = 'C_Swirl'
+        G3 = TIGER = 'C_Tiger'
+        H1 = URBAN = 'C_Urban'
+        H2 = YELLOW = 'C_Yellow'
+        H3 = BURNT = 'P_Burnt'
+        I1 = FIRE = 'P_Fire'
+        I2 = HEXAGON = 'P_Hexagon'
+        I3 = SWIRL_ARABICA = 'P_SwirlArabica'
+        J1 = WARNING = 'P_Warning'
+        J2 = WARNING_RED = 'P_Warning_Red'
+        J3 = YELLOW_CIRCLES = 'P_YellowCircles'
 
     class SensorType(Enum):
         SPEED = 'Speed'
@@ -340,6 +304,12 @@ class Value15(Value):
         YAW = 'Yaw'
         ROLL = 'Roll'
         NUMBER_OF_HEAT_SEEKERS = 'NumSeekingProjectiles'
+        DISTANCE_OF_HEAT_SEEKER = 'SeekingProjectileDistance'
+        DELTA_TIME = 'DeltaTime'
+        FRAMERATE = 'Framerate'
+        TIME_OF_DAY = 'TimeOfDay'
+        WIND_SPEED = 'WindSpeed'
+        WIND_DIRECTION = 'WindDirection'
 
     class SirenType(Enum):
         CAR = 'Car'
