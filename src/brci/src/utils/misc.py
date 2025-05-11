@@ -77,6 +77,26 @@ class FM:
     CLEAR_REVERSE: Final[str] = '\033[27m'
     CLEAR_STRIKETHROUGH: Final[str] = '\033[29m'
 
+
+    @staticmethod
+    def rgb(r: int, g: int, b: int) -> str:
+
+        """
+        Will output the ansi escape code for RGB text.
+
+        Arguments:
+            r (int): red (0-255)
+            g (int): green (0-255)
+            b (int): blue (0-255)
+
+        Returns:
+            str: ANSI escape code
+        """
+
+        # "this is an insult to human intelligence" - Kira
+
+        return f'\033[38;2;{r};{g};{b}m'
+
     # Function that outputs an error message
     @staticmethod
     def error(message: str, details: Optional[str] = None, force_print: bool = False) -> bool:

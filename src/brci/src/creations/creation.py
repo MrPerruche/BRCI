@@ -75,16 +75,19 @@ class Creation(ABC):
 
 
 
-    def get_full_path(self) -> str:
+    def get_full_path(self, name: Optional[str] = None) -> str:
 
         """
         Will return the path where all files will be written
+
+        Arguments:
+            name (Optional[str], optional): Pretend the name of this project is different.
 
         Returns:
             str: Path
         """
 
-        return self.get_full_path_of(self.project_dir, self.project_name)
+        return self.get_full_path_of(self.project_dir, self.project_name if name is None else name)
 
 
 
@@ -400,7 +403,7 @@ def register_creation(version: int, creation: Type[Creation]) -> None:
     creation_classes[version] = creation
 
 
-def get_creation(version: int) -> Type[Creation] | None:
+def get_creation(version: int) -> Type | None:
     result = creation_classes.get(version)  # To get None
     if result is None:
         raise NotImplementedError(f"Creation version {version} is not supported")
@@ -422,7 +425,7 @@ def get_file_version(path: str) -> int:
         return int(f.read()[0])
 
 
-def get_creation_of(path: str) -> Type[Creation]:
+def get_creation_of(path: str) -> Type:
 
     """
     Will return the creation class of a Brick Rigs file.
@@ -431,7 +434,7 @@ def get_creation_of(path: str) -> Type[Creation]:
         path (str): Path to the creation file.
 
     Returns:
-        Type[Creation]: Creation class
+        Type: Sub-class of ModernCreation or LegacyCreation
 
     Exceptions:
         NotImplementedError: If the file version is not supported
@@ -442,3 +445,54 @@ def get_creation_of(path: str) -> Type[Creation]:
         raise NotImplementedError(f"Creation version {get_file_version(path)} is not supported")
 
     return result
+
+
+def new_creation_from(project_name: str, project_dir: str, version_filter: Optional[Callable[[int], bool]] = None) -> Any:
+
+    """
+    Will create a new creation object of a file of an unknown version
+
+    Arguments:
+        project_name (str): Name of the project
+        project_dir (str): Directory of the project
+        version_filter (Optional[Callable[[int], bool]], optional): Function to filter the versions. Defaults to None. Raises error if returns false
+
+    Returns:
+        Any: Instance of a subclass of LegacyCreation or ModernCreation
+
+    Exceptions:
+        * Any exceptions that may arise from get_creation(...)
+        NotImplementedError: If the file version is not supported
+    """
+
+    file_version = get_file_version(Creation.get_full_path_of(project_dir, project_name))
+
+    if version_filter is not None and not version_filter(file_version):
+        raise NotImplementedError(f"Creation version {file_version} is not supported")
+
+    return get_creation(file_version)(project_name, project_dir)
+
+
+def load_new_creation_from(project_name: str, project_dir: str, version_filter: Optional[Callable[[int], bool]] = None) -> Any:
+
+    """
+    Just like new_creation_from(...), it will create a new creation object of a file of an unknown version.
+    .read_creation() will be called before returning the object.
+
+    Arguments:
+        project_name (str): Name of the project
+        project_dir (str): Directory of the project
+        version_filter (Optional[Callable[[int], bool]], optional): Function to filter the versions. Defaults to None. Raises error if returns false
+
+    Returns:
+        Any: Loaded instance of a subclass of LegacyCreation or ModernCreation
+
+    Exceptions:
+        * Any exceptions that may arise from get_creation(...)
+        * Any exceptions that may arise from .read_creation()
+        NotImplementedError: If the file version is not supported
+    """
+
+    creation = new_creation_from(project_name, project_dir, version_filter)
+    creation.read_creation()
+    return creation
